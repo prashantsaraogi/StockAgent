@@ -28,7 +28,11 @@ const nextConfig: NextConfig = {
     '/home': repoRuntimeTrace,
     '/portfolio': repoRuntimeTrace,
     '/api/chat': repoRuntimeTrace,
+    '/api/holdings/search': repoRuntimeTrace,
+    '/api/stock-calculator': repoRuntimeTrace,
+    '/api/stock-calculator/full': repoRuntimeTrace,
     '/api/**/*': repoRuntimeTrace,
+    '/stock-calculator': repoRuntimeTrace,
   },
   experimental: {
     serverActions: {

@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { getUserPaths, assertSafeTenantId } from './tenant';
+import { writeTenantIndexFile, writeTenantMarkdownFile } from './tenant-disk-persist';
 import {
   groupByYearMonthDate,
   type DateYearGroup,
@@ -165,9 +166,7 @@ async function readIndex(tenantId: string): Promise<CalculatorIndexFile> {
 }
 
 async function writeIndex(tenantId: string, data: CalculatorIndexFile): Promise<void> {
-  const dir = calculatorDir(tenantId);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(indexPath(tenantId), JSON.stringify(data, null, 2), 'utf8');
+  await writeTenantIndexFile(indexPath(tenantId), data);
 }
 
 function rowToRecord(row: CalculatorHistoryRow): CalculatorRecord {
@@ -269,10 +268,9 @@ async function persistRecordToDisk(tenantId: string, record: CalculatorRecord): 
     index.entries.unshift(record);
   }
   await writeIndex(tenantId, index);
-  await fs.writeFile(
+  await writeTenantMarkdownFile(
     path.join(calculatorDir(tenantId), `${record.id}.md`),
-    record.report,
-    'utf8'
+    record.report
   );
 }
 

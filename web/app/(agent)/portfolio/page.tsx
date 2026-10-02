@@ -2,15 +2,15 @@ import Link from 'next/link';
 import { HoldingForm } from '@/components/HoldingForm';
 import { HoldingsLotsTable } from '@/components/HoldingsLotsTable';
 import { PortfolioDividendRankPanel } from '@/components/PortfolioDividendRankPanel';
-import { requireSession } from '@/lib/auth';
+import { requireSession, portfolioLotContext } from '@/lib/auth';
 import { listLotsWithMetrics, aggregateRows } from '@/lib/holding-lots';
 import { getPortfolioDividendRank } from '@/lib/portfolio-dividend-rank';
 
 export default async function PortfolioPage() {
   const session = await requireSession();
   const [lots, dividendRank] = await Promise.all([
-    listLotsWithMetrics(session.tenantId),
-    getPortfolioDividendRank(session.tenantId),
+    listLotsWithMetrics(session.tenantId, portfolioLotContext(session)),
+    getPortfolioDividendRank(session.tenantId, portfolioLotContext(session)),
   ]);
   const summary = aggregateRows(lots);
 

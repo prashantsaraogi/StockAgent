@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { getUserPaths, assertSafeTenantId } from './tenant';
+import { writeTenantIndexFile, writeTenantMarkdownFile } from './tenant-disk-persist';
 import { groupByYearMonthDate, type DateYearGroup } from './date-history-group';
 import { createClientIfConfigured } from './supabase/server';
 import {
@@ -68,9 +69,7 @@ async function readIndex(tenantId: string): Promise<RiskDecisionIndexFile> {
 }
 
 async function writeIndex(tenantId: string, data: RiskDecisionIndexFile): Promise<void> {
-  const dir = riskDecisionDir(tenantId);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(indexPath(tenantId), JSON.stringify(data, null, 2), 'utf8');
+  await writeTenantIndexFile(indexPath(tenantId), data);
 }
 
 export function formatRiskDecisionReport(analysis: RiskDecisionResult): string {
@@ -154,7 +153,10 @@ async function persistRecordToDisk(tenantId: string, record: RiskDecisionRecord)
   if (existing >= 0) index.entries[existing] = record;
   else index.entries.unshift(record);
   await writeIndex(tenantId, index);
-  await fs.writeFile(path.join(riskDecisionDir(tenantId), `${record.id}.md`), record.report, 'utf8');
+  await writeTenantMarkdownFile(
+    path.join(riskDecisionDir(tenantId), `${record.id}.md`),
+    record.report
+  );
 }
 
 async function fetchAllFromSupabase(userId: string): Promise<RiskDecisionRecord[]> {

@@ -9,6 +9,12 @@ import { getStockbookByTicker } from './stockbook-index';
 import { getCmpMetaMap } from './cmp';
 import type { CmpSource } from './cmp-labels';
 import { calcLotCagr } from './holding-cagr';
+import { readLotsFromSupabase, writeLotsToSupabase } from './portfolio-lots-supabase';
+
+/** Pass `userId` on Vercel so Supabase-backed lots load/save (tenantId must equal auth user id). */
+export interface LotPersistenceContext {
+  userId?: string;
+}
 
 export interface HoldingLot {
   id: string;
@@ -42,7 +48,30 @@ function lotsPath(tenantId: string): string {
   return path.join(getUserPaths(tenantId).portfolioDir, 'lots.json');
 }
 
-async function readLotsFile(tenantId: string): Promise<LotsFile> {
+const SUPABASE_USER_ID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function useSupabaseLots(tenantId: string, ctx?: LotPersistenceContext): boolean {
+  const userId = ctx?.userId;
+  return (
+    isServerlessReadOnlyFs() &&
+    Boolean(userId && SUPABASE_USER_ID.test(userId)) &&
+    tenantId === userId
+  );
+}
+
+const HOSTED_SAVE_HELP =
+  'On Vercel, portfolio saves need Supabase magic-link login and migration 010_portfolio_lots.sql. Cookie-only dev login cannot write to disk — use local npm run dev for full portfolio edits.';
+
+async function readLotsFile(tenantId: string, ctx?: LotPersistenceContext): Promise<LotsFile> {
+  if (useSupabaseLots(tenantId, ctx)) {
+    const fromDb = await readLotsFromSupabase(ctx!.userId!);
+    if (fromDb?.version === 1 && Array.isArray(fromDb.lots)) {
+      return fromDb as LotsFile;
+    }
+    return { version: 1, lots: [] };
+  }
+
   const file = lotsPath(tenantId);
   try {
     const raw = await fs.readFile(file, 'utf8');
@@ -54,9 +83,18 @@ async function readLotsFile(tenantId: string): Promise<LotsFile> {
   return { version: 1, lots: [] };
 }
 
-async function writeLotsFile(tenantId: string, data: LotsFile): Promise<void> {
+async function writeLotsFile(
+  tenantId: string,
+  data: LotsFile,
+  ctx?: LotPersistenceContext
+): Promise<void> {
+  if (useSupabaseLots(tenantId, ctx)) {
+    await writeLotsToSupabase(ctx!.userId!, tenantId, data);
+    return;
+  }
+
   if (isServerlessReadOnlyFs()) {
-    throw new Error('Saving portfolio lots is not supported on read-only hosting (use local dev).');
+    throw new Error(HOSTED_SAVE_HELP);
   }
   const file = lotsPath(tenantId);
   const ok = await safeMkdir(path.dirname(file));
@@ -81,9 +119,12 @@ function validateLotFields(input: {
 }
 
 /** Import existing holdings.md rows into lots.json when lots file is empty. */
-export async function ensureLotsInitialized(tenantId: string): Promise<HoldingLot[]> {
+export async function ensureLotsInitialized(
+  tenantId: string,
+  ctx?: LotPersistenceContext
+): Promise<HoldingLot[]> {
   assertSafeTenantId(tenantId);
-  const data = await readLotsFile(tenantId);
+  const data = await readLotsFile(tenantId, ctx);
   if (data.lots.length > 0) return data.lots;
 
   const rows = await parseHoldingsTable(tenantId);
@@ -102,9 +143,9 @@ export async function ensureLotsInitialized(tenantId: string): Promise<HoldingLo
     legacy: true,
   }));
 
-  if (!isServerlessReadOnlyFs()) {
+  if (!useSupabaseLots(tenantId, ctx) && !isServerlessReadOnlyFs()) {
     try {
-      await writeLotsFile(tenantId, { version: 1, lots: imported });
+      await writeLotsFile(tenantId, { version: 1, lots: imported }, ctx);
       await syncHoldingsMarkdown(tenantId, imported);
     } catch {
       /* read-only host — serve imported lots for this request only */
@@ -113,8 +154,11 @@ export async function ensureLotsInitialized(tenantId: string): Promise<HoldingLo
   return imported;
 }
 
-export async function listHoldingLots(tenantId: string): Promise<HoldingLot[]> {
-  const lots = await ensureLotsInitialized(tenantId);
+export async function listHoldingLots(
+  tenantId: string,
+  ctx?: LotPersistenceContext
+): Promise<HoldingLot[]> {
+  const lots = await ensureLotsInitialized(tenantId, ctx);
   return lots.sort(
     (a, b) =>
       a.ticker.localeCompare(b.ticker) ||
@@ -123,8 +167,11 @@ export async function listHoldingLots(tenantId: string): Promise<HoldingLot[]> {
   );
 }
 
-export async function listLotsWithMetrics(tenantId: string): Promise<LotWithMetrics[]> {
-  const lots = await listHoldingLots(tenantId);
+export async function listLotsWithMetrics(
+  tenantId: string,
+  ctx?: LotPersistenceContext
+): Promise<LotWithMetrics[]> {
+  const lots = await listHoldingLots(tenantId, ctx);
   const cmpMeta = await getCmpMetaMap(lots.map((l) => l.ticker));
 
   return lots.map((lot) => {
@@ -252,14 +299,19 @@ export interface UpdateLotInput {
   purchaseDate: string;
 }
 
-async function persistLots(tenantId: string, lots: HoldingLot[]) {
-  await writeLotsFile(tenantId, { version: 1, lots });
+async function persistLots(
+  tenantId: string,
+  lots: HoldingLot[],
+  ctx?: LotPersistenceContext
+) {
+  await writeLotsFile(tenantId, { version: 1, lots }, ctx);
   await syncHoldingsMarkdown(tenantId, lots);
 }
 
 export async function addHoldingLot(
   tenantId: string,
-  input: AddLotInput
+  input: AddLotInput,
+  ctx?: LotPersistenceContext
 ): Promise<{ lot: HoldingLot; rows: HoldingRow[]; lots: HoldingLot[] }> {
   assertSafeTenantId(tenantId);
 
@@ -288,10 +340,10 @@ export async function addHoldingLot(
     legacy: false,
   };
 
-  await ensureLotsInitialized(tenantId);
-  const data = await readLotsFile(tenantId);
+  await ensureLotsInitialized(tenantId, ctx);
+  const data = await readLotsFile(tenantId, ctx);
   data.lots.push(lot);
-  await persistLots(tenantId, data.lots);
+  await persistLots(tenantId, data.lots, ctx);
 
   return { lot, rows: aggregateRows(data.lots), lots: data.lots };
 }
@@ -299,13 +351,14 @@ export async function addHoldingLot(
 export async function updateHoldingLot(
   tenantId: string,
   lotId: string,
-  input: UpdateLotInput
+  input: UpdateLotInput,
+  ctx?: LotPersistenceContext
 ): Promise<{ lot: HoldingLot; rows: HoldingRow[]; lots: HoldingLot[] }> {
   assertSafeTenantId(tenantId);
   validateLotFields(input);
 
-  await ensureLotsInitialized(tenantId);
-  const data = await readLotsFile(tenantId);
+  await ensureLotsInitialized(tenantId, ctx);
+  const data = await readLotsFile(tenantId, ctx);
   const idx = data.lots.findIndex((l) => l.id === lotId);
   if (idx < 0) throw new Error('Lot not found');
 
@@ -337,30 +390,32 @@ export async function updateHoldingLot(
   };
 
   data.lots[idx] = updated;
-  await persistLots(tenantId, data.lots);
+  await persistLots(tenantId, data.lots, ctx);
 
   return { lot: updated, rows: aggregateRows(data.lots), lots: data.lots };
 }
 
 export async function deleteHoldingLot(
   tenantId: string,
-  lotId: string
+  lotId: string,
+  ctx?: LotPersistenceContext
 ): Promise<{ rows: HoldingRow[]; lots: HoldingLot[] }> {
   assertSafeTenantId(tenantId);
 
-  await ensureLotsInitialized(tenantId);
-  const data = await readLotsFile(tenantId);
+  await ensureLotsInitialized(tenantId, ctx);
+  const data = await readLotsFile(tenantId, ctx);
   const next = data.lots.filter((l) => l.id !== lotId);
   if (next.length === data.lots.length) throw new Error('Lot not found');
 
-  await persistLots(tenantId, next);
+  await persistLots(tenantId, next, ctx);
   return { rows: aggregateRows(next), lots: next };
 }
 
 export async function getHoldingLot(
   tenantId: string,
-  lotId: string
+  lotId: string,
+  ctx?: LotPersistenceContext
 ): Promise<HoldingLot | null> {
-  const lots = await listHoldingLots(tenantId);
+  const lots = await listHoldingLots(tenantId, ctx);
   return lots.find((l) => l.id === lotId) ?? null;
 }

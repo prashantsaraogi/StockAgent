@@ -1,4 +1,4 @@
-import { listLotsWithMetrics, aggregateRows } from './holding-lots';
+import { listLotsWithMetrics, aggregateRows, type LotPersistenceContext } from './holding-lots';
 import { getStockbookByTicker } from './stockbook-index';
 import { toSlug } from './navigation';
 import { weightedAverage } from './format-gain';
@@ -88,9 +88,12 @@ function lotGainPct(lot: { price: number; cmp: number | null }): number | null {
 }
 
 /** Full dashboard: gains, overall CAGR, sector charts, per-stock detail with lots. */
-export async function getPortfolioDashboard(tenantId: string): Promise<PortfolioDashboard> {
+export async function getPortfolioDashboard(
+  tenantId: string,
+  lotCtx?: LotPersistenceContext
+): Promise<PortfolioDashboard> {
   assertSafeTenantId(tenantId);
-  const lots = await listLotsWithMetrics(tenantId);
+  const lots = await listLotsWithMetrics(tenantId, lotCtx);
   const summary = aggregateRows(lots);
 
   if (lots.length === 0) {

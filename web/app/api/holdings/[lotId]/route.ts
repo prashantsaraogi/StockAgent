@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getSession, portfolioLotContext } from '@/lib/auth';
 import {
   updateHoldingLot,
   deleteHoldingLot,
@@ -17,7 +17,8 @@ export async function GET(_request: Request, { params }: RouteParams) {
   }
 
   const { lotId } = await params;
-  const lot = await getHoldingLot(session.tenantId, lotId);
+  const lotCtx = portfolioLotContext(session);
+  const lot = await getHoldingLot(session.tenantId, lotId, lotCtx);
   if (!lot) {
     return NextResponse.json({ ok: false, error: 'Lot not found' }, { status: 404 });
   }
@@ -34,12 +35,17 @@ export async function PUT(request: Request, { params }: RouteParams) {
   try {
     const { lotId } = await params;
     const body = await request.json();
-    const result = await updateHoldingLot(session.tenantId, lotId, {
-      stockName: body.stockName ? String(body.stockName) : undefined,
-      qty: Number(body.qty),
-      price: Number(body.price),
-      purchaseDate: String(body.purchaseDate ?? ''),
-    });
+    const result = await updateHoldingLot(
+      session.tenantId,
+      lotId,
+      {
+        stockName: body.stockName ? String(body.stockName) : undefined,
+        qty: Number(body.qty),
+        price: Number(body.price),
+        purchaseDate: String(body.purchaseDate ?? ''),
+      },
+      portfolioLotContext(session)
+    );
 
     return NextResponse.json({
       ok: true,
@@ -61,7 +67,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
   try {
     const { lotId } = await params;
-    const result = await deleteHoldingLot(session.tenantId, lotId);
+    const result = await deleteHoldingLot(session.tenantId, lotId, portfolioLotContext(session));
     return NextResponse.json({
       ok: true,
       summary: result.rows,

@@ -16,6 +16,11 @@ export interface AppSession {
   authMode: AuthMode;
 }
 
+/** For portfolio lots on Vercel (Supabase-backed when tenant is auth user uuid). */
+export function portfolioLotContext(session: AppSession): { userId?: string } {
+  return session.authMode === 'supabase' ? { userId: session.userId } : {};
+}
+
 export function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }

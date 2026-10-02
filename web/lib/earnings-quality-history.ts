@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { getUserPaths, assertSafeTenantId } from './tenant';
+import { writeTenantIndexFile, writeTenantMarkdownFile } from './tenant-disk-persist';
 import { groupByYearMonthDate, type DateYearGroup } from './date-history-group';
 import { createClientIfConfigured } from './supabase/server';
 import {
@@ -66,9 +67,7 @@ async function readIndex(tenantId: string): Promise<EarningsQualityIndexFile> {
 }
 
 async function writeIndex(tenantId: string, data: EarningsQualityIndexFile): Promise<void> {
-  const dir = earningsQualityDir(tenantId);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(indexPath(tenantId), JSON.stringify(data, null, 2), 'utf8');
+  await writeTenantIndexFile(indexPath(tenantId), data);
 }
 
 export function formatEarningsQualityReport(analysis: EarningsQualityResult): string {
@@ -220,10 +219,9 @@ async function persistRecordToDisk(tenantId: string, record: EarningsQualityReco
     index.entries.unshift(record);
   }
   await writeIndex(tenantId, index);
-  await fs.writeFile(
+  await writeTenantMarkdownFile(
     path.join(earningsQualityDir(tenantId), `${record.id}.md`),
-    record.report,
-    'utf8'
+    record.report
   );
 }
 

@@ -1,11 +1,14 @@
 import Link from 'next/link';
 import { PortfolioDashboardCharts } from '@/components/PortfolioDashboard';
 import { getPortfolioDashboard } from '@/lib/portfolio-dashboard';
-import { requireSession } from '@/lib/auth';
+import { requireSession, portfolioLotContext } from '@/lib/auth';
 
 export default async function HomePage() {
   const session = await requireSession();
-  const dashboard = await getPortfolioDashboard(session.tenantId);
+  const dashboard = await getPortfolioDashboard(
+    session.tenantId,
+    portfolioLotContext(session)
+  );
 
   return (
     <div className="page">

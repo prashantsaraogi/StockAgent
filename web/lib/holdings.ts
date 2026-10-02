@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { getRepoRoot } from './framework-paths';
 import { getUserPaths, assertSafeTenantId } from './tenant';
+import { isServerlessReadOnlyFs, safeWriteFile } from './serverless-fs';
 import { getStockbookByTicker } from './stockbook-index';
 import type { StockEntry } from './content';
 import { toSlug } from './navigation';
@@ -104,8 +105,11 @@ export async function importCursorHoldings(tenantId: string): Promise<string> {
 
 ${content.replace(/^# Portfolio Holdings[^\n]*\n\n/m, '')}`;
 
-  await fs.mkdir(path.dirname(dest), { recursive: true });
-  await fs.writeFile(dest, content, 'utf8');
+  if (isServerlessReadOnlyFs()) {
+    throw new Error('Importing holdings is not supported on read-only hosting (use local dev).');
+  }
+  const ok = await safeWriteFile(dest, content);
+  if (!ok) throw new Error('Could not write holdings file.');
   return dest;
 }
 

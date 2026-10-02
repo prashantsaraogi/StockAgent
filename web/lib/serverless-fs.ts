@@ -2,6 +2,8 @@
 export function isServerlessReadOnlyFs(): boolean {
   return (
     process.env.VERCEL === '1' ||
+    process.env.VERCEL === 'true' ||
+    Boolean(process.env.VERCEL_ENV) ||
     Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME) ||
     process.env.NEXT_PUBLIC_READONLY_TENANT_FS === 'true'
   );

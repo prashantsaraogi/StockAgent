@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getSession, portfolioLotContext } from '@/lib/auth';
 import { addHoldingLot, listLotsWithMetrics } from '@/lib/holding-lots';
 import { parseHoldingsTable } from '@/lib/holdings';
 
@@ -9,8 +9,9 @@ export async function GET() {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   }
 
+  const lotCtx = portfolioLotContext(session);
   const [lots, rows] = await Promise.all([
-    listLotsWithMetrics(session.tenantId),
+    listLotsWithMetrics(session.tenantId, lotCtx),
     parseHoldingsTable(session.tenantId),
   ]);
 
@@ -25,12 +26,16 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const result = await addHoldingLot(session.tenantId, {
-      stockName: String(body.stockName ?? ''),
-      qty: Number(body.qty),
-      price: Number(body.price),
-      purchaseDate: String(body.purchaseDate ?? ''),
-    });
+    const result = await addHoldingLot(
+      session.tenantId,
+      {
+        stockName: String(body.stockName ?? ''),
+        qty: Number(body.qty),
+        price: Number(body.price),
+        purchaseDate: String(body.purchaseDate ?? ''),
+      },
+      portfolioLotContext(session)
+    );
 
     return NextResponse.json({
       ok: true,

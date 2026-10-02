@@ -5,6 +5,7 @@ import {
   getDevUserPaths,
   getRepoRoot,
 } from './framework-paths';
+import { isServerlessReadOnlyFs, safeWriteFile } from './serverless-fs';
 
 export class UnsafeWritePathError extends Error {
   constructor(message: string) {
@@ -54,8 +55,13 @@ export async function writeDevStockbookFile(
   const { stockbookDir } = getDevUserPaths(tenantId);
   const fullPath = path.resolve(stockbookDir, relativePath);
   assertSafeWritePath(fullPath, tenantId);
-  await fs.mkdir(path.dirname(fullPath), { recursive: true });
-  await fs.writeFile(fullPath, content, 'utf8');
+  if (isServerlessReadOnlyFs()) {
+    throw new UnsafeWritePathError('StockBook tenant writes are not supported on read-only hosting.');
+  }
+  const ok = await safeWriteFile(fullPath, content);
+  if (!ok) {
+    throw new UnsafeWritePathError('Could not write tenant file on this host.');
+  }
   return fullPath;
 }
 

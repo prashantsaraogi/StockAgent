@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { getRepoRoot } from './framework-paths';
-import { aggregateRows, listLotsWithMetrics } from './holding-lots';
+import { aggregateRows, listLotsWithMetrics, type LotPersistenceContext } from './holding-lots';
 import { assertSafeTenantId } from './tenant';
 
 export interface DividendRegistryEntry {
@@ -108,11 +108,14 @@ function cmpByTicker(lots: Awaited<ReturnType<typeof listLotsWithMetrics>>): Map
   return map;
 }
 
-export async function getPortfolioDividendRank(tenantId: string): Promise<PortfolioDividendRank> {
+export async function getPortfolioDividendRank(
+  tenantId: string,
+  lotCtx?: LotPersistenceContext
+): Promise<PortfolioDividendRank> {
   assertSafeTenantId(tenantId);
   const [registry, lots] = await Promise.all([
     loadDividendRegistry(),
-    listLotsWithMetrics(tenantId),
+    listLotsWithMetrics(tenantId, lotCtx),
   ]);
   const holdings = aggregateRows(lots);
   const cmpMap = cmpByTicker(lots);

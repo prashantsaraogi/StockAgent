@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { getUserPaths, assertSafeTenantId } from './tenant';
+import { writeTenantIndexFile, writeTenantMarkdownFile } from './tenant-disk-persist';
 import { groupByYearMonthDate, type DateYearGroup } from './date-history-group';
 import { createClientIfConfigured } from './supabase/server';
 import {
@@ -76,9 +77,7 @@ async function readIndex(tenantId: string): Promise<PeEvaluationIndexFile> {
 }
 
 async function writeIndex(tenantId: string, data: PeEvaluationIndexFile): Promise<void> {
-  const dir = peEvaluationDir(tenantId);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(indexPath(tenantId), JSON.stringify(data, null, 2), 'utf8');
+  await writeTenantIndexFile(indexPath(tenantId), data);
 }
 
 function fmtPe(n: number | null): string {
@@ -185,10 +184,9 @@ async function persistRecordToDisk(tenantId: string, record: PeEvaluationRecord)
     index.entries.unshift(record);
   }
   await writeIndex(tenantId, index);
-  await fs.writeFile(
+  await writeTenantMarkdownFile(
     path.join(peEvaluationDir(tenantId), `${record.id}.md`),
-    record.report,
-    'utf8'
+    record.report
   );
 }
 

@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { getUserPaths, assertSafeTenantId } from './tenant';
+import { writeTenantIndexFile, writeTenantMarkdownFile } from './tenant-disk-persist';
 import { groupByYearMonthDate, type DateYearGroup } from './date-history-group';
 import { createClientIfConfigured } from './supabase/server';
 import {
@@ -85,9 +86,7 @@ async function readIndex(tenantId: string): Promise<FullIndexFile> {
 }
 
 async function writeIndex(tenantId: string, data: FullIndexFile): Promise<void> {
-  const dir = fullDir(tenantId);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(indexPath(tenantId), JSON.stringify(data, null, 2), 'utf8');
+  await writeTenantIndexFile(indexPath(tenantId), data);
 }
 
 export function formatFullAnalysisReport(analysis: StockCalculatorFullResult): string {
@@ -195,7 +194,10 @@ export async function saveFullAnalysisRecord(
   const index = await readIndex(input.tenantId);
   index.entries.unshift(record);
   await writeIndex(input.tenantId, index);
-  await fs.writeFile(path.join(fullDir(input.tenantId), `${record.id}.md`), record.report, 'utf8');
+  await writeTenantMarkdownFile(
+    path.join(fullDir(input.tenantId), `${record.id}.md`),
+    record.report
+  );
 
   if (input.authMode === 'supabase') {
     const supabase = await createClientIfConfigured();
@@ -247,7 +249,10 @@ async function persistRecordToDisk(tenantId: string, record: StockCalculatorFull
   if (i >= 0) index.entries[i] = record;
   else index.entries.unshift(record);
   await writeIndex(tenantId, index);
-  await fs.writeFile(path.join(fullDir(tenantId), `${record.id}.md`), record.report, 'utf8');
+  await writeTenantMarkdownFile(
+    path.join(fullDir(tenantId), `${record.id}.md`),
+    record.report
+  );
 }
 
 async function fetchOneFromSupabase(
