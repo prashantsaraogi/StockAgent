@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { verifyAllPaths } from '@/lib/verify-paths';
 import { getDevUserPaths, getSharedFrameworkPaths } from '@/lib/framework-paths';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
+import { isServerlessReadOnlyFs } from '@/lib/serverless-fs';
 
 export async function GET() {
   const verification = await verifyAllPaths();
@@ -14,8 +15,14 @@ export async function GET() {
     mode: 'parallel-development',
     auth: {
       supabaseConfigured: supabaseReady,
-      loginMode: supabaseReady ? 'supabase-magic-link' : 'cookie-dev',
+      forceDevAuth: process.env.FORCE_DEV_AUTH === 'true',
+      loginMode: supabaseReady ? 'supabase-poc-or-magic-link' : 'cookie-dev',
       callbackUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/auth/callback`,
+    },
+    hosting: {
+      serverlessReadOnlyFs: isServerlessReadOnlyFs(),
+      portfolioSaveOnVercel:
+        'Supabase login (uuid tenant) + migration 010_portfolio_lots.sql — not cookie-dev',
     },
     cursor: {
       note: 'Root StockBook/ and .cursor/portfolio/ are read-only for web',

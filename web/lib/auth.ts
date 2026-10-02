@@ -16,9 +16,16 @@ export interface AppSession {
   authMode: AuthMode;
 }
 
-/** For portfolio lots on Vercel (Supabase-backed when tenant is auth user uuid). */
+const SUPABASE_TENANT_ID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Vercel: persist lots in Supabase when tenant folder is a real auth user uuid (not `dev`). */
 export function portfolioLotContext(session: AppSession): { userId?: string } {
-  return session.authMode === 'supabase' ? { userId: session.userId } : {};
+  const id = session.tenantId;
+  if (SUPABASE_TENANT_ID.test(id) && id === session.userId) {
+    return { userId: id };
+  }
+  return {};
 }
 
 export function isValidEmail(email: string): boolean {
