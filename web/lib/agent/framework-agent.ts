@@ -109,8 +109,8 @@ async function writeAgentInbox(
   query: string,
   answer: string
 ): Promise<void> {
+  const { safeWriteFile } = await import('@/lib/serverless-fs');
   const dir = path.join(getUserPaths(tenantId).portfolioDir, '../agent-inbox');
-  await fs.mkdir(dir, { recursive: true });
   const body = `# Web Ask Agent
 
 **Updated:** ${new Date().toISOString()}
@@ -127,7 +127,7 @@ ${answer}
 ---
 *Same query context as Cursor stock agent. Open this file in Cursor to continue analysis.*
 `;
-  await fs.writeFile(path.join(dir, 'last-query.md'), body, 'utf8');
+  await safeWriteFile(path.join(dir, 'last-query.md'), body);
 }
 
 function buildSystemPrompt(ctx: {

@@ -35,12 +35,14 @@ export function assertSafeNewsWritePath(filePath: string): void {
   }
 }
 
-export async function writeNewsSummary(date: string, content: string): Promise<string> {
+/** Returns written path, or null when hosted read-only (Vercel). */
+export async function writeNewsSummary(date: string, content: string): Promise<string | null> {
+  const { isServerlessReadOnlyFs, safeWriteFile } = await import('./serverless-fs');
   const fullPath = newsSummaryPath(date);
   assertSafeNewsWritePath(fullPath);
-  await fs.mkdir(path.dirname(fullPath), { recursive: true });
-  await fs.writeFile(fullPath, content, 'utf8');
-  return fullPath;
+  if (isServerlessReadOnlyFs()) return null;
+  const ok = await safeWriteFile(fullPath, content);
+  return ok ? fullPath : null;
 }
 
 export async function readNewsSummaryFile(date: string): Promise<string | null> {

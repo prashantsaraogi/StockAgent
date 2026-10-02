@@ -16,6 +16,7 @@ import {
   type DateYearGroup,
 } from './date-history-group';
 import type { StockChatMessage } from './stock-chat-thread';
+import { isServerlessReadOnlyFs, safeWriteFile } from './serverless-fs';
 
 export interface AnalysisRecord {
   id: string;
@@ -57,9 +58,8 @@ async function readIndex(tenantId: string): Promise<AnalysisIndexFile> {
 }
 
 async function writeIndex(tenantId: string, data: AnalysisIndexFile): Promise<void> {
-  const dir = analysisDir(tenantId);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(indexPath(tenantId), JSON.stringify(data, null, 2), 'utf8');
+  if (isServerlessReadOnlyFs()) return;
+  await safeWriteFile(indexPath(tenantId), JSON.stringify(data, null, 2));
 }
 
 export function extractVerdict(answer: string): string | null {
@@ -178,9 +178,11 @@ export async function saveAnalysisRecord(input: SaveAnalysisInput): Promise<Anal
     sessionId: input.sessionId ?? null,
   };
 
-  const index = await readIndex(input.tenantId);
-  index.entries.unshift(record);
-  await writeIndex(input.tenantId, index);
+  if (!isServerlessReadOnlyFs()) {
+    const index = await readIndex(input.tenantId);
+    index.entries.unshift(record);
+    await writeIndex(input.tenantId, index);
+  }
 
   // Per-entry markdown for Cursor cross-ref
   const md = `# Analysis — ${record.stockName ?? record.ticker ?? 'General'}
@@ -198,7 +200,9 @@ ${record.query}
 
 ${record.answer}
 `;
-  await fs.writeFile(path.join(analysisDir(input.tenantId), `${record.id}.md`), md, 'utf8');
+  if (!isServerlessReadOnlyFs()) {
+    await safeWriteFile(path.join(analysisDir(input.tenantId), `${record.id}.md`), md);
+  }
 
   if (input.authMode === 'supabase') {
     const supabase = await createClientIfConfigured();

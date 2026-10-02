@@ -18,3 +18,18 @@ export async function safeMkdir(dir: string): Promise<boolean> {
     return false;
   }
 }
+
+/** Write a file (mkdir parent) on local disk only; no-op on serverless — never throws. */
+export async function safeWriteFile(filePath: string, content: string): Promise<boolean> {
+  if (isServerlessReadOnlyFs()) return false;
+  try {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const ok = await safeMkdir(path.dirname(filePath));
+    if (!ok) return false;
+    await fs.writeFile(filePath, content, 'utf8');
+    return true;
+  } catch {
+    return false;
+  }
+}

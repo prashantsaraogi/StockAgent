@@ -17,8 +17,8 @@ async function writeAgentInbox(
   query: string,
   answer: string
 ): Promise<void> {
+  const { safeWriteFile } = await import('@/lib/serverless-fs');
   const dir = path.join(getUserPaths(tenantId).portfolioDir, '../agent-inbox');
-  await fs.mkdir(dir, { recursive: true });
   const body = `# Web Ask Agent — News run
 
 **Updated:** ${new Date().toISOString()}
@@ -31,7 +31,7 @@ ${query}
 
 ${answer}
 `;
-  await fs.writeFile(path.join(dir, 'last-query.md'), body, 'utf8');
+  await safeWriteFile(path.join(dir, 'last-query.md'), body);
 }
 
 function clip(text: string, max = 8000): string {
@@ -242,6 +242,7 @@ Return ONLY the markdown file content starting with # News summary — ${targetD
 
   const writtenPath = await writeNewsSummary(targetDate, summaryMd);
   const webPath = newsWebPath(targetDate);
+  const newsSavedOnDisk = Boolean(writtenPath);
 
   const answerBody = `## Framework lens
 
@@ -249,8 +250,8 @@ Applied **News/AGENT-RULES.md** + **SEARCH-WORKFLOW.md** — daily summary write
 
 1. Parsed target date: **${targetDate}**
 2. Loaded portfolio (${holdingsLines.length} holdings) for stock-wise impact table
-3. Wrote framework \`summary.md\` to repo News archive
-4. Web News tab updated — browse Year → Month → Date
+3. ${newsSavedOnDisk ? 'Wrote framework `summary.md` to repo News archive' : '**News file not written** — read-only hosting (Vercel); content is in this answer only'}
+4. ${newsSavedOnDisk ? 'Web News tab updated — browse Year → Month → Date' : 'Use local dev or Cursor to persist News/ files'}
 
 ---
 
@@ -293,7 +294,7 @@ Open **[News → ${targetDate}](${webPath})** or the **News** tab (September ${p
     mode,
     model,
     newsDate: targetDate,
-    newsFilePath: writtenPath,
+    newsFilePath: writtenPath ?? undefined,
     newsWebPath: webPath,
   };
 }
