@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "lots": [
+    {
+      "id": "b0308ab6-a307-4ca9-9124-c6cc459875a9",
+      "ticker": "LT",
+      "company": "Larsen and Toubro",
+      "sector": "Infrastructure",
+      "qty": 10,
+      "price": 3925,
+      "purchaseDate": "2025-09-05",
+      "addedAt": "2026-09-05T16:14:36.106Z",
+      "legacy": false
+    },
+    {
+      "id": "26a90bf9-7d55-4d57-924c-f5faf7cae567",
+      "ticker": "DRREDDY",
+      "company": "Dr Reddys Laboratories",
+      "sector": "Pharma",
+      "qty": 25,
+      "price": 1325,
+      "purchaseDate": "2025-09-08",
+      "addedAt": "2026-09-05T16:52:02.347Z",
+      "legacy": false
+    }
+  ]
+}

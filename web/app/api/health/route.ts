@@ -1,0 +1,36 @@
+import { NextResponse } from 'next/server';
+import { verifyAllPaths } from '@/lib/verify-paths';
+import { getDevUserPaths, getSharedFrameworkPaths } from '@/lib/framework-paths';
+import { isSupabaseConfigured } from '@/lib/supabase/config';
+
+export async function GET() {
+  const verification = await verifyAllPaths();
+  const shared = getSharedFrameworkPaths();
+  const dev = getDevUserPaths();
+  const supabaseReady = isSupabaseConfigured();
+
+  return NextResponse.json({
+    status: verification.ok ? 'ok' : 'degraded',
+    mode: 'parallel-development',
+    auth: {
+      supabaseConfigured: supabaseReady,
+      loginMode: supabaseReady ? 'supabase-magic-link' : 'cookie-dev',
+      callbackUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/auth/callback`,
+    },
+    cursor: {
+      note: 'Root StockBook/ and .cursor/portfolio/ are read-only for web',
+      protected: ['StockBook/', '.cursor/portfolio/holdings.md'],
+    },
+    sharedFramework: {
+      repoRoot: shared.repoRoot,
+      rules: shared.stockAgentRules,
+      skills: shared.skillsDir,
+    },
+    devTenant: {
+      tenantId: dev.tenantId,
+      holdings: dev.holdingsFile,
+      stockbook: dev.stockbookDir,
+    },
+    pathChecks: verification.checks,
+  });
+}

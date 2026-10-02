@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Morning Run — Copy-Paste Prompts</title>
+<style>
+:root{--blue:#1e40af;--blue-light:#dbeafe;--green:#15803d;--gray:#64748b;--border:#e2e8f0;--bg:#f8fafc}
+*{box-sizing:border-box}
+body{font-family:Segoe UI,system-ui,sans-serif;max-width:960px;margin:0 auto;padding:1.25rem;line-height:1.55;background:var(--bg);color:#1e293b}
+.header{background:var(--blue);color:#fff;padding:1.25rem 1.5rem;border-radius:10px;margin-bottom:1.25rem}
+.header h1{margin:0 0 .35rem;font-size:1.45rem}
+.header p{margin:.25rem 0;opacity:.92;font-size:.95rem}
+.how{background:#fff;border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1.25rem}
+.how strong{color:var(--blue)}
+.tabs{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+.tab{padding:.5rem 1rem;border:2px solid var(--border);background:#fff;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;color:#334155;transition:.15s}
+.tab:hover{border-color:var(--blue);color:var(--blue)}
+.tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.panel{display:none;background:#fff;border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:1rem}
+.panel.active{display:block}
+.panel h2{margin:0 0 .25rem;font-size:1.15rem;color:var(--blue)}
+.panel .meta{color:var(--gray);font-size:.88rem;margin-bottom:1rem}
+.prompt-box{background:#0f172a;color:#e2e8f0;padding:1rem 1.25rem;border-radius:8px;font-family:Consolas,Monaco,monospace;font-size:.82rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;max-height:420px;overflow-y:auto;margin:0 0 1rem}
+.actions{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center}
+.btn{padding:.55rem 1.25rem;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;transition:.15s}
+.btn-copy{background:var(--green);color:#fff}
+.btn-copy:hover{background:#166534}
+.btn-copy.copied{background:#059669}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1e293b;color:#fff;padding:.75rem 1.25rem;border-radius:8px;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:99}
+.toast.show{opacity:1;transform:translateY(0)}
+.footer{color:var(--gray);font-size:.85rem;margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border)}
+.footer a{color:var(--blue)}
+.badge{display:inline-block;background:var(--blue-light);color:var(--blue);font-size:.75rem;font-weight:700;padding:.15rem .5rem;border-radius:4px;margin-left:.35rem}
+@media(max-width:600px){body{padding:.75rem}.prompt-box{font-size:.78rem;max-height:320px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Morning Run — Copy-Paste Prompts</h1>
+  <p>India Stock Investment Agent · Last updated 29 Aug 2026</p>
+  <p>Pick a variant → <strong>Copy</strong> → paste into Cursor chat</p>
+</div>
+
+<div class="how">
+  <strong>How to open:</strong> Double-click this file — or use <strong>auto on login</strong> (see <code>AUTOMATION.md</code>).
+  Pick a variant → <strong>Copy</strong> → paste into Cursor chat (Ctrl+V).
+  Sequence: <a href="MORNING-FRAMEWORK-SEQUENCE.md">MORNING-FRAMEWORK-SEQUENCE.md</a>
+</div>
+
+<div class="tabs" role="tablist">
+  <button class="tab active" data-tab="a">A · Early morning</button>
+  <button class="tab" data-tab="b">B · Post-close</button>
+  <button class="tab" data-tab="c">C · Weekly</button>
+  <button class="tab" data-tab="d">D · Buy today</button>
+  <button class="tab" data-tab="e">E · Numbers only</button>
+  <button class="tab" data-tab="trade">Trade update</button>
+</div>
+
+<div id="panel-a" class="panel active">
+  <h2>Variant A — Early morning daily <span class="badge">08:00–10:00 IST</span></h2>
+  <p class="meta">Full end-to-end: news partial → portfolio scripts → surplus brief</p>
+  <pre class="prompt-box" id="prompt-a">Run my India Stock Investment Agent MORNING FRAMEWORK — Variant A (early morning).
+
+Follow end-to-end: .cursor/prompts/MORNING-FRAMEWORK-SEQUENCE.md
+
+PHASE 0 — Read: holdings.md · latest News/summary.md · TICKER-INDEX.md · quadrant-map.md
+
+PHASE 1 — NEWS (mandatory):
+- News/SEARCH-WORKFLOW.md — window = today 00:01 IST to NOW (state partial)
+- Buckets A + B (+ C if overnight headlines exist)
+- Stock-wise loop: all 50 holdings from holdings.md — gap-check each vs macro pass
+- Primary four: CNBC-TV18 · Moneycontrol · ET · NDTV Profit
+- Write/update News/YYYY-MM/YYYY-MM-DD/summary.md + TICKER-INDEX.md
+- Light StockBook write-back for material holdings only
+
+PHASE 2 — PORTFOLIO NUMBERS (run scripts):
+cd d:\D-Drive\Personal\My-agent\Report
+.\_generate-all-cagr.ps1
+.\_generate-portfolio-cagr.ps1
+.\_generate-all-parameters.ps1 -SkipDetailed
+Refresh .cursor/portfolio/portfolio-parameters.md index table
+
+PHASE 3 — SURPLUS:
+- Refresh quadrant-map.md only if news/CMP shifts surplus rank
+- Flag any holding down >=15% from peak (price-decline §22 watchlist)
+
+PHASE 4 — Deliver short brief:
+1) Macro + geo one paragraph
+2) Top 5 material news for my holdings
+3) Surplus rank changes (if any)
+4) Portfolio CAGR snapshot (total return + cost-weighted CAGR)
+5) Parameters: cheap vs expensive vs 10Y (count + top 3 cheap / top 3 expensive)
+6) Any ADD/PAUSE flips from news
+7) Next run: post-close ~21:00 IST for full day news
+
+Do not suggest TRIM/SELL. Surplus deployment only. Persist all updates to files — not chat only.</pre>
+  <div class="actions"><button class="btn btn-copy" data-copy="prompt-a">Copy Variant A</button></div>
+</div>
+
+<div id="panel-b" class="panel">
+  <h2>Variant B — Post-close <span class="badge">21:00–23:00 IST</span></h2>
+  <p class="meta">Trading days — complete full-day news + Bucket C</p>
+  <pre class="prompt-box" id="prompt-b">Run my India Stock Investment Agent MORNING FRAMEWORK — Variant B (post-close pass).
+
+Follow: .cursor/prompts/MORNING-FRAMEWORK-SEQUENCE.md
+
+Focus PHASE 1 only (full calendar day):
+- News/SEARCH-WORKFLOW.md — window = today 00:01–23:59 IST (full day target)
+- Bucket C post-close — highest priority (CNG, tariffs, block deals, global spillover)
+- Stock-wise loop: all 50 holdings — complete any gap from morning partial run
+- Merge/update same day summary.md (do not create duplicate date)
+- TICKER-INDEX + affected Report summary-analysis.md
+- Refresh quadrant-map.md if sector surplus band changed
+
+Optional PHASE 2 if market moved >1%: re-run _generate-all-cagr.ps1 + _generate-portfolio-cagr.ps1
+
+Deliver: what changed since morning pass · triggers for Monday open · FII/geo read.</pre>
+  <div class="actions"><button class="btn btn-copy" data-copy="prompt-b">Copy Variant B</button></div>
+</div>
+
+<div id="panel-c" class="panel">
+  <h2>Variant C — Weekly deep <span class="badge">Saturday</span></h2>
+  <p class="meta">P/E rebuild + full quadrant refresh + week review</p>
+  <pre class="prompt-box" id="prompt-c">Run my India Stock Investment Agent MORNING FRAMEWORK — Variant C (weekly deep).
+
+Follow: .cursor/prompts/MORNING-FRAMEWORK-SEQUENCE.md — all phases 0–6.
+
+PHASE 1: Full news for last 7 days — catch missed post-close · stock-wise 50/50
+PHASE 2:
+  .\_generate-all-cagr.ps1
+  .\_generate-portfolio-cagr.ps1
+  cd ..\.cursor\portfolio
+  .\_build-pe-averaging-analysis.ps1
+  cd ..\..\Report
+  .\_generate-all-parameters.ps1 -SkipDetailed
+  Refresh portfolio-parameters.md
+
+PHASE 3: Full quadrant-map.md refresh with live CMP · sector comparative ranks if stale
+PHASE 6: List top 10 holdings needing PARAMETERS Block B/C deep-fill (like HDFCBANK)
+
+Deliver:
+- Week in review (macro + portfolio holdings)
+- Surplus deployment table for next month salary
+- Stale reports list (summary-analysis date >30 days)
+- One paragraph: what changed vs last week in framework ranks
+
+No TRIM/SELL. Long-term mandate.</pre>
+  <div class="actions"><button class="btn btn-copy" data-copy="prompt-c">Copy Variant C</button></div>
+</div>
+
+<div id="panel-d" class="panel">
+  <h2>Variant D — Buy / add today</h2>
+  <p class="meta">Replace {TICKER} before copying. Use with A or C.</p>
+  <pre class="prompt-box" id="prompt-d">BUY DECISION today — run full framework for {TICKER}.
+
+After completing latest News read (today summary + TICKER-INDEX):
+
+1. investor-wisdom/buy-decision-workflow.md — all 10 steps
+2. investor-wisdom/personal-discipline.md — pause registry
+3. stock-analysis SKILL + exclusion-guards
+4. Read StockBook/{sector}/{stock}/ — summary · faq · PARAMETERS · PCCL
+5. Quotes lens — >=3 quotes from investor-wisdom/quotes.md
+6. Verdict: STAGED STARTER OK | ACCUMULATE SIP | WAIT | PAUSE ADDS
+7. Write-back: faq.md · summary-analysis.md · suggested-approach.md · News if material
+
+Surplus rank vs quadrant-map.md. Do not suggest selling other holdings to fund this.</pre>
+  <div class="actions"><button class="btn btn-copy" data-copy="prompt-d">Copy Variant D (single stock)</button></div>
+  <pre class="prompt-box" id="prompt-d2" style="margin-top:1rem">Compare fresh surplus deployment: {TICKER1} vs {TICKER2} [vs {TICKER3}].
+
+Run buy-decision-workflow for each · comparative scorecard · state #1 rank for salary ₹ today.
+Read latest News + PARAMETERS + quadrant-map. Quotes lens on final verdict.</pre>
+  <div class="actions"><button class="btn btn-copy" data-copy="prompt-d2">Copy Variant D (compare)</button></div>
+</div>
+
+<div id="panel-e" class="panel">
+  <h2>Variant E — Quick numbers only</h2>
+  <p class="meta">When news already done today</p>
+  <pre class="prompt-box" id="prompt-e">Run PHASE 2 only — portfolio numbers refresh.
+
+.\StockBook\_generate-all-cagr.ps1
+.\StockBook\_generate-portfolio-cagr.ps1
+.\StockBook\_generate-all-parameters.ps1 -SkipDetailed
+
+Update portfolio-cagr.md summary + portfolio-parameters.md index.
+Give: total book return · cost-weighted CAGR · 3 best / 3 worst holdings by CAGR.</pre>
+  <div class="actions"><button class="btn btn-copy" data-copy="prompt-e">Copy Variant E</button></div>
+</div>
+
+<div id="panel-trade" class="panel">
+  <h2>After manual trade</h2>
+  <p class="meta">Any time — replace placeholders</p>
+  <pre class="prompt-box" id="prompt-trade">Update portfolio: bought/sold {TICKER} {QTY} @ Rs {PRICE} on {YYYY-MM-DD}.
+
+Update holdings.md · CAGR_{TICKER}.md new lot · quadrant-map if needed · StockBook write-back.</pre>
+  <div class="actions"><button class="btn btn-copy" data-copy="prompt-trade">Copy trade prompt</button></div>
+</div>
+
+<div class="footer">
+  <p><strong>Daily:</strong> Variant A (morning) + Variant B (evening on trading days)</p>
+  <p>Markdown source: <a href="MORNING-RUN-PROMPT.md">MORNING-RUN-PROMPT.md</a> ·
+  Sequence: <a href="MORNING-FRAMEWORK-SEQUENCE.md">MORNING-FRAMEWORK-SEQUENCE.md</a></p>
+</div>
+
+<div class="toast" id="toast">Copied to clipboard</div>
+
+<script>
+function activateTab(tabId) {
+  var tab = document.querySelector('.tab[data-tab="' + tabId + '"]');
+  var panel = document.getElementById('panel-' + tabId);
+  if (!tab || !panel) return;
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  tab.classList.add('active');
+  panel.classList.add('active');
+}
+document.querySelectorAll('.tab').forEach(function(tab){
+  tab.addEventListener('click',function(){ activateTab(tab.dataset.tab); });
+});
+(function(){
+  var hash = (location.hash || '').replace('#','');
+  if (hash) activateTab(hash);
+  else if (new Date().getDay() === 6) activateTab('c');
+})();
+document.querySelectorAll('.btn-copy').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var el=document.getElementById(btn.dataset.copy);
+    var text=el.textContent;
+    navigator.clipboard.writeText(text).then(function(){
+      var toast=document.getElementById('toast');
+      toast.classList.add('show');
+      btn.textContent='Copied!';
+      btn.classList.add('copied');
+      setTimeout(function(){
+        toast.classList.remove('show');
+        btn.classList.remove('copied');
+        btn.textContent=btn.textContent.replace('Copied!','Copy ')+'';
+        if(btn.dataset.copy==='prompt-a')btn.textContent='Copy Variant A';
+        else if(btn.dataset.copy==='prompt-b')btn.textContent='Copy Variant B';
+        else if(btn.dataset.copy==='prompt-c')btn.textContent='Copy Variant C';
+        else if(btn.dataset.copy==='prompt-d')btn.textContent='Copy Variant D (single stock)';
+        else if(btn.dataset.copy==='prompt-d2')btn.textContent='Copy Variant D (compare)';
+        else if(btn.dataset.copy==='prompt-e')btn.textContent='Copy Variant E';
+        else if(btn.dataset.copy==='prompt-trade')btn.textContent='Copy trade prompt';
+      },2000);
+    });
+  });
+});
+</script>
+</body>
+</html>

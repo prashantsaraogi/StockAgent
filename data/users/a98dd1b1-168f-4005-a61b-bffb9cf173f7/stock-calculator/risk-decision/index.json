@@ -1,0 +1,389 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "e9a257ec-7adb-460e-abbd-0c97a433bc79",
+      "createdAt": "2026-09-13T05:09:18.268Z",
+      "ticker": "MANIPALHOS",
+      "stockName": "Manipal Health",
+      "sector": "Healthcare",
+      "cmp": 717.35,
+      "quantitativeScore100": 58,
+      "investmentVerdict": "🟡 HOLD / WAIT",
+      "thesisStatus": "HOLD",
+      "report": "# Risk & Decision — Manipal Health (MANIPALHOS)\n\n**Score:** 58/100 · **Verdict:** 🟡 HOLD / WAIT\n**CMP:** ₹717.35\n\n## Investment Thesis\n\n- Status: HOLD\n- Valuation: Stretched\n- Business: Average\n- Earnings: Mixed\n- Risk: Low-Medium\n- Why own: Healthy balance sheet / manageable risk profile\n- Why not aggressive: Current valuation is not cheap vs history or forward fair value\n- Change mind if: Sustained EPS deterioration or material moat erosion\n- Next review: Next quarterly results\n\n## Component scores\n\n| Component | Weight | Score |\n|-----------|-------:|------:|\n| Valuation | 25% | 5.5/10 |\n| Earnings Quality | 25% | 6.5/10 |\n| Business Quality | 25% | 5/10 |\n| Growth / CAGR | 15% | 5.5/10 |\n| Risk | 10% | 7/10 |\n\n## Positives\n- Healthy balance sheet / manageable risk profile\n- Strong franchise and scale\n- Long-term sector tailwind\n\n## Concerns\n- Current valuation is not cheap vs history or forward fair value\n- Earnings quality mixed — monitor quarterly translation\n- Monitor next quarter margins\n\n## Next quarter watch\n- Revenue growth\n- Operating margin\n- EPS vs prior year\n\n---\n_Stock Calculator Tab 5 — not investment advice._",
+      "analysis": {
+        "ticker": "MANIPALHOS",
+        "stockName": "Manipal Health",
+        "sector": "Healthcare",
+        "cmp": 717.35,
+        "cmpSource": "nse-yahoo",
+        "analyzedAt": "2026-09-13T05:09:14.711Z",
+        "dataSource": "Live tab synthesis + StockBook risk registers",
+        "riskDecisionFile": null,
+        "stockbookUrl": "/stockbook/healthcare/manipal-health/summary",
+        "thesis": {
+          "status": "HOLD",
+          "score100": 58,
+          "valuationLabel": "Stretched",
+          "businessLabel": "Average",
+          "earningsLabel": "Mixed",
+          "riskLabel": "Low-Medium",
+          "whyOwn": "Healthy balance sheet / manageable risk profile",
+          "whyNotAggressive": "Current valuation is not cheap vs history or forward fair value",
+          "changeMind": "Sustained EPS deterioration or material moat erosion",
+          "nextReview": "Next quarterly results"
+        },
+        "riskFactors": [],
+        "riskBuckets": [
+          {
+            "bucket": "Business risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "Financial risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "Valuation risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "Governance risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "External risk",
+            "signal": "🟢",
+            "factorCount": 0
+          }
+        ],
+        "catalysts": [],
+        "thesisBreakers": [],
+        "components": [
+          {
+            "id": "valuation",
+            "label": "Valuation",
+            "weightPct": 25,
+            "score10": 5.5,
+            "weightedContribution": 13.750000000000002,
+            "source": "PE Evaluation / PARAMETERS"
+          },
+          {
+            "id": "earningsQuality",
+            "label": "Earnings Quality",
+            "weightPct": 25,
+            "score10": 6.5,
+            "weightedContribution": 16.25,
+            "source": "Tab 3 — earnings quality engine"
+          },
+          {
+            "id": "businessQuality",
+            "label": "Business Quality",
+            "weightPct": 25,
+            "score10": 5,
+            "weightedContribution": 12.5,
+            "source": "Tab 4 — business quality engine"
+          },
+          {
+            "id": "growth",
+            "label": "Growth / CAGR",
+            "weightPct": 15,
+            "score10": 5.5,
+            "weightedContribution": 8.25,
+            "source": "PARAMETERS forward EPS / volume"
+          },
+          {
+            "id": "risk",
+            "label": "Risk",
+            "weightPct": 10,
+            "score10": 7,
+            "weightedContribution": 7,
+            "source": "Section A + risk registers"
+          }
+        ],
+        "quantitativeScore100": 58,
+        "investmentVerdict": "🟡 HOLD / WAIT",
+        "verdictTone": "wait",
+        "verdictEmoji": "🟡",
+        "positives": [
+          "Healthy balance sheet / manageable risk profile",
+          "Strong franchise and scale",
+          "Long-term sector tailwind"
+        ],
+        "concerns": [
+          "Current valuation is not cheap vs history or forward fair value",
+          "Earnings quality mixed — monitor quarterly translation",
+          "Monitor next quarter margins"
+        ],
+        "nextQuarterWatch": [
+          "Revenue growth",
+          "Operating margin",
+          "EPS vs prior year"
+        ],
+        "narrativeSummary": "Not a screaming BUY — excellent business qualities with valuation and/or near-term earnings caveats.",
+        "notScreamingBuy": true
+      }
+    },
+    {
+      "id": "600950b5-d5b5-459c-aa2f-21bf21e4c529",
+      "createdAt": "2026-09-13T05:02:59.111Z",
+      "ticker": "NUVAMA",
+      "stockName": "Nuvama Wealth Management Limited",
+      "sector": "Asset Management",
+      "cmp": 1737.2,
+      "quantitativeScore100": 59,
+      "investmentVerdict": "🟡 HOLD / WAIT",
+      "thesisStatus": "HOLD",
+      "report": "# Risk & Decision — Nuvama Wealth Management Limited (NUVAMA)\n\n**Score:** 59/100 · **Verdict:** 🟡 HOLD / WAIT\n**CMP:** ₹1,737.2\n\n## Investment Thesis\n\n- Status: HOLD\n- Valuation: Stretched\n- Business: Average\n- Earnings: Mixed\n- Risk: Low-Medium\n- Why own: Healthy balance sheet / manageable risk profile\n- Why not aggressive: Current valuation is not cheap vs history or forward fair value\n- Change mind if: Sustained EPS deterioration or material moat erosion\n- Next review: Next quarterly results\n\n## Component scores\n\n| Component | Weight | Score |\n|-----------|-------:|------:|\n| Valuation | 25% | 5.5/10 |\n| Earnings Quality | 25% | 6.5/10 |\n| Business Quality | 25% | 5/10 |\n| Growth / CAGR | 15% | 5.5/10 |\n| Risk | 10% | 8/10 |\n\n## Positives\n- Healthy balance sheet / manageable risk profile\n- Strong franchise and scale\n- Long-term sector tailwind\n\n## Concerns\n- Current valuation is not cheap vs history or forward fair value\n- Earnings quality mixed — monitor quarterly translation\n- Monitor next quarter margins\n\n## Next quarter watch\n- Revenue growth\n- Operating margin\n- EPS vs prior year\n\n---\n_Stock Calculator Tab 5 — not investment advice._",
+      "analysis": {
+        "ticker": "NUVAMA",
+        "stockName": "Nuvama Wealth Management Limited",
+        "sector": "Asset Management",
+        "cmp": 1737.2,
+        "cmpSource": "nse-yahoo",
+        "analyzedAt": "2026-09-13T05:02:55.621Z",
+        "dataSource": "Live tab synthesis + StockBook risk registers",
+        "riskDecisionFile": null,
+        "stockbookUrl": "/stockbook/asset-management/nuvama-wealth-management-limited/summary",
+        "thesis": {
+          "status": "HOLD",
+          "score100": 59,
+          "valuationLabel": "Stretched",
+          "businessLabel": "Average",
+          "earningsLabel": "Mixed",
+          "riskLabel": "Low-Medium",
+          "whyOwn": "Healthy balance sheet / manageable risk profile",
+          "whyNotAggressive": "Current valuation is not cheap vs history or forward fair value",
+          "changeMind": "Sustained EPS deterioration or material moat erosion",
+          "nextReview": "Next quarterly results"
+        },
+        "riskFactors": [],
+        "riskBuckets": [
+          {
+            "bucket": "Business risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "Financial risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "Valuation risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "Governance risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "External risk",
+            "signal": "🟢",
+            "factorCount": 0
+          }
+        ],
+        "catalysts": [],
+        "thesisBreakers": [],
+        "components": [
+          {
+            "id": "valuation",
+            "label": "Valuation",
+            "weightPct": 25,
+            "score10": 5.5,
+            "weightedContribution": 13.750000000000002,
+            "source": "PE Evaluation / PARAMETERS"
+          },
+          {
+            "id": "earningsQuality",
+            "label": "Earnings Quality",
+            "weightPct": 25,
+            "score10": 6.5,
+            "weightedContribution": 16.25,
+            "source": "Tab 3 — earnings quality engine"
+          },
+          {
+            "id": "businessQuality",
+            "label": "Business Quality",
+            "weightPct": 25,
+            "score10": 5,
+            "weightedContribution": 12.5,
+            "source": "Tab 4 — business quality engine"
+          },
+          {
+            "id": "growth",
+            "label": "Growth / CAGR",
+            "weightPct": 15,
+            "score10": 5.5,
+            "weightedContribution": 8.25,
+            "source": "PARAMETERS forward EPS / volume"
+          },
+          {
+            "id": "risk",
+            "label": "Risk",
+            "weightPct": 10,
+            "score10": 8,
+            "weightedContribution": 8,
+            "source": "Section A + risk registers"
+          }
+        ],
+        "quantitativeScore100": 59,
+        "investmentVerdict": "🟡 HOLD / WAIT",
+        "verdictTone": "wait",
+        "verdictEmoji": "🟡",
+        "positives": [
+          "Healthy balance sheet / manageable risk profile",
+          "Strong franchise and scale",
+          "Long-term sector tailwind"
+        ],
+        "concerns": [
+          "Current valuation is not cheap vs history or forward fair value",
+          "Earnings quality mixed — monitor quarterly translation",
+          "Monitor next quarter margins"
+        ],
+        "nextQuarterWatch": [
+          "Revenue growth",
+          "Operating margin",
+          "EPS vs prior year"
+        ],
+        "narrativeSummary": "Not a screaming BUY — excellent business qualities with valuation and/or near-term earnings caveats.",
+        "notScreamingBuy": true
+      }
+    },
+    {
+      "id": "c65a9bc4-052f-4889-99be-a83ac0ac7554",
+      "createdAt": "2026-09-10T17:08:08.842Z",
+      "ticker": "HEROMOTOCO",
+      "stockName": "Hero MotoCorp",
+      "sector": "Auto",
+      "cmp": 5280,
+      "quantitativeScore100": 54,
+      "investmentVerdict": "🟡 HOLD / WAIT",
+      "thesisStatus": "HOLD",
+      "report": "# Risk & Decision — Hero MotoCorp (HEROMOTOCO)\n\n**Score:** 54/100 · **Verdict:** 🟡 HOLD / WAIT\n**CMP:** ₹5,280\n\n## Investment Thesis\n\n- Status: HOLD\n- Valuation: Stretched\n- Business: Average\n- Earnings: Mixed\n- Risk: Elevated\n- Why own: Solid long-term earnings growth path\n- Why not aggressive: Current valuation is not cheap vs history or forward fair value\n- Change mind if: Sustained EPS deterioration or material moat erosion\n- Next review: Next quarterly results\n\n## Component scores\n\n| Component | Weight | Score |\n|-----------|-------:|------:|\n| Valuation | 25% | 6/10 |\n| Earnings Quality | 25% | 4/10 |\n| Business Quality | 25% | 5/10 |\n| Growth / CAGR | 15% | 8/10 |\n| Risk | 10% | 4/10 |\n\n## Positives\n- Solid long-term earnings growth path\n- Strong franchise and scale\n- Long-term sector tailwind\n\n## Concerns\n- Current valuation is not cheap vs history or forward fair value\n- Earnings quality mixed — monitor quarterly translation\n- Monitor next quarter margins\n\n## Next quarter watch\n- Revenue growth\n- Operating margin\n- EPS vs prior year\n\n---\n_Stock Calculator Tab 5 — not investment advice._",
+      "analysis": {
+        "ticker": "HEROMOTOCO",
+        "stockName": "Hero MotoCorp",
+        "sector": "Auto",
+        "cmp": 5280,
+        "cmpSource": "nse-yahoo",
+        "analyzedAt": "2026-09-10T17:08:06.159Z",
+        "dataSource": "Live tab synthesis + StockBook risk registers",
+        "riskDecisionFile": null,
+        "stockbookUrl": "/stockbook/auto/hero-motocorp/summary",
+        "thesis": {
+          "status": "HOLD",
+          "score100": 54,
+          "valuationLabel": "Stretched",
+          "businessLabel": "Average",
+          "earningsLabel": "Mixed",
+          "riskLabel": "Elevated",
+          "whyOwn": "Solid long-term earnings growth path",
+          "whyNotAggressive": "Current valuation is not cheap vs history or forward fair value",
+          "changeMind": "Sustained EPS deterioration or material moat erosion",
+          "nextReview": "Next quarterly results"
+        },
+        "riskFactors": [],
+        "riskBuckets": [
+          {
+            "bucket": "Business risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "Financial risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "Valuation risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "Governance risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "External risk",
+            "signal": "🟢",
+            "factorCount": 0
+          }
+        ],
+        "catalysts": [],
+        "thesisBreakers": [],
+        "components": [
+          {
+            "id": "valuation",
+            "label": "Valuation",
+            "weightPct": 25,
+            "score10": 6,
+            "weightedContribution": 15,
+            "source": "PE Evaluation / PARAMETERS"
+          },
+          {
+            "id": "earningsQuality",
+            "label": "Earnings Quality",
+            "weightPct": 25,
+            "score10": 4,
+            "weightedContribution": 10,
+            "source": "Tab 3 — earnings quality engine"
+          },
+          {
+            "id": "businessQuality",
+            "label": "Business Quality",
+            "weightPct": 25,
+            "score10": 5,
+            "weightedContribution": 12.5,
+            "source": "Tab 4 — business quality engine"
+          },
+          {
+            "id": "growth",
+            "label": "Growth / CAGR",
+            "weightPct": 15,
+            "score10": 8,
+            "weightedContribution": 12,
+            "source": "PARAMETERS forward EPS / volume"
+          },
+          {
+            "id": "risk",
+            "label": "Risk",
+            "weightPct": 10,
+            "score10": 4,
+            "weightedContribution": 4,
+            "source": "Section A + risk registers"
+          }
+        ],
+        "quantitativeScore100": 54,
+        "investmentVerdict": "🟡 HOLD / WAIT",
+        "verdictTone": "wait",
+        "verdictEmoji": "🟡",
+        "positives": [
+          "Solid long-term earnings growth path",
+          "Strong franchise and scale",
+          "Long-term sector tailwind"
+        ],
+        "concerns": [
+          "Current valuation is not cheap vs history or forward fair value",
+          "Earnings quality mixed — monitor quarterly translation",
+          "Monitor next quarter margins"
+        ],
+        "nextQuarterWatch": [
+          "Revenue growth",
+          "Operating margin",
+          "EPS vs prior year"
+        ],
+        "narrativeSummary": "Not a screaming BUY — excellent business qualities with valuation and/or near-term earnings caveats.",
+        "notScreamingBuy": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,211 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8">
+<title>India Stock Investment Agent - Web Application Roadmap</title>
+<!--[if gte mso 9]><xml>
+<w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument>
+</xml><![endif]-->
+<style>
+body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.4; margin: 1in; }
+h1 { font-size: 22pt; color: #1a365d; border-bottom: 2px solid #1a365d; padding-bottom: 6px; }
+h2 { font-size: 16pt; color: #2c5282; margin-top: 24px; }
+h3 { font-size: 13pt; color: #2d3748; margin-top: 16px; }
+table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+th, td { border: 1px solid #cbd5e0; padding: 8px; text-align: left; vertical-align: top; }
+th { background: #edf2f7; font-weight: bold; }
+.meta { color: #718096; font-size: 10pt; }
+.disclaimer { background: #fff5f5; border-left: 4px solid #c53030; padding: 10px; margin: 16px 0; }
+ul { margin: 8px 0; }
+li { margin: 4px 0; }
+.phase-box { background: #f7fafc; border: 1px solid #e2e8f0; padding: 12px; margin: 12px 0; }
+</style>
+</head>
+<body>
+
+<h1>India Stock Investment Agent — Web Application Roadmap</h1>
+<p class="meta"><strong>Document version:</strong> 1.1 &nbsp;|&nbsp; <strong>Date:</strong> 5 September 2026 &nbsp;|&nbsp; <strong>Project:</strong> My-agent &nbsp;|&nbsp; <strong>Update:</strong> Report folder renamed to <strong>StockBook</strong></p>
+
+<div class="disclaimer">
+<strong>Disclaimer:</strong> This product is a research assistant. It is not SEBI-registered investment advice. All analysis outputs require user judgment.
+</div>
+
+<h2>1. Executive Summary</h2>
+<p>The My-agent repository already separates <strong>shared framework logic</strong> from <strong>user-specific data</strong>. The web application preserves this split:</p>
+<ul>
+<li><strong>One core framework</strong> for all users (rules, skills, workflows, lenses)</li>
+<li><strong>Isolated StockBook folders + holdings</strong> per user after email login</li>
+</ul>
+
+<table>
+<tr><th>Phase</th><th>Timeline</th><th>Theme</th><th>Key deliverable</th></tr>
+<tr><td><strong>Phase 1 — MVP</strong></td><td>Weeks 1–8</td><td>Prove the loop</td><td>Login + chat + one-stock StockBook write-back</td></tr>
+<tr><td><strong>Phase 2 — V1</strong></td><td>Weeks 9–14</td><td>Daily usability</td><td>StockBook browser + thematic + sector outlook</td></tr>
+<tr><td><strong>Phase 3 — V2</strong></td><td>Weeks 15–22</td><td>Automation</td><td>Morning run + broker batch + CAGR dashboard</td></tr>
+</table>
+
+<p><strong>Recommended stack:</strong> Next.js (UI + API) · Supabase (auth + Postgres) · S3/R2 (user markdown) · LLM API (Gemini Flash default) · Live search (Serper/Tavily)</p>
+
+<h2>2. Current State (Repository)</h2>
+<p>Framework-complete in Cursor today: ~694 markdown files, 22-section rules, skills, investor-wisdom workflows, StockBook/ per stock, News/, portfolio holdings, PowerShell sync scripts, HTML report generation.</p>
+
+<table>
+<tr><th>Layer</th><th>Location today</th><th>Web app treatment</th></tr>
+<tr><td>Shared framework</td><td>.cursor/rules, .cursor/skills, investor-wisdom/, StockBook/*-FRAMEWORK.md</td><td>Read-only; versioned; same for all users</td></tr>
+<tr><td>Per-user data</td><td>StockBook/[Sector]/[Stock]/, .cursor/portfolio/holdings.md</td><td>Tenant-scoped storage per user_id</td></tr>
+<tr><td>Semi-shared</td><td>News/ summaries</td><td>Shared cache + per-user TICKER-INDEX</td></tr>
+<tr><td>Agent logic</td><td>Cursor agent + skills</td><td>Backend agent service with tool calling</td></tr>
+</table>
+
+<h2>3. Target Architecture (Monorepo)</h2>
+<p><strong>Terminology:</strong> <code>StockBook/</code> in the repo = per-stock analysis folders. In the web app, each user gets a tenant-scoped <code>stockbook/</code> mirror (lowercase cloud path) with the same file layout.</p>
+<pre>
+My-agent/
+├── framework/          # SHARED — rules, skills, investor-wisdom (all users)
+├── web/                # Next.js UI + API + agent orchestration
+├── scripts/            # Existing PS1 tools (HTML combine, broker fetch)
+└── data/users/{id}/    # Dev only; production → cloud storage
+</pre>
+<p>On signup (email magic link or OTP): provision <code>portfolio/holdings.md</code> and empty <code>stockbook/</code> tree (same structure as <code>StockBook/[Sector]/[Stock Name]/</code> in the repo). Core framework is <strong>never copied</strong> per user.</p>
+
+<h2>4. Phase 1 — MVP (Weeks 1–8)</h2>
+<div class="phase-box">
+<p><strong>Goal:</strong> Prove end-to-end loop — login → ask about one stock → agent runs framework → saves StockBook markdown → user reads verdict.</p>
+</div>
+
+<h3>4.1 In Scope</h3>
+<ul>
+<li>Email authentication (magic link or OTP) — no access without verified email</li>
+<li>User onboarding: empty portfolio + optional CSV import (qty, avg cost)</li>
+<li>Holdings CRUD: view/edit quantities and average cost</li>
+<li>Analysis chat: single-stock query (e.g. “Analyze Maruti — buy today?”)</li>
+<li>Agent pipeline: shared framework + user holdings + existing StockBook + live search</li>
+<li>StockBook write-back: summary-analysis.md, faq.md, suggested-approach.md (Standard tier)</li>
+<li>Framework gates: exclusion guards, buy-decision-workflow, personal discipline pre-flight</li>
+<li>Rate limits: 5–10 deep analyses per user per day</li>
+<li>Export: download user StockBook folder as ZIP</li>
+</ul>
+
+<h3>4.2 Out of Scope (MVP)</h3>
+<ul>
+<li>Thematic multi-stock runs, sector outlook weekly cron, morning run automation</li>
+<li>Broker target batch fetch, PARAMETERS auto-fill, HTML combiner in UI</li>
+<li>Admin dashboard, billing, mobile app</li>
+</ul>
+
+<h3>4.3 Technical Stack (MVP)</h3>
+<table>
+<tr><th>Component</th><th>Technology</th><th>Notes</th></tr>
+<tr><td>Frontend</td><td>Next.js 14+ App Router</td><td>Login, chat, holdings, markdown StockBook viewer</td></tr>
+<tr><td>Auth</td><td>Supabase Auth or Clerk</td><td>Email only for MVP</td></tr>
+<tr><td>User StockBook</td><td>S3 / Cloudflare R2</td><td>Same structure as repo <code>StockBook/</code> per stock</td></tr>
+<tr><td>Metadata</td><td>Supabase Postgres</td><td>Profile, job status, holdings snapshot</td></tr>
+<tr><td>Agent</td><td>Node API + Gemini 2.5 Flash</td><td>RAG over framework; selective skill loading</td></tr>
+<tr><td>Search</td><td>Serper or Tavily</td><td>Live news for dynamic context</td></tr>
+<tr><td>Jobs</td><td>Inngest or BullMQ + Redis</td><td>Async analysis &gt; 60 seconds</td></tr>
+</table>
+
+<h3>4.4 MVP Success Criteria</h3>
+<ul>
+<li>User signs up, adds 3 holdings, runs one full stock analysis, sees updated StockBook files</li>
+<li>Agent follows buy-decision-workflow; does not contradict <code>StockBook/AGENT-RULES.md</code> without new evidence</li>
+<li>Per-user data isolated — User A cannot read User B StockBook</li>
+<li>Framework update applies to all users without migrating their StockBook files</li>
+</ul>
+
+<h2>5. Phase 2 — Product V1 (Weeks 9–14)</h2>
+<div class="phase-box">
+<p><strong>Goal:</strong> Match Cursor experience for daily use — browse StockBook, thematic analysis, sector research.</p>
+</div>
+
+<h3>5.1 Features</h3>
+<ul>
+<li><strong>StockBook browser:</strong> sector → stock → all files (summary, FAQ, detail, PARAMETERS, BROKER, risks)</li>
+<li><strong>HTML report view:</strong> combined report like cupid-report.html</li>
+<li><strong>Thematic analysis:</strong> user names 3–6 tickers → agent updates all in-scope StockBook folders + comparative markdown</li>
+<li><strong>Sector outlook (L11):</strong> fmcg-sector-outlook.md style files; weekly refresh reminder in UI</li>
+<li><strong>News integration:</strong> shared News/ cache; per-user TICKER-INDEX</li>
+<li><strong>PCCL / tier dashboard:</strong> premium to Applied PCCL, SIP tier, blended cap per holding</li>
+<li><strong>Quadrant map / surplus rank:</strong> fresh capital allocation view</li>
+<li><strong>Conviction inputs:</strong> Conviction_PCCL, blended caps → persisted to faq.md</li>
+<li><strong>Optional:</strong> premium LLM “Deep run” button (Claude/GPT-4 class)</li>
+</ul>
+
+<h3>5.2 Technical Additions</h3>
+<ul>
+<li>Background jobs for multi-stock thematic runs (progress UI)</li>
+<li>Framework version pinning (deploy v2 without breaking user StockBook files)</li>
+<li>Markdown + HTML dual write (port _combine-stockbook-md-to-html.ps1 to Node)</li>
+</ul>
+
+<h2>6. Phase 3 — Automation &amp; Scale (Weeks 15–22)</h2>
+<div class="phase-box">
+<p><strong>Goal:</strong> Portfolio monitoring at scale — scheduled runs, batch data, dashboards.</p>
+</div>
+
+<h3>6.1 Features</h3>
+<ul>
+<li><strong>Morning run:</strong> daily digest — news scan, holdings fair-value screen, sector alerts</li>
+<li><strong>Broker fetch:</strong> batch BROKER_[TICKER].md refresh (Trendlyne-style)</li>
+<li><strong>PARAMETERS batch:</strong> 10Y rear-view + 5Y forward per holding</li>
+<li><strong>Portfolio CAGR dashboard:</strong> per-lot CAGR, sector snapshot</li>
+<li><strong>P/E averaging analysis:</strong> upward/downward PE scripts in UI</li>
+<li><strong>Sector outlook cron:</strong> auto-refresh sector-outlook.md files due &gt; 7 days</li>
+<li><strong>Email notifications:</strong> “StockBook updated for MAXHEALTH”</li>
+<li><strong>Admin:</strong> usage analytics, LLM cost per user, framework changelog</li>
+<li><strong>Billing (optional):</strong> Razorpay/Stripe — paid tiers, higher limits, premium models</li>
+</ul>
+
+<h3>6.2 Technical Additions</h3>
+<ul>
+<li>Cron workers (Vercel cron, Railway, or dedicated VM)</li>
+<li>Market data API: NSE CMP refresh for PARAMETERS</li>
+<li>RAG embedding cache for framework files</li>
+<li>Multi-region storage at scale</li>
+</ul>
+
+<h2>7. Data Model &amp; Multi-Tenancy</h2>
+<table>
+<tr><th>Path (per user)</th><th>Content</th></tr>
+<tr><td>portfolio/holdings.md</td><td>Qty, avg cost, sector tags</td></tr>
+<tr><td>stockbook/{sector}/{stock}/summary-analysis.md</td><td>Verdict, PCCL, tier</td></tr>
+<tr><td>stockbook/{sector}/{stock}/faq.md</td><td>Q&amp;A, quotes lens, user caps</td></tr>
+<tr><td>stockbook/{sector}/{stock}/suggested-approach.md</td><td>SIP plan, blended caps</td></tr>
+<tr><td>stockbook/.../detail-analysis.md</td><td>Full thesis</td></tr>
+<tr><td>news/ticker-index.md</td><td>User-specific headline links</td></tr>
+</table>
+<p><strong>Shared (read-only):</strong> framework/rules, framework/skills, investor-wisdom/, <code>StockBook/*-FRAMEWORK.md</code>, <code>StockBook/AGENT-RULES.md</code> (template — not per-user copies)</p>
+
+<h2>8. Monthly Cost Estimate (INR)</h2>
+<table>
+<tr><th>Scenario</th><th>Users</th><th>Infra</th><th>LLM + Search</th><th>Total approx.</th></tr>
+<tr><td>MVP — solo dev</td><td>1</td><td>₹0–500</td><td>₹500–2,000</td><td><strong>₹1,000–4,000</strong></td></tr>
+<tr><td>Phase 2 — small beta</td><td>5–20</td><td>₹3,000–4,000</td><td>₹5,000–15,000</td><td><strong>₹10,000–25,000</strong></td></tr>
+<tr><td>Phase 3 — growth</td><td>50+</td><td>₹8,000–15,000</td><td>₹25,000–80,000+</td><td><strong>₹40,000–1,10,000+</strong></td></tr>
+</table>
+<p><em>One full framework analysis ≈ ₹5–40 depending on model. Mitigation: Gemini Flash default, RAG, rate limits.</em></p>
+
+<h2>9. Risks &amp; Mitigations</h2>
+<table>
+<tr><th>Risk</th><th>Mitigation</th></tr>
+<tr><td>LLM cost blow-up</td><td>Rate limits, Flash default, async queue, user quotas</td></tr>
+<tr><td>Hallucinated financial data</td><td>Live search; FACT vs ASSUMPTION labels; cite sources</td></tr>
+<tr><td>Framework drift (Cursor vs web)</td><td>Single framework/ folder; same AGENT-RULES</td></tr>
+<tr><td>Regulatory liability</td><td>Disclaimer; no order placement; research tool only</td></tr>
+<tr><td>User data leak</td><td>Tenant isolation; auth on every API; audit logs</td></tr>
+</table>
+
+<h2>10. Immediate Next Actions</h2>
+<ol>
+<li>Create <code>web/</code> scaffold: Next.js + Supabase auth</li>
+<li>Define API: POST /api/analyze → job id → poll → StockBook file paths</li>
+<li>Prototype agent on MARUTI (read holdings + framework → write <code>StockBook/Auto/Maruti Suzuki/faq.md</code>)</li>
+<li>Terms of use + research disclaimer before beta users</li>
+<li>Optional: migrate shared docs to <code>framework/</code> folder alias</li>
+</ol>
+
+<p class="meta" style="margin-top: 32px;">End of document · v1.1 · StockBook rename · 5 September 2026 · My-agent repository</p>
+
+</body>
+</html>

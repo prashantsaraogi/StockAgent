@@ -1,0 +1,5 @@
+# data/cron — scheduled job logs
+
+Written by `npm run daily-market-pack` and `/api/cron/daily-market-pack`.
+
+See `web/scripts/register-morning-cron.ps1` for 8 AM IST Task Scheduler setup.

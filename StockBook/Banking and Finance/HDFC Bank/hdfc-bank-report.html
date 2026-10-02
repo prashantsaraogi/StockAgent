@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HDFC Bank — Investment Report</title>
+  <style>
+    :root {
+      --bg: #f8f9fb;
+      --card: #ffffff;
+      --text: #1a1d26;
+      --muted: #5c6370;
+      --border: #e2e6ed;
+      --accent: #1e40af;
+      --accent-light: #eff6ff;
+      --warn: #b45309;
+      --warn-light: #fff7ed;
+      --hold: #0d6e4f;
+      --hold-light: #e8f5f0;
+      --section1: #1e40af;
+      --section2: #0d6e4f;
+      --section3: #7c3aed;
+      --section4: #c2410c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+      color: #fff;
+      padding: 2rem 1.5rem 1.5rem;
+    }
+
+    .header-inner { max-width: 960px; margin: 0 auto; }
+
+    .header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+
+    .header .meta {
+      opacity: 0.9;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .verdict-box {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .nav {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .nav-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nav a:hover { background: var(--bg); color: var(--text); }
+    .nav a.s1:hover { background: var(--accent-light); color: var(--section1); }
+    .nav a.s2:hover { background: var(--hold-light); color: var(--section2); }
+    .nav a.s3:hover { background: #f3e8ff; color: var(--section3); }
+    .nav a.s4:hover { background: #ffedd5; color: var(--section4); }
+
+    .label-faq { background: #ffedd5; color: var(--section4); }
+
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.85rem;
+      overflow: hidden;
+    }
+
+    .faq-q {
+      background: #f8fafc;
+      padding: 0.85rem 1rem;
+      font-weight: 600;
+      font-size: 0.92rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--section4);
+    }
+
+    .faq-q::before { content: "Q. "; font-weight: 700; }
+
+    .faq-a { padding: 0.85rem 1rem 1rem; font-size: 0.9rem; }
+    .faq-a p:last-child { margin-bottom: 0; }
+    .faq-short { font-weight: 600; color: var(--hold); margin-bottom: 0.5rem; }
+
+    main { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+
+    section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .section-label {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .label-summary { background: var(--accent-light); color: var(--section1); }
+    .label-detail { background: var(--hold-light); color: var(--section2); }
+    .label-approach { background: #f3e8ff; color: var(--section3); }
+
+    h2 {
+      font-size: 1.35rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    h3 { font-size: 1.05rem; margin: 1.5rem 0 0.75rem; color: var(--text); }
+    h4 { font-size: 0.95rem; margin: 1rem 0 0.5rem; color: var(--muted); }
+
+    p { margin-bottom: 0.75rem; color: var(--text); }
+
+    .highlight {
+      background: var(--warn-light);
+      border-left: 4px solid var(--warn);
+      padding: 0.85rem 1rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+      font-size: 0.92rem;
+    }
+
+    .decision-card {
+      background: #1a1d26;
+      color: #e2e8f0;
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      margin: 1rem 0;
+      white-space: pre-line;
+    }
+
+    .code-block {
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin: 1rem 0;
+      white-space: pre-line;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0 1.25rem;
+      font-size: 0.875rem;
+    }
+
+    th, td {
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th { background: #f1f5f9; font-weight: 600; color: var(--text); }
+    td.num, th.num { text-align: right; }
+    tr:hover td { background: #fafbfc; }
+
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .badge-hold { background: var(--hold-light); color: var(--hold); }
+    .badge-ok { background: var(--accent-light); color: var(--accent); }
+    .badge-warn { background: var(--warn-light); color: var(--warn); }
+
+    ul.checklist { list-style: none; margin: 0.75rem 0 1rem; }
+    ul.checklist li {
+      padding: 0.35rem 0 0.35rem 1.5rem;
+      position: relative;
+      font-size: 0.9rem;
+    }
+    ul.checklist li::before {
+      content: "☐";
+      position: absolute;
+      left: 0;
+      color: var(--muted);
+    }
+
+    ul.bullet { margin: 0.5rem 0 1rem 1.25rem; font-size: 0.9rem; }
+    ul.bullet li { margin-bottom: 0.35rem; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    @media (max-width: 640px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .header h1 { font-size: 1.4rem; }
+      section { padding: 1.25rem; }
+      table { font-size: 0.8rem; }
+      th, td { padding: 0.45rem 0.5rem; }
+    }
+
+    .footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    @media print {
+      .nav { display: none; }
+      section { break-inside: avoid; box-shadow: none; }
+      body { background: #fff; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <h1>HDFC Bank</h1>
+      <p class="meta">
+        HDFCBANK (NSE) · BSE: 500180 · Private D-SIB · Analysis date: 23 Aug 2026<br>
+        <span style="opacity:0.85">Persistent report — Summary · Detail · Approach · FAQ</span>
+      </p>
+      <div class="verdict-box">
+        <strong>Verdict:</strong> HOLD legacy core bank · small DCA below your avg (5–10/mo) ·
+        ICICI ranks above for fresh bank capital · no bulk add until Oct CEO + RBI MSRDC clarity · governance caps PCCL
+      </div>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#summary" class="s1">1. Summary</a>
+      <a href="#detail" class="s2">2. Detail Analysis</a>
+      <a href="#approach" class="s3">3. Suggested Approach</a>
+      <a href="#faq" class="s4">4. FAQ</a>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- SECTION 1: SUMMARY -->
+    <section id="summary">
+      <span class="section-label label-summary">Section 1</span>
+      <h2>Summary Analysis</h2>
+
+      <h3>Your position</h3>
+      <table>
+        <thead>
+          <tr><th>Metric</th><th class="num">Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Quantity</td><td class="num">1,125 shares</td></tr>
+          <tr><td>Avg cost</td><td class="num">₹775.31</td></tr>
+          <tr><td>Cost basis</td><td class="num">₹8,72,224</td></tr>
+          <tr><td>CMP (approx.)</td><td class="num">₹727</td></tr>
+          <tr><td>Current value</td><td class="num">₹8,17,875</td></tr>
+          <tr><td>Unrealized P&amp;L</td><td class="num">−~₹54,000 (~−6%)</td></tr>
+          <tr><td>Portfolio weight</td><td class="num">~5.1%</td></tr>
+          <tr><td>52-week range</td><td class="num">₹715 – ₹1,020</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Dual rating (mandatory for banks)</h3>
+      <table>
+        <thead>
+          <tr><th>Dimension</th><th>Rating</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Business / franchise</td><td><span class="badge badge-ok">Strong</span></td></tr>
+          <tr><td>Management &amp; governance</td><td><span class="badge badge-warn">Weak–Mixed</span></td></tr>
+          <tr><td>Combined action</td><td><span class="badge badge-hold">HOLD · slow add only</span></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Key facts — Q1 FY27 (Jun 2026)</h3>
+      <table>
+        <thead>
+          <tr><th>Metric</th><th class="num">Q1 FY27</th><th>Note</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>NIM</td><td class="num"><strong>3.26%</strong></td><td>−12 bps QoQ</td></tr>
+          <tr><td>NII growth</td><td class="num"><strong>+6.7%</strong> YoY</td><td>Lagging loan growth</td></tr>
+          <tr><td>PAT growth</td><td class="num"><strong>+5%</strong> YoY</td><td>Adj ~+10%</td></tr>
+          <tr><td>CASA</td><td class="num"><strong>~32.3%</strong></td><td>Post-merger mix pressure</td></tr>
+          <tr><td>GNPA</td><td class="num"><strong>~1.17%</strong></td><td>Stable asset quality</td></tr>
+          <tr><td>Credit cost</td><td class="num"><strong>~0.40%</strong></td><td>Benign</td></tr>
+          <tr><td>P/E (CMP)</td><td class="num"><strong>~14×</strong></td><td>Below historical ~18–20×</td></tr>
+        </tbody>
+      </table>
+
+      <h3>PCCL summary (pessimistic + governance overlay)</h3>
+      <table>
+        <thead>
+          <tr><th>Scenario</th><th class="num">PCCL</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>NIM stress only</td><td class="num">₹700–750</td></tr>
+          <tr><td><strong>+ Governance overlay</strong></td><td class="num"><strong>₹620–680</strong></td></tr>
+          <tr><td><strong>Planning anchor</strong></td><td class="num"><strong>₹660</strong></td></tr>
+          <tr><td>Conservative IV</td><td class="num">₹740–780</td></tr>
+        </tbody>
+      </table>
+
+      <table>
+        <thead>
+          <tr><th>@ CMP ₹727</th><th class="num">Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Premium to PCCL ₹660</td><td class="num"><strong>+10%</strong></td></tr>
+          <tr><td>vs your cost ₹775</td><td class="num"><strong>−6%</strong> (below avg — DCA improves blend)</td></tr>
+          <tr><td>MoS vs IV ~₹760</td><td class="num"><strong>~+4%</strong></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Why stock fell ~29% from ₹1,020 peak</h3>
+      <table>
+        <thead>
+          <tr><th>Driver</th><th>Type</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>NIM compression post merger</td><td>FACT — cyclical</td></tr>
+          <tr><td>Lower CASA, higher term deposits</td><td>FACT</td></tr>
+          <tr><td>Governance: chairman exit, MSRDC probe</td><td>FACT</td></tr>
+          <tr><td>RBI supervisory review pending</td><td>FACT — UNVERIFIED outcome</td></tr>
+          <tr><td>CEO term ends Oct 2026</td><td>FACT — binary catalyst</td></tr>
+        </tbody>
+      </table>
+      <div class="highlight">
+        <strong>Not an EXIT</strong> — structural moat intact; governance <strong>caps adds</strong>, not mandate sell.
+      </div>
+
+      <h3>Action summary</h3>
+      <table>
+        <thead>
+          <tr><th>Action</th><th>Detail</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="badge badge-hold">HOLD</span></td><td>All 1,125 shares — no trim (long-term mandate)</td></tr>
+          <tr><td><span class="badge badge-ok">Small DCA</span></td><td><strong>5–10 shares/month</strong> @ CMP while below ₹775 avg</td></tr>
+          <tr><td>Bank priority</td><td><strong>ICICI #1</strong> for fresh bank surplus; HDFC <strong>#2 opportunistic</strong></td></tr>
+          <tr><td>Pause bulk</td><td>Until <strong>Oct 2026</strong> CEO reappointment + <strong>RBI MSRDC</strong> outcome</td></tr>
+          <tr><td>Accelerate</td><td><strong>₹680–700</strong> (near PCCL) if thesis intact</td></tr>
+        </tbody>
+      </table>
+
+      <h3>FAQ highlights</h3>
+      <div class="faq-item">
+        <div class="faq-q">Add at 775 cost, CMP ~725?</div>
+        <div class="faq-a"><p class="faq-short">Small DCA yes — not bulk.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Management a big issue?</div>
+        <div class="faq-a"><p class="faq-short">Yes — separate Weak–Mixed rating from Strong business.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">vs ICICI for fresh bank capital?</div>
+        <div class="faq-a"><p class="faq-short">Deploy fresh bank ₹ to ICICI first (~70/30 split).</p></div>
+      </div>
+      <p style="margin-top:0.75rem;font-size:0.875rem;color:var(--muted);">Full Q&amp;A → <a href="#faq">Section 4: FAQ</a> (12 questions from prior chats)</p>
+    </section>
+
+    <!-- SECTION 2: DETAIL -->
+    <section id="detail">
+      <span class="section-label label-detail">Section 2</span>
+      <h2>Detail Analysis</h2>
+      <p><strong>Framework:</strong> India Stock Investment Agent · D-SIB bank protocol · Evidence: FACT / MANAGEMENT CLAIM / HYPOTHESIS / OUR ASSUMPTION</p>
+
+      <h3>1. Business model</h3>
+      <table>
+        <thead>
+          <tr><th>Element</th><th>Detail</th><th>Type</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Revenue</td><td>Net interest income + fees</td><td>FACT</td></tr>
+          <tr><td>Post Jul 2023</td><td><strong>HDFC Ltd merged</strong> — balance sheet ~2×</td><td>FACT</td></tr>
+          <tr><td>Funding</td><td>CASA + term deposits + wholesale</td><td>FACT</td></tr>
+          <tr><td>Q1 FY27 NIM</td><td><strong>3.26%</strong></td><td>FACT</td></tr>
+          <tr><td>Asset quality</td><td>GNPA ~1.17%, credit cost ~0.40%</td><td>FACT</td></tr>
+          <tr><td>Moat</td><td>Scale, distribution, brand, low GNPA history</td><td>FACT</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Moat limit:</strong> Post-merger funding mix hurts NIM; governance discount on multiple.</p>
+
+      <h3>2. Q1 FY27 results</h3>
+      <table>
+        <thead>
+          <tr><th>Metric</th><th>Reading</th><th>Type</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>NII</td><td>+6.7% YoY</td><td>FACT</td></tr>
+          <tr><td>NIM</td><td>3.26% (−12 bps QoQ)</td><td>FACT</td></tr>
+          <tr><td>PAT</td><td>+5% YoY (adj ~+10%)</td><td>FACT</td></tr>
+          <tr><td>Loan growth</td><td>+11–16%</td><td>FACT</td></tr>
+          <tr><td>CASA</td><td>~32.3%</td><td>FACT</td></tr>
+          <tr><td>vs ICICI/Kotak NIM</td><td>Underperformed on NIM QoQ</td><td>FACT</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Quality flag:</strong> Loan growth not translating proportionally to NII — merger integration story.</p>
+
+      <h3>3. Price decline attribution (~29% from ₹1,020, Jan 2026)</h3>
+      <table>
+        <thead>
+          <tr><th>Driver</th><th>Type</th><th>Temp / Structural</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>NIM compression</td><td>FACT</td><td>Temporary–partial</td></tr>
+          <tr><td>Post-merger CASA dilution</td><td>FACT</td><td>Temporary (integration)</td></tr>
+          <tr><td>Relative NII lag vs peers</td><td>FACT</td><td>Partial</td></tr>
+          <tr><td>Chairman resignation + probe headlines</td><td>FACT</td><td>Governance overhang</td></tr>
+          <tr><td>RBI MSRDC review pending</td><td>FACT</td><td>Until order</td></tr>
+          <tr><td>CEO term Oct 2026</td><td>FACT</td><td>Binary</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Verdict:</strong> Cyclical + governance overhang — not moat destruction.</p>
+
+      <h3>4. Management &amp; governance (separate rating)</h3>
+      <p><strong>Rating: Weak–Mixed</strong> | Business: <strong>Strong</strong></p>
+
+      <h4>Timeline register</h4>
+      <table>
+        <thead>
+          <tr><th>Date</th><th>Event</th><th>Label</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Mar 12, 2026</td><td>Audit Committee <strong>vigilance probe</strong></td><td>FACT</td></tr>
+          <tr><td>Mar 17–18, 2026</td><td>Chairman <strong>Chakraborty</strong> resigns</td><td>FACT</td></tr>
+          <tr><td>Mar–Apr 2026</td><td><strong>MSRDC</strong> ~₹45 cr interest matter</td><td>FACT</td></tr>
+          <tr><td>Jun 2026</td><td>External legal review — no evidence for chairman claims</td><td>FACT</td></tr>
+          <tr><td>Jul 23, 2026</td><td><strong>Warning letters + ₹1L penalty</strong> CEO/CFO/Group Head</td><td>FACT</td></tr>
+          <tr><td>Jul–Aug 2026</td><td><strong>RBI supervisory review</strong> — pending</td><td>UNVERIFIED outcome</td></tr>
+          <tr><td>Oct 26, 2026</td><td><strong>CEO Jagdishan</strong> term ends</td><td>FACT</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Historical pattern (not one-off)</h4>
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Label</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>RBI card embargo (2020–21)</td><td>FACT</td></tr>
+          <tr><td>Auto-loan mis-selling (2020)</td><td>FACT</td></tr>
+          <tr><td>Deposit conduct penalties (2024)</td><td>FACT</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Fraud check:</strong> No accounting fraud finding — not hard exclude. Governance caps conviction.</p>
+
+      <h3>5. Valuation &amp; PCCL</h3>
+      <table>
+        <thead>
+          <tr><th>Scenario</th><th class="num">EPS / basis</th><th class="num">Multiple</th><th class="num">Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>PCCL (pessimistic + gov)</strong></td><td class="num">~₹48–50</td><td class="num">13–14×</td><td class="num"><strong>₹620–680</strong></td></tr>
+          <tr><td><strong>PCCL anchor</strong></td><td class="num">—</td><td class="num">—</td><td class="num"><strong>₹660</strong></td></tr>
+          <tr><td><strong>Conservative IV</strong></td><td class="num">~₹52–54</td><td class="num">14–15×</td><td class="num"><strong>₹740–780</strong></td></tr>
+          <tr><td><strong>CMP</strong></td><td class="num">TTM ~₹49</td><td class="num">~14×</td><td class="num"><strong>~₹727</strong></td></tr>
+        </tbody>
+      </table>
+
+      <h3>6. Core-problem test @ PCCL</h3>
+      <table>
+        <thead>
+          <tr><th>Driver</th><th>Core?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>NIM / merger</td><td>No — cyclical</td></tr>
+          <tr><td>Governance / RBI</td><td>Overhang until resolved — caps size</td></tr>
+          <tr><td>Asset quality</td><td>No</td></tr>
+          <tr><td>Fraud</td><td>No evidence</td></tr>
+        </tbody>
+      </table>
+
+      <h3>7. Risk register</h3>
+      <table>
+        <thead>
+          <tr><th>Risk</th><th>Severity</th><th>Mitigant</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>RBI adverse on MSRDC</td><td>High</td><td>D-SIB — monitor; pause adds</td></tr>
+          <tr><td>CEO not reappointed</td><td>High</td><td>Oct 2026 catalyst</td></tr>
+          <tr><td>NIM further compression</td><td>Medium</td><td>Rate cycle, deposit mix</td></tr>
+          <tr><td>Merger integration slip</td><td>Medium</td><td>Scale, history</td></tr>
+          <tr><td>Governance pattern</td><td>Medium</td><td>Separate rating; caps PCCL</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>Refresh after:</strong> Q2 FY27 · RBI MSRDC order · CEO reappointment (Oct 2026).</p>
+    </section>
+
+    <!-- SECTION 3: APPROACH -->
+    <section id="approach">
+      <span class="section-label label-approach">Section 3</span>
+      <h2>Suggested Approach</h2>
+      <p><strong>For:</strong> Existing holder — 1,125 shares @ ₹775.31 · <strong>Long-term wealth builder — HOLD default</strong></p>
+
+      <div class="code-block">Wealth = Quantity × Time × Business quality
+
+HDFC rule (below cost):  Add below YOUR avg → blended avg falls
+PCCL (~₹660):            Stress floor — accelerate near this zone
+Governance gate:        Caps SIZE until RBI + CEO (Oct 2026)</div>
+
+      <h3>Default action</h3>
+      <table>
+        <thead>
+          <tr><th></th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Legacy 1,125 @ ₹775</td><td><span class="badge badge-hold">HOLD</span> — no trim</td></tr>
+          <tr><td>At CMP ~₹727</td><td><strong>Small DCA</strong> 5–10 shares/month</td></tr>
+          <tr><td>Bulk / lump add</td><td><strong>Pause</strong> until Oct CEO + RBI clarity</td></tr>
+          <tr><td>Fresh bank surplus</td><td><strong>ICICI first</strong>, HDFC second</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Dual lens</h3>
+      <table>
+        <thead>
+          <tr><th>Lens</th><th>Reading</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Fresh capital (no position)</td><td>Governance open; ICICI better</td><td><strong>Prefer ICICI</strong></td></tr>
+          <tr><td>Existing holder below cost</td><td>MoS vs IV ~OK; franchise strong</td><td><strong>5–10 shares/mo</strong></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Blended average — adds @ ₹725</h3>
+      <table>
+        <thead>
+          <tr><th>Add</th><th class="num">Total shares</th><th class="num">Blended avg</th><th class="num">vs cost ₹775</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Now</td><td class="num">1,125</td><td class="num"><strong>₹775</strong></td><td class="num">—</td></tr>
+          <tr><td>+50</td><td class="num">1,175</td><td class="num"><strong>₹773</strong></td><td class="num">Improves</td></tr>
+          <tr><td>+100</td><td class="num">1,225</td><td class="num"><strong>₹771</strong></td><td class="num">Improves</td></tr>
+          <tr><td>+200</td><td class="num">1,325</td><td class="num"><strong>₹767</strong></td><td class="num">Improves</td></tr>
+          <tr><td>+500</td><td class="num">1,625</td><td class="num"><strong>₹760</strong></td><td class="num">Improves</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Monthly plan</h3>
+      <table>
+        <thead>
+          <tr><th>Pace</th><th class="num">Fresh ₹/mo @ ₹725</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>5 shares</strong></td><td class="num">~₹3,625</td><td><strong>Base case</strong></td></tr>
+          <tr><td><strong>10 shares</strong></td><td class="num">~₹7,250</td><td>Max if governance stable</td></tr>
+          <tr><td>15+ shares</td><td class="num">—</td><td><strong>Only after</strong> favourable RBI + CEO</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Price zones</h3>
+      <table>
+        <thead>
+          <tr><th>Zone</th><th class="num">Price (₹)</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>PCCL / stress</strong></td><td class="num">620–680</td><td><strong>Accelerate</strong> 15–25 shares if thesis intact</td></tr>
+          <tr><td><strong>Attractive</strong></td><td class="num">680–720</td><td><strong>Steady</strong> 10 shares/month</td></tr>
+          <tr><td><strong>CMP band</strong></td><td class="num">720–760</td><td><strong>5–10 shares/month</strong> (below your avg)</td></tr>
+          <tr><td>Above cost</td><td class="num">775+</td><td><strong>Pause</strong> new adds unless IV catch-up</td></tr>
+          <tr><td>Above IV</td><td class="num">800+</td><td><strong>HOLD only</strong></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Bank surplus split (with ICICI)</h3>
+      <table>
+        <thead>
+          <tr><th>Monthly bank ₹</th><th class="num">ICICI (~70%)</th><th class="num">HDFC (~30%)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>₹10,000</td><td class="num">~₹7,000 (5 sh)</td><td class="num">~₹3,000 (4 sh)</td></tr>
+          <tr><td>₹15,000</td><td class="num">~₹10,500</td><td class="num">~₹4,500</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Catalyst calendar</h3>
+      <table>
+        <thead>
+          <tr><th>Window</th><th>Event</th><th>If favourable</th><th>If adverse</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Q2 FY27</td><td>NIM bottom?</td><td>Hold/add pace</td><td>Wait</td></tr>
+          <tr><td><strong>Aug–Oct 2026</strong></td><td><strong>RBI MSRDC</strong></td><td>PCCL ↑; add pace ↑</td><td><strong>Pause adds</strong></td></tr>
+          <tr><td><strong>Oct 2026</strong></td><td><strong>CEO reappointment</strong></td><td>Stability premium</td><td>De-rate; pause</td></tr>
+          <tr><td>Chairman appointed</td><td>Board stability</td><td>Small +</td><td>—</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Upgrade triggers</h3>
+      <ul class="checklist">
+        <li>RBI <strong>mild</strong> closure on MSRDC</li>
+        <li>CEO <strong>reappointed</strong></li>
+        <li>NIM <strong>stable/improving</strong> 2 quarters</li>
+        <li>CMP <strong>≤ ₹680</strong> with thesis intact</li>
+      </ul>
+
+      <h3>Pause triggers (HOLD only)</h3>
+      <ul class="checklist">
+        <li>RBI <strong>material</strong> penalty / stricture</li>
+        <li>CEO <strong>not</strong> reappointed</li>
+        <li>NIM <strong>&lt; 3.0%</strong> with no guide</li>
+        <li>Fraud / restatement finding</li>
+      </ul>
+
+      <h3>12-month plan (conditional)</h3>
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Target</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Starting qty</td><td>1,125</td></tr>
+          <tr><td>Adds (base)</td><td>+60 to +120 (5–10/mo)</td></tr>
+          <tr><td>End qty</td><td>1,185–1,245</td></tr>
+          <tr><td>Blended avg (approx.)</td><td><strong>₹760–773</strong></td></tr>
+          <tr><td>Fresh capital</td><td><strong>₹43k–87k</strong></td></tr>
+          <tr><td>Pause if</td><td>RBI adverse or CEO denied</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Decision card</h3>
+      <div class="decision-card">HOLD 1,125 @ ₹775
+Small DCA: 5–10 shares/month @ CMP while below your avg
+Bank surplus: ICICI 70% / HDFC 30%
+Pause bulk until: Oct CEO + RBI MSRDC
+Accelerate: ₹620–680 (PCCL zone)
+No trim on governance noise alone</div>
+
+      <p><strong>Next refresh:</strong> Q2 FY27 or RBI/CEO headline.</p>
+    </section>
+
+    <!-- SECTION 4: FAQ -->
+    <section id="faq">
+      <span class="section-label label-faq">Section 4</span>
+      <h2>FAQ — Questions We Discussed</h2>
+      <p>Stock-specific Q&amp;A from prior chats. Updated 23 Aug 2026 — <strong>12 questions</strong>.</p>
+
+      <div class="faq-item">
+        <div class="faq-q">Do we add HDFC Bank? I have 1,115 shares @ ₹775.</div>
+        <div class="faq-a">
+          <p class="faq-short">HOLD all · small DCA OK at CMP (~₹719–727) · not a full-size add.</p>
+          <p>~−6–7% vs cost — not a deep loss. Market ~−29% from peak; you only ~−6% vs avg. Thesis intact (franchise); governance caps size. Action: <strong>5–10 shares/month</strong> on weak days — not lump sum.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">HDFC Management is a big issue — did you analyse that separately?</div>
+        <div class="faq-a">
+          <p class="faq-short">Yes — must be rated separately from business quality.</p>
+          <table>
+            <thead><tr><th>Dimension</th><th>Rating</th></tr></thead>
+            <tbody>
+              <tr><td>Business / franchise</td><td><strong>Strong</strong></td></tr>
+              <tr><td>Management &amp; governance</td><td><strong>Weak–Mixed</strong></td></tr>
+            </tbody>
+          </table>
+          <p>Not proven fraud. Not automatic SELL. Key events: Mar 2026 chairman resigns; Jul 2026 warning letters + penalties; RBI review pending; CEO term Oct 2026.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Should I lower my average at CMP ~₹725 while my cost is ₹775?</div>
+        <div class="faq-a">
+          <p class="faq-short">Yes — with size caps (opposite logic to Fortis/Muthoot at premium).</p>
+          <table>
+            <thead><tr><th>Add</th><th class="num">Total shares</th><th class="num">Blended avg</th></tr></thead>
+            <tbody>
+              <tr><td>+50</td><td class="num">1,175</td><td class="num"><strong>₹773</strong></td></tr>
+              <tr><td>+100</td><td class="num">1,225</td><td class="num"><strong>₹771</strong></td></tr>
+              <tr><td>+200</td><td class="num">1,325</td><td class="num"><strong>₹767</strong></td></tr>
+            </tbody>
+          </table>
+          <p>Suggested: <strong>5–10 shares/month</strong> (~₹3,600–7,250/mo @ ₹725).</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Why did the stock fall ~30% from the peak? Is the business broken?</div>
+        <div class="faq-a">
+          <p class="faq-short">Cyclical/transitional pressure + governance overhang — not broken moat.</p>
+          <p>NIM 3.26%, post-merger CASA mix = temporary. Chairman exit + MSRDC + RBI review = governance overhang. GNPA ~1.17% stable. Core-problem test: <strong>No EXIT</strong> under long-term mandate.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">What is PCCL with governance factored in?</div>
+        <div class="faq-a">
+          <p class="faq-short">₹620–680 — anchor ₹660 (lower than pure NIM model by ~₹30–50).</p>
+          <table>
+            <thead><tr><th>Layer</th><th class="num">PCCL</th></tr></thead>
+            <tbody>
+              <tr><td>NIM/merger stress only</td><td class="num">₹700–750</td></tr>
+              <tr><td><strong>+ Governance overlay</strong></td><td class="num"><strong>₹620–680</strong></td></tr>
+              <tr><td>Conservative IV</td><td class="num">₹740–780</td></tr>
+            </tbody>
+          </table>
+          <p>At CMP <strong>₹727</strong> → near fair IV, <strong>+10% above PCCL ₹660</strong>.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Why prefer ICICI over HDFC for fresh bank capital?</div>
+        <div class="faq-a">
+          <p class="faq-short">Better governance era + underweight position + cleaner catalyst path.</p>
+          <table>
+            <thead><tr><th></th><th>ICICI</th><th>HDFC</th></tr></thead>
+            <tbody>
+              <tr><td>Your weight</td><td>~1.3%</td><td>~5.1%</td></tr>
+              <tr><td>Governance</td><td><strong>Adequate–Strong</strong></td><td><strong>Weak–Mixed</strong></td></tr>
+              <tr><td>Salary rank</td><td><strong>#1 bank</strong></td><td><strong>#2 opportunistic</strong></td></tr>
+            </tbody>
+          </table>
+          <p>Split example (₹50k/mo bank slice): ~70% ICICI · ~30% HDFC.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Should I sell or trim because of management issues?</div>
+        <div class="faq-a">
+          <p class="faq-short">No — per long-term investor mandate.</p>
+          <p>Weak management → <strong>pause bulk adds</strong>, not mandated sell. EXIT only for accounting fraud, existential RBI stricture, licence loss — not triggered Aug 2026.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Why pause bulk adds but allow 5–10 shares/month?</div>
+        <div class="faq-a">
+          <p class="faq-short">Price PCCL protects the stock; governance gate blocks large bets; below-cost DCA improves blend.</p>
+          <p>Oct 2026 and RBI outcome = upgrade or pause decision points.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">What happens if RBI outcome is adverse vs favourable?</div>
+        <div class="faq-a">
+          <table>
+            <thead><tr><th>Outcome</th><th>Action</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Mild closure</strong> + CEO reappointed</td><td>Governance → Adequate; nudge to 10–15/mo</td></tr>
+              <tr><td><strong>Mixed / delayed</strong></td><td>Continue 5–10/mo only</td></tr>
+              <tr><td><strong>Material penalty / stricture</strong></td><td><strong>Pause all adds</strong>; HOLD legacy</td></tr>
+              <tr><td><strong>CEO not reappointed</strong></td><td><strong>Pause</strong>; reassess thesis</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">Is HDFC Bank the same as HDFC AMC in my portfolio?</div>
+        <div class="faq-a">
+          <p class="faq-short">No — different companies.</p>
+          <table>
+            <thead><tr><th>Ticker</th><th>Business</th><th>Your position</th></tr></thead>
+            <tbody>
+              <tr><td><strong>HDFCBANK</strong></td><td>Banking</td><td>1,125 @ ₹775</td></tr>
+              <tr><td><strong>HDFCAMC</strong></td><td>Asset management</td><td>237 @ ₹1,501</td></tr>
+            </tbody>
+          </table>
+          <p>Separate reports. AMC analysis Aug 2026: HOLD, don't add at ₹2,525.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">PCCL protects — do I wait forever for ₹660 to buy?</div>
+        <div class="faq-a">
+          <p class="faq-short">No. PCCL is protection, not the only buy price.</p>
+          <p>At <strong>₹727</strong> you are above PCCL but below your ₹775 cost → <strong>small DCA OK</strong>. Full conviction adds near ₹660–700. Bulk adds wait for governance catalysts.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">What triggers a report refresh?</div>
+        <div class="faq-a">
+          <ul class="checklist">
+            <li>Q2 FY27 results (NIM trend)</li>
+            <li><strong>RBI MSRDC</strong> supervisory outcome</li>
+            <li><strong>Oct 2026</strong> CEO reappointment news</li>
+            <li>Permanent chairman appointed</li>
+            <li>User trade (update qty/avg in holdings.md)</li>
+          </ul>
+        </div>
+      </div>
+
+      <p style="margin-top:1.25rem;font-size:0.85rem;color:var(--muted);">
+        <strong>Purpose:</strong> This report preserves analysis and Q&amp;A across sessions.
+        Agent reads <code>StockBook/HDFC Bank/</code> before re-analyzing. See <code>StockBook/AGENT-RULES.md</code>.
+      </p>
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    HDFC Bank Investment Report · 23 Aug 2026 · My-Agent Framework<br>
+    Files: summary-analysis.md · detail-analysis.md · suggested-approach.md · faq.md · hdfc-bank-report.html
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,284 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "a63d9edd-107d-48ed-90c1-a5bc3a129834",
+      "createdAt": "2026-10-01T06:56:35.097Z",
+      "ticker": "GLASSWALL",
+      "stockName": "GLASS WALL SYSTEM (I) LTD",
+      "sector": "NSE Listed",
+      "peBasis": "ttm",
+      "expectedCagrPct": 12,
+      "years": 5,
+      "cmp": 267.85,
+      "anchorPe": 25,
+      "manualPeOverride": 25,
+      "investmentAmountInr": null,
+      "frameworkPe": null,
+      "impliedVerdict": "Attractive — implied price CAGR 12.0% meets/exceeds 12% hurdle (TTM lens)",
+      "report": "# Stock Calculator Report — GLASS WALL SYSTEM (I) LTD (GLASSWALL)\n\n**Sector:** NSE Listed · **Date:** 2026-10-01  \n**Mode:** Framework-first · **Standalone what-if** (no Portfolio / holdings link)\n\n> This report is **not** generic AI stock commentary. It applies the **India Stock Investment Framework** — the same core logic as Ask Agent and StockBook — to your calculator inputs.\n\n---\n\n## Framework lens\n\n**Precedence:** Core framework → StockBook context → Calculator math (never reversed).\n\n**Applied in this run:**\n\n1. **PARAMETERS read order** — Part 1 (10Y rear-view) for ROE, EBITDA, leverage; Part 2 forward P/E **confirmatory only** (PARAMETERS-FRAMEWORK.md).\n2. **Risk registers** — `internal-negative-risk.md` + `external-negative-risk.md` with L1/L2/L3 growth haircut scale (0–2 / 3–7 / ≥8 pp).\n3. **CAGR gap test** — Framework *possible* CAGR vs **your** expected 12.0% earnings CAGR.\n4. **PE projection** — Anchor TTM P/E 25.0× @ ₹268; exit scenarios at same / 10Y avg / forward fair multiple.\n5. **Calculator isolation** — No cost basis, no averaging-down, no portfolio weights (mandate for this tool).\n6. **Exclusion guards** — *Leverage within normal framework band or not reported.*\n\n**Binding sources:** `stock-agent.mdc` · `StockBook/AGENT-RULES.md` · `investor-wisdom/buy-decision-workflow.md` · `PARAMETERS-FRAMEWORK.md`\n\n---\n\n## Context used\n\n| Layer | Source | Status |\n|-------|--------|--------|\n| StockBook summary | `summary-analysis.md` | Not available |\n| StockBook approach | `suggested-approach.md` | Not available |\n| PARAMETERS | `PARAMETERS_GLASSWALL.md` | Loaded |\n| Internal risk | `internal-negative-risk.md` | Missing |\n| External risk | `external-negative-risk.md` | Missing |\n| Live CMP | NSE / Yahoo / PARAMETERS | nse-yahoo |\n\n\n\n\n\n**Your inputs (ASSUMPTION unless from PARAMETERS):**\n\n| Input | Value | Type |\n|-------|------:|------|\n| PE basis | TTM P/E | User selection |\n| Expected earnings CAGR | 12.0% | **YOUR ASSUMPTION** |\n| Horizon | 5 years | User selection |\n| Manual P/E override | 25.0× | User override |\n| Hypothetical investment | — | — |\n\n---\n\n## Business quality\n\n| Metric | Today @ CMP | Framework read | Label |\n|--------|------------:|----------------|-------|\n| **ROE** | — | — | UNVERIFIED |\n| **EBITDA margin** | — | — | PARAMETERS Part 1 |\n| **Debt / leverage** | — | — | Qualitative / UNVERIFIED |\n| **Cash flow / balance sheet** | — | — | StockBook / PARAMETERS |\n\n*Separate **business quality** from **valuation at CMP** — excellent business can still be a poor entry at the wrong price.*\n\n---\n\n## Valuation & PE projection\n\n| Metric | Value | Source |\n|--------|------:|--------|\n| CMP | ₹268 | nse-yahoo |\n| TTM P/E | — | PARAMETERS |\n| Forward P/E | — | PARAMETERS Part 2 |\n| 10Y avg P/E | — | PARAMETERS Part 1 |\n| Forward fair P/E | — | ASSUMPTION in PARAMETERS |\n| Anchor P/E used | 25.0× (manual) | Calculator |\n| Implied anchor EPS | ₹11 | Derived |\n| EPS after 5Y @ 12.0% | ₹19 | **YOUR CAGR assumption** |\n| Framework 5Y fair (base) | — | PARAMETERS |\n\n**Price scenario verdict (primary lens):** Attractive — implied price CAGR 12.0% meets/exceeds 12% hurdle (TTM lens)\n\n---\n\n## Risk assessment (framework registers)\n\n### Internal risk — company-specific\n\n| Field | Value |\n|-------|-------|\n| Worst level | **none** |\n| Growth haircut | ~0.0 pp (0 pp) |\n| Active rows | 0 |\n| Summary | Risk register not available in StockBook. |\n\n\n\n### External risk — macro / sector / policy\n\n| Field | Value |\n|-------|-------|\n| Worst level | **none** |\n| Growth haircut | ~0.0 pp (0 pp) |\n| Active rows | 0 |\n| Summary | Risk register not available in StockBook. |\n\n\n\n*Risk level scale (AGENT-RULES): L1 = 0–2 pp · L2 = 3–7 pp · L3 = ≥8 pp off sustainable EPS CAGR.*\n\n---\n\n## CAGR gap analysis\n\n| Metric | Value |\n|--------|------:|\n| Framework base EPS CAGR | — |\n| Max risk haircut applied | −0.0 pp |\n| **Possible EPS CAGR** | **—** |\n| Implied price CAGR (framework) | 12.0% |\n| **Possible CAGR (conservative)** | **12.0%** |\n| **Your expected CAGR** | **12.0%** |\n| **Gap (possible − expected)** | **+0.0 pp** |\n\nAligned — your 12% expectation is near framework possible ~12.0% (+0.0 pp).\n\n---\n\n## Exit scenarios (5 years)\n\n| Scenario | Exit P/E | Exit price | Total return | Price CAGR |\n|----------|---------:|-----------:|-------------:|-----------: |\n| Manual TTM P/E | 25.0× | ₹472 | 76.2% | 12.0% |\n\n*Formula: projected EPS = anchor EPS × (1 + CAGR)^years; exit = projected EPS × exit P/E.*\n\n---\n\n## Core-problem test\n\n> **Why might 12.0% CAGR be wrong?**\n\n| Question | Framework answer |\n|----------|------------------|\n| Is growth **temporary vs structural**? | Internal none · External none — review risk registers. |\n| Is the stock **cheap for a reason**? | Compare TTM —× vs 10Y —×; forward IV premium in PARAMETERS. |\n| Does **price CAGR** match **earnings CAGR**? | Primary scenario price CAGR vs your 12.0%% earnings assumption — multiple re-rating may differ. |\n| StockBook disagree? | No approach verdict loaded. |\n\n---\n\n## Analysis\n\n**Framework-constrained read (deterministic):**\n\n1. **Quality lens** — ROE —, EBITDA —, cash —. ROE unverified — do not rank on quality alone.\n\n2. **Valuation lens** — At ₹268 on 25.0× TTM P/E, attractive — implied price cagr 12.0% meets/exceeds 12% hurdle (ttm lens). Forward P/E is **confirmatory only** — not a primary buy trigger per framework.\n\n3. **Risk lens** — Combined worst haircut ~0.0 pp caps *possible* EPS path before your 12.0% assumption is tested.\n\n4. **CAGR gap** — Aligned — your 12% expectation is near framework possible ~12.0% (+0.0 pp). This is the key differentiator vs generic AI: we anchor on **StockBook PARAMETERS + risk registers**, not headline optimism.\n\n5. **Not a buy call** — Calculator output informs **WAIT / WATCHLIST / STAGED** vocabulary; fresh capital still requires full `buy-decision-workflow.md` + PCCL when you choose to deploy.\n\n---\n\n## Verdict\n\n**WATCHLIST — aligned with framework possible CAGR band**\n\n| Check | Result |\n|-------|--------|\n| 12% long-term hurdle (price CAGR) | Primary scenario vs hurdle — see exit table |\n| Framework possible vs expected CAGR | Gap +0.0 pp |\n| StockBook alignment | Not loaded |\n| Fresh capital action | Run full buy-decision-workflow before any real ADD |\n\n*Calculator verdict is **what-if only** — does not replace StockBook `suggested-approach.md` or personal pause registry.*\n\n---\n\n## Quotes lens\n\n1. > *\"The stock market is a device for transferring money from the impatient to the patient.\"*  \n> — **Warren Buffett**\n\n2. > *\"There is always something to do. You just need a higher standard before you act.\"*  \n> — **Charlie Munger** *(attributed)*\n\n3. > *\"Don't average down on a losing position unless the thesis has improved — not because the price fell.\"*  \n> — **Framework synthesis** *(Buffett/Lynch doctrine)*\n\n---\n\n## What would change the view\n\n- Quarterly EPS **above** 12.0% run-rate for 2+ quarters → revisit possible CAGR upward.\n- Risk register **downgrade** (L2→L1) on internal or external file → haircut reduces; gap narrows.\n- **CMP** moves ≥10% without thesis change → re-run calculator; PCCL tier may shift.\n- New **StockBook** approach verdict after results → framework verdict takes precedence over this run.\n- Material **governance / legal / structural** headline → run fraud-detection + legal-threat analysis before any ADD.\n\n---\n\n*Report generated by Stock Calculator · Framework precedence: Core rules → StockBook → Calculator math · Not generic AI opinion.*\n",
+      "snapshot": {
+        "cmp": 267.85,
+        "cmpSource": "nse-yahoo",
+        "ttmPe": null,
+        "forwardPe": null,
+        "avg10yPe": null,
+        "forwardFairPe": null,
+        "normalizedEps": null,
+        "framework5yFairPrice": null,
+        "parametersDate": null
+      },
+      "scenarios": [
+        {
+          "label": "Manual TTM P/E",
+          "exitPe": 25,
+          "exitPrice": 472.0432198451202,
+          "totalReturnPct": 76.23416832000005,
+          "priceCagrPct": 12.00000000000001
+        }
+      ],
+      "projectedEps": 18.881728793804808,
+      "anchorEps": 10.714,
+      "quality": {
+        "roePct": null,
+        "roeDisplay": "—",
+        "roeRead": null,
+        "debtDisplay": "—",
+        "debtRatio": null,
+        "debtRead": null,
+        "ebitdaMarginPct": null,
+        "ebitdaDisplay": "—",
+        "ebitdaRead": null,
+        "cashFlowDisplay": "—",
+        "cashFlowRead": null,
+        "baseEpsCagrPct": null,
+        "baseEpsCagrRange": null,
+        "impliedPriceCagrPct": null
+      },
+      "internalRisk": {
+        "level": "none",
+        "score": 0,
+        "haircutMidPp": 0,
+        "haircutRange": "0 pp",
+        "activeRiskCount": 0,
+        "topRisks": [],
+        "summary": "Risk register not available in StockBook.",
+        "source": "unavailable"
+      },
+      "externalRisk": {
+        "level": "none",
+        "score": 0,
+        "haircutMidPp": 0,
+        "haircutRange": "0 pp",
+        "activeRiskCount": 0,
+        "topRisks": [],
+        "summary": "Risk register not available in StockBook.",
+        "source": "unavailable"
+      },
+      "cagrGap": {
+        "frameworkBaseEpsCagrPct": null,
+        "internalHaircutPp": 0,
+        "externalHaircutPp": 0,
+        "possibleEpsCagrPct": null,
+        "impliedPriceCagrPct": 12.00000000000001,
+        "possibleCagrPct": 12.00000000000001,
+        "expectedCagrPct": 12,
+        "cagrGapPp": 1.0658141036401503e-14,
+        "gapVerdict": "Aligned — your 12% expectation is near framework possible ~12.0% (+0.0 pp).",
+        "gapTone": "neutral"
+      },
+      "frameworkVerdict": "WATCHLIST — aligned with framework possible CAGR band",
+      "reportMode": "framework-local",
+      "tabAnalysis": {
+        "historical": {
+          "part1Verdict": null,
+          "cheapOrExpensive": null,
+          "peToday": null,
+          "pe10yAvg": null,
+          "premiumToIv": null,
+          "ownerEarningsYield": null,
+          "epsCagrHist": null,
+          "rows": []
+        },
+        "forward": {
+          "epsCagrBase": null,
+          "epsCagrPessimistic": null,
+          "epsCagrOptimistic": null,
+          "forwardFairPe": null,
+          "framework5yFairPrice": null,
+          "implied5yPriceCagr": null,
+          "forwardPremiumIv": null,
+          "forwardVerdict": null,
+          "volumeCagr": null,
+          "addCase": null
+        },
+        "entry": {
+          "stockbookVerdict": null,
+          "axisBValue": null,
+          "axisATier": null,
+          "sipPace": null,
+          "monthlyPace": null,
+          "blendedCeiling": null,
+          "holderAction": null,
+          "approachExcerpt": null
+        }
+      }
+    },
+    {
+      "id": "35697670-3527-4501-8626-6b415e0f0173",
+      "createdAt": "2026-10-01T06:56:10.516Z",
+      "ticker": "BAJAJFINSV",
+      "stockName": "Bajaj Finserv",
+      "sector": "Banking and Finance",
+      "peBasis": "ttm",
+      "expectedCagrPct": 12,
+      "years": 5,
+      "cmp": 1726.1,
+      "anchorPe": 35,
+      "manualPeOverride": null,
+      "investmentAmountInr": null,
+      "frameworkPe": 35,
+      "impliedVerdict": "Attractive — implied price CAGR 12.0% meets/exceeds 12% hurdle (TTM lens)",
+      "report": "# Stock Calculator Report — Bajaj Finserv (BAJAJFINSV)\n\n**Sector:** Banking and Finance · **Date:** 2026-10-01  \n**Mode:** Framework-first · **Standalone what-if** (no Portfolio / holdings link)\n\n> This report is **not** generic AI stock commentary. It applies the **India Stock Investment Framework** — the same core logic as Ask Agent and StockBook — to your calculator inputs.\n\n---\n\n## Framework lens\n\n**Precedence:** Core framework → StockBook context → Calculator math (never reversed).\n\n**Applied in this run:**\n\n1. **PARAMETERS read order** — Part 1 (10Y rear-view) for ROE, EBITDA, leverage; Part 2 forward P/E **confirmatory only** (PARAMETERS-FRAMEWORK.md).\n2. **Risk registers** — `internal-negative-risk.md` + `external-negative-risk.md` with L1/L2/L3 growth haircut scale (0–2 / 3–7 / ≥8 pp).\n3. **CAGR gap test** — Framework *possible* CAGR vs **your** expected 12.0% earnings CAGR.\n4. **PE projection** — Anchor TTM P/E 35.0× @ ₹1,726; exit scenarios at same / 10Y avg / forward fair multiple.\n5. **Calculator isolation** — No cost basis, no averaging-down, no portfolio weights (mandate for this tool).\n6. **Exclusion guards** — *Leverage within normal framework band or not reported.*\n\n**Binding sources:** `stock-agent.mdc` · `StockBook/AGENT-RULES.md` · `investor-wisdom/buy-decision-workflow.md` · `PARAMETERS-FRAMEWORK.md`\n\n---\n\n## Context used\n\n| Layer | Source | Status |\n|-------|--------|--------|\n| StockBook summary | `summary-analysis.md` | Loaded (excerpt below) |\n| StockBook approach | `suggested-approach.md` | Loaded |\n| PARAMETERS | `PARAMETERS_BAJAJFINSV.md` | CMP as of 2026-09-14 |\n| Internal risk | `internal-negative-risk.md` | Loaded |\n| External risk | `external-negative-risk.md` | Loaded |\n| Live CMP | NSE / Yahoo / PARAMETERS | nse-yahoo |\n\n**StockBook saved verdict (Axis B / approach):** *Expensive* — **FACT** from StockBook; calculator does not override without new evidence.\n\n\n### Summary excerpt (StockBook)\n\n# Bajaj Finserv — Summary Analysis\r\n\r\n**Ticker:** BAJAJFINSV (NSE)  \r\n**Analysis date:** 23 Aug 2026  \r\n**Sector:** Banking and Finance\r\n\r\n---\r\n\r\n## Your position\r\n\r\n| Metric | Value |\r\n|--------|------:|\r\n| Quantity | 60 shares |\r\n| Avg cost | ₹1699.73 |\r\n| Cost basis | ₹101,984 |\r\n| CMP (approx.) | ₹2033 |\r\n| Current value | ₹121,980 |\r\n| Return | 19.6% |\r\n\r\n---\r\n\r\n## Verdict (one line)\r\n\r\n**HOLD · token SIP**\r\n\r\n---\r\n\r\n## Valuation tier @ CMP (₹2033)\r\n\r\n| Metric | Value |\r\n|--------|------:|\r\n| PCCL anchor (pessimistic) | ₹1600-1750 |\r\n| Premium to PCCL (low) | 27% |\r\n| **Tier (1-5)** | **3 — Little premium** |\r\n| **Current value @ CMP** | **Expensive** |\r\n| **Framework read (past + forward)** | Holding-co premium; +16-27% vs PCCL. Past rerating strong; forward prob ~60% · token SIP. |\r\n| **SIP stance** | Slow — reduced tranche |\r\n| **Monthly pace** | **1 sh/mo** |\r\n| **Blended avg ce\n\n… [truncated]\n\n\n### Approach excerpt (StockBook)\n\n# Bajaj Finserv — Suggested Approach\r\n\r\n**Analysis date:** 24 Aug 2026  \r\n**For:** 60 shares @ ₹1699.73  \r\n**Investor mandate:** Continuous salary SIP in quality names · **PCCL protects** pace + blended book\r\n\r\n---\r\n\r\n## Philosophy\r\n\r\n```\r\nWealth = Quantity x Time x Business quality\r\nNobody knows timing — SIP through sideways markets\r\nPCCL = protection (pace + book floor), NOT wait-for-crash entry\r\n```\r\n\r\nCross-ref: `pccl-analysis/continuous-sip-valuation-tiers.md` · `StockBook/_templates/dual-axis-suggested-approach.md`\r\n\r\n---\r\n\n<!-- LENSES-APPROACH:START -->\r\n## Lens-driven plan\r\n\r\nHow standalone lenses constrain **pace** and **surplus** (source files updated independently).\r\n\r\n| Lens | Read @ CMP | Effect on pace / surplus |\r\n|------|------------|---------------------------|\r\n| **News** | No row in TICKER-INDEX | Thesis-led pace |\r\n| **Parameters (Part 2 forward)** | See PARAMETERS fi\n\n… [truncated]\n\n\n**Your inputs (ASSUMPTION unless from PARAMETERS):**\n\n| Input | Value | Type |\n|-------|------:|------|\n| PE basis | TTM P/E | User selection |\n| Expected earnings CAGR | 12.0% | **YOUR ASSUMPTION** |\n| Horizon | 5 years | User selection |\n| Manual P/E override | — | Framework PARAMETERS |\n| Hypothetical investment | — | — |\n\n---\n\n## Business quality\n\n| Metric | Today @ CMP | Framework read | Label |\n|--------|------------:|----------------|-------|\n| **ROE** | UNVERIFIED | - | UNVERIFIED |\n| **EBITDA margin** | — | — | PARAMETERS Part 1 |\n| **Debt / leverage** | — | — | Qualitative / UNVERIFIED |\n| **Cash flow / balance sheet** | OEY 6.2% | +114% | StockBook / PARAMETERS |\n\n*Separate **business quality** from **valuation at CMP** — excellent business can still be a poor entry at the wrong price.*\n\n---\n\n## Valuation & PE projection\n\n| Metric | Value | Source |\n|--------|------:|--------|\n| CMP | ₹1,726 | nse-yahoo |\n| TTM P/E | 35.0× | PARAMETERS |\n| Forward P/E | — | PARAMETERS Part 2 |\n| 10Y avg P/E | — | PARAMETERS Part 1 |\n| Forward fair P/E | — | ASSUMPTION in PARAMETERS |\n| Anchor P/E used | 35.0× (TTM P/E) | Calculator |\n| Implied anchor EPS | ₹49 | Derived |\n| EPS after 5Y @ 12.0% | ₹87 | **YOUR CAGR assumption** |\n| Framework 5Y fair (base) | — | PARAMETERS |\n\n**Price scenario verdict (primary lens):** Attractive — implied price CAGR 12.0% meets/exceeds 12% hurdle (TTM lens)\n\n---\n\n## Risk assessment (framework registers)\n\n### Internal risk — company-specific\n\n| Field | Value |\n|-------|-------|\n| Worst level | **L3** |\n| Growth haircut | ~10.0 pp (-5 to -15 pp) |\n| Active rows | 3 |\n| Summary | Internal worst case L3 — growth haircut ~10.0 pp (-5 to -15 pp) |\n\n**Top risks:** Asset quality / slippage spike (L2) · Governance / fraud / branch conduct (L3) · ALM / liquidity mismatch (L2)\n\n\n### External risk — macro / sector / policy\n\n| Field | Value |\n|-------|-------|\n| Worst level | **L2** |\n| Growth haircut | ~5.0 pp (-3 to -7 pp) |\n| Active rows | 4 |\n| Summary | External worst case L2 — growth haircut ~5.0 pp (-3 to -7 pp) |\n\n**Top risks:** RBI hawkish / NIM compression (L1-L2) · Credit cycle / asset quality downturn (L2) · INR volatility / liquidity (L1)\n\n\n*Risk level scale (AGENT-RULES): L1 = 0–2 pp · L2 = 3–7 pp · L3 = ≥8 pp off sustainable EPS CAGR.*\n\n---\n\n## CAGR gap analysis\n\n| Metric | Value |\n|--------|------:|\n| Framework base EPS CAGR | 12-18% CAGR |\n| Max risk haircut applied | −10.0 pp |\n| **Possible EPS CAGR** | **5.0%** |\n| Implied price CAGR (framework) | 12.0% |\n| **Possible CAGR (conservative)** | **5.0%** |\n| **Your expected CAGR** | **12.0%** |\n| **Gap (possible − expected)** | **-7.0 pp** |\n\nStretched expectation — your 12% exceeds framework possible ~5.0% by 7.0 pp (stress haircut up to 15.0 pp).\n\n---\n\n## Exit scenarios (5 years)\n\n| Scenario | Exit P/E | Exit price | Total return | Price CAGR |\n|----------|---------:|-----------:|-------------:|-----------: |\n| Same TTM P/E | 35.0× | ₹3,042 | 76.2% | 12.0% |\n\n*Formula: projected EPS = anchor EPS × (1 + CAGR)^years; exit = projected EPS × exit P/E.*\n\n---\n\n## Core-problem test\n\n> **Why might 12.0% CAGR be wrong?**\n\n| Question | Framework answer |\n|----------|------------------|\n| Is growth **temporary vs structural**? | Internal L3 · External L2 — review risk registers. |\n| Is the stock **cheap for a reason**? | Compare TTM 35.0× vs 10Y —×; forward IV premium in PARAMETERS. |\n| Does **price CAGR** match **earnings CAGR**? | Primary scenario price CAGR vs your 12.0%% earnings assumption — multiple re-rating may differ. |\n| StockBook disagree? | Saved verdict: *Expensive* |\n\n---\n\n## Analysis\n\n**Framework-constrained read (deterministic):**\n\n1. **Quality lens** — ROE UNVERIFIED, EBITDA —, cash OEY 6.2%. ROE unverified — do not rank on quality alone.\n\n2. **Valuation lens** — At ₹1,726 on 35.0× TTM P/E, attractive — implied price cagr 12.0% meets/exceeds 12% hurdle (ttm lens). Forward P/E is **confirmatory only** — not a primary buy trigger per framework.\n\n3. **Risk lens** — Combined worst haircut ~10.0 pp caps *possible* EPS path before your 12.0% assumption is tested.\n\n4. **CAGR gap** — Stretched expectation — your 12% exceeds framework possible ~5.0% by 7.0 pp (stress haircut up to 15.0 pp). This is the key differentiator vs generic AI: we anchor on **StockBook PARAMETERS + risk registers**, not headline optimism.\n\n5. **Not a buy call** — Calculator output informs **WAIT / WATCHLIST / STAGED** vocabulary; fresh capital still requires full `buy-decision-workflow.md` + PCCL when you choose to deploy.\n\n---\n\n## Verdict\n\n**INVESTIGATE — L3 risk on internal/external register**\n\n| Check | Result |\n|-------|--------|\n| 12% long-term hurdle (price CAGR) | Primary scenario vs hurdle — see exit table |\n| Framework possible vs expected CAGR | Gap -7.0 pp |\n| StockBook alignment | Expensive |\n| Fresh capital action | Run full buy-decision-workflow before any real ADD |\n\n*Calculator verdict is **what-if only** — does not replace StockBook `suggested-approach.md` or personal pause registry.*\n\n---\n\n## Quotes lens\n\n1. > *\"The stock market is a device for transferring money from the impatient to the patient.\"*  \n> — **Warren Buffett**\n\n2. > *\"Price is what you pay; value is what you get.\"*  \n> — **Warren Buffett**\n\n3. > *\"It's far better to buy a wonderful company at a fair price than a fair company at a wonderful price.\"*  \n> — **Warren Buffett**\n\n---\n\n## What would change the view\n\n- Quarterly EPS **above** 12.0% run-rate for 2+ quarters → revisit possible CAGR upward.\n- Risk register **downgrade** (L2→L1) on internal or external file → haircut reduces; gap narrows.\n- **CMP** moves ≥10% without thesis change → re-run calculator; PCCL tier may shift.\n- New **StockBook** approach verdict after results → framework verdict takes precedence over this run.\n- Material **governance / legal / structural** headline → run fraud-detection + legal-threat analysis before any ADD.\n\n---\n\n*Report generated by Stock Calculator · Framework precedence: Core rules → StockBook → Calculator math · Not generic AI opinion.*\n",
+      "snapshot": {
+        "cmp": 1726.1,
+        "cmpSource": "nse-yahoo",
+        "ttmPe": 35,
+        "forwardPe": null,
+        "avg10yPe": null,
+        "forwardFairPe": null,
+        "normalizedEps": null,
+        "framework5yFairPrice": null,
+        "parametersDate": "2026-09-14"
+      },
+      "scenarios": [
+        {
+          "label": "Same TTM P/E",
+          "exitPe": 35,
+          "exitPrice": 3041.9779793715215,
+          "totalReturnPct": 76.2341683200001,
+          "priceCagrPct": 12.00000000000001
+        }
+      ],
+      "projectedEps": 86.91365655347204,
+      "anchorEps": 49.317142857142855,
+      "quality": {
+        "roePct": null,
+        "roeDisplay": "UNVERIFIED",
+        "roeRead": "-",
+        "debtDisplay": "—",
+        "debtRatio": null,
+        "debtRead": null,
+        "ebitdaMarginPct": null,
+        "ebitdaDisplay": "—",
+        "ebitdaRead": null,
+        "cashFlowDisplay": "OEY 6.2%",
+        "cashFlowRead": "+114%",
+        "baseEpsCagrPct": 15,
+        "baseEpsCagrRange": "12-18% CAGR",
+        "impliedPriceCagrPct": null
+      },
+      "internalRisk": {
+        "level": "L3",
+        "score": 3,
+        "haircutMidPp": 10,
+        "haircutRange": "-5 to -15 pp",
+        "activeRiskCount": 3,
+        "topRisks": [
+          "Asset quality / slippage spike (L2)",
+          "Governance / fraud / branch conduct (L3)",
+          "ALM / liquidity mismatch (L2)"
+        ],
+        "summary": "Internal worst case **L3** — growth haircut ~10.0 pp (-5 to -15 pp)",
+        "source": "internal-negative-risk.md"
+      },
+      "externalRisk": {
+        "level": "L2",
+        "score": 2,
+        "haircutMidPp": 5,
+        "haircutRange": "-3 to -7 pp",
+        "activeRiskCount": 4,
+        "topRisks": [
+          "RBI hawkish / NIM compression (L1-L2)",
+          "Credit cycle / asset quality downturn (L2)",
+          "INR volatility / liquidity (L1)"
+        ],
+        "summary": "External worst case **L2** — growth haircut ~5.0 pp (-3 to -7 pp)",
+        "source": "external-negative-risk.md"
+      },
+      "cagrGap": {
+        "frameworkBaseEpsCagrPct": 15,
+        "internalHaircutPp": 10,
+        "externalHaircutPp": 5,
+        "possibleEpsCagrPct": 5,
+        "impliedPriceCagrPct": 12.00000000000001,
+        "possibleCagrPct": 5,
+        "expectedCagrPct": 12,
+        "cagrGapPp": -7,
+        "gapVerdict": "Stretched expectation — your 12% exceeds framework possible ~5.0% by 7.0 pp (stress haircut up to 15.0 pp).",
+        "gapTone": "negative"
+      },
+      "frameworkVerdict": "INVESTIGATE — L3 risk on internal/external register",
+      "reportMode": "framework-local",
+      "tabAnalysis": {
+        "historical": {
+          "part1Verdict": null,
+          "cheapOrExpensive": null,
+          "peToday": "Normal fair value anchor",
+          "pe10yAvg": "—",
+          "premiumToIv": "sqrt(22.5 x EPS x BVPS)",
+          "ownerEarningsYield": "Price / EPS",
+          "epsCagrHist": null,
+          "rows": [
+            {
+              "parameter": "P/E",
+              "avg10y": "—",
+              "today": "Normal fair value anchor",
+              "read": "Price below IV = margin"
+            },
+            {
+              "parameter": "Owner Earnings Yield",
+              "avg10y": "—",
+              "today": "Price / EPS",
+              "read": "Higher = pays more per Rs profit"
+            },
+            {
+              "parameter": "Premium to IV",
+              "avg10y": "—",
+              "today": "sqrt(22.5 x EPS x BVPS)",
+              "read": "Max Graham fair price"
+            },
+            {
+              "parameter": "ROE",
+              "avg10y": "—",
+              "today": "PAT / assets",
+              "read": "NBFC earning power"
+            }
+          ]
+        },
+        "forward": {
+          "epsCagrBase": null,
+          "epsCagrPessimistic": null,
+          "epsCagrOptimistic": null,
+          "forwardFairPe": null,
+          "framework5yFairPrice": null,
+          "implied5yPriceCagr": null,
+          "forwardPremiumIv": null,
+          "forwardVerdict": null,
+          "volumeCagr": null,
+          "addCase": null
+        },
+        "entry": {
+          "stockbookVerdict": "Expensive",
+          "axisBValue": "Conflict resolution:",
+          "axisATier": "3",
+          "sipPace": "—",
+          "monthlyPace": "1 sh/mo",
+          "blendedCeiling": "₹1926",
+          "holderAction": null,
+          "approachExcerpt": "## Valuation tier @ CMP (₹2033) — Axis A\r\n\r\n| Metric | Value | Tier |\r\n|--------|------:|:----:|\r\n| PCCL anchor | ₹1600-1750 | |\r\n| Premium to PCCL | 27% | |\r\n| **Label** | **Little premium** | **3** |\r\n| **Current value @ CMP** | **Expensive** | |\r\n| **SIP stance** | Slow — reduced tranche | |\r\n| **Monthly pace** | **1 sh/mo** | |\r\n| **Blended ceiling** | **₹1926** | |\r\n\r\n---"
+        }
+      }
+    }
+  ]
+}

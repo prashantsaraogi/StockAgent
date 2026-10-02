@@ -1,0 +1,39 @@
+---
+description: When updating web features or frameworks, sync Prompt Guidelines and Services catalog
+alwaysApply: true
+---
+
+# Web updates — Prompt & Services sync (mandatory)
+
+Whenever the user asks to **update**, **add**, or **redesign** a web feature, Stock Calculator tab,
+API job, or framework workflow, **in the same session** also update applicable entries in:
+
+1. **Prompt tab** — `web/lib/agent/prompt-guidelines.ts` (`PROMPT_CATEGORIES`)
+2. **Services tab** — `web/lib/services-catalog.ts` (`SERVICE_CATEGORIES`)
+
+Do this **by default** without waiting for a separate request. Skip only when the change is
+purely internal (CSS typo, refactor with no user-facing workflow change).
+
+## When to add or edit
+
+| Change type | Prompt tab | Services tab |
+|-------------|------------|--------------|
+| New Stock Calculator tab or major section | Copy-paste prompt for agent to populate StockBook + run analysis | Link to tab + refresh prompt if data-driven |
+| New one-click API job (`/api/services/run`) | Optional companion prompt for manual/AI follow-up | `actionType: 'api'` entry + pack membership if daily |
+| New copy-paste agent workflow | New `PromptExample` with framework refs | Mirror as `actionType: 'prompt'` if runnable from Services |
+| Framework doc restructure (Part A/B, Gordon PE, etc.) | Update affected prompt text + `framework[]` tags | Update related service descriptions/prompts |
+| Quarterly / news / morning run cascade | Update steps in post-results prompts | Update refresh-quarter-results and dependency descriptions |
+
+## Quality bar
+
+- Prompts must reference **StockBook paths**, framework files, and evidence labels (FACT / ASSUMPTION).
+- Services must have **title**, **description**, **cadence**, **channel** (`web` | `cursor` | `both`).
+- Use placeholders: `{TICKER}`, `{DATE}`, `{SECTOR}`, `{AMOUNT}` — document in `placeholders` on Prompt tab.
+- Cross-link: Services panel links to `/chat/prompts`; keep IDs aligned where the same workflow appears in both.
+
+## Files (do not duplicate elsewhere)
+
+- Prompt UI: `web/components/PromptGuidelinesPanel.tsx` (reads `prompt-guidelines.ts`)
+- Services UI: `web/components/ServicesPanel.tsx` (reads `services-catalog.ts`)
+
+After edits, run `npm run build` in `web/` if TypeScript changed.

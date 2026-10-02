@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "lots": [
+    {
+      "id": "a0b82c22-5c09-404e-9507-a846fa509a29",
+      "ticker": "MARUTI",
+      "company": "Maruti Suzuki",
+      "sector": "Auto",
+      "qty": 57,
+      "price": 11155.83,
+      "purchaseDate": "2026-10-01",
+      "addedAt": "2026-10-01T06:55:22.228Z",
+      "legacy": true
+    },
+    {
+      "id": "be818514-eec3-4165-8c4f-40e7fa2d33cc",
+      "ticker": "ITC",
+      "company": "ITC",
+      "sector": "FMCG",
+      "qty": 100,
+      "price": 357.94,
+      "purchaseDate": "2026-10-01",
+      "addedAt": "2026-10-01T06:55:22.228Z",
+      "legacy": true
+    },
+    {
+      "id": "3136b1f3-0521-48b9-abf3-6485106c6cc7",
+      "ticker": "MAXHEALTH",
+      "company": "Max Healthcare",
+      "sector": "Healthcare",
+      "qty": 10,
+      "price": 655.84,
+      "purchaseDate": "2026-10-01",
+      "addedAt": "2026-10-01T06:55:22.228Z",
+      "legacy": true
+    }
+  ]
+}

@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cupid Ltd - Investment Report</title>
+  <style>
+    :root {
+      --bg: #f8f9fb; --card: #ffffff; --text: #1a1d26; --muted: #5c6370; --border: #e2e6ed;
+      --accent: #7c2d12; --accent-light: #fff7ed; --hold: #0d6e4f; --hold-light: #e8f5f0;
+      --warn: #b45309; --warn-light: #fff7ed;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-size: 15px; }
+    .header { background: linear-gradient(135deg, #7c2d12 0%, #9a3412 100%); color: #fff; padding: 2rem 1.5rem 1.5rem; }
+    .header-inner { max-width: 960px; margin: 0 auto; }
+    .header h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .header .meta { opacity: 0.9; font-size: 0.9rem; margin-bottom: 1rem; }
+    .verdict-box { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 8px; padding: 0.85rem 1rem; font-size: 0.95rem; }
+    .nav { background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .nav-inner { max-width: 960px; margin: 0 auto; display: flex; gap: 0.35rem; padding: 0.75rem 1.5rem; flex-wrap: wrap; }
+    .nav a { text-decoration: none; color: var(--muted); font-size: 0.8rem; font-weight: 600; padding: 0.35rem 0.7rem; border-radius: 6px; }
+    .nav a:hover { background: var(--bg); color: var(--text); }
+    main { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+    section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.75rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .section-label { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.25rem 0.6rem; border-radius: 4px; margin-bottom: 0.5rem; background: var(--accent-light); color: var(--accent); }
+    .section-title { font-size: 1.35rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+    .section-body h1 { font-size: 1.25rem; margin: 1rem 0 0.75rem; }
+    .section-body h2 { font-size: 1.15rem; margin: 1.25rem 0 0.65rem; padding-bottom: 0.35rem; border-bottom: 1px solid var(--border); }
+    .section-body h3 { font-size: 1.05rem; margin: 1rem 0 0.5rem; color: var(--text); }
+    .section-body h4 { font-size: 0.95rem; margin: 0.85rem 0 0.4rem; color: var(--muted); }
+    .section-body p { margin-bottom: 0.75rem; }
+    .section-body hr { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+    table { width: 100%; border-collapse: collapse; margin: 0.75rem 0 1.25rem; font-size: 0.875rem; }
+    th, td { padding: 0.6rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: #f1f5f9; font-weight: 600; }
+    td.num, th.num { text-align: right; }
+    tr:hover td { background: #fafbfc; }
+    ul.bullet { margin: 0.5rem 0 1rem 1.25rem; font-size: 0.9rem; }
+    ul.bullet li { margin-bottom: 0.35rem; }
+    pre.code-block { background: #f1f5f9; border: 1px solid var(--border); padding: 1rem 1.25rem; border-radius: 8px; font-family: Consolas, monospace; font-size: 0.85rem; line-height: 1.6; margin: 1rem 0; white-space: pre-wrap; overflow-x: auto; }
+    code { background: #f1f5f9; padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.85em; }
+    blockquote { border-left: 4px solid var(--accent); padding: 0.5rem 1rem; margin: 1rem 0; background: var(--accent-light); font-style: italic; }
+    a { color: #1d4ed8; }
+    .footer { text-align: center; padding: 1.5rem; color: var(--muted); font-size: 0.8rem; }
+    @media print { .nav { display: none; } section { break-inside: avoid; box-shadow: none; } body { background: #fff; } }
+    @media (max-width: 640px) { .header h1 { font-size: 1.4rem; } section { padding: 1.25rem; } table { font-size: 0.78rem; } }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <h1>Cupid Ltd</h1>
+      <p class="meta">CUPID (NSE) | Full investment report | Generated 01 Sep 2026<br>
+      <span style="opacity:0.85">Combined from markdown sections - shareable HTML</span></p>
+      <div class="verdict-box"><strong>Verdict:</strong> HOLD legacy winner | PAUSE ADDS | 0% surplus</div>
+    </div>
+  </header>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#summary" class="s1">1. Summary</a>
+      <a href="#detail" class="s2">2. Detail Analysis</a>
+      <a href="#approach" class="s3">3. Suggested Approach</a>
+      <a href="#faq" class="s4">4. FAQ</a>
+      <a href="#ext-risk" class="s5">5. External Risks</a>
+      <a href="#int-risk" class="s6">6. Internal Risks</a>
+      <a href="#parameters" class="s7">7. Parameters</a>
+      <a href="#cagr" class="s8">8. Holding CAGR</a>
+      <a href="#broker" class="s9">9. Broker Targets</a>
+    </div>
+  </nav>
+  <main>
+    <section id="summary">
+      <span class="section-label label-summary">Section 1</span>
+      <h2 class="section-title">Summary</h2>
+      <div class="section-body">
+<p><strong>Ticker:</strong> CUPID (NSE) · BSE 530843 <strong>Analysis date:</strong> 31 Aug 2026 <strong>Sector:</strong> Consumer (Personal Products / contraceptives &amp; healthcare)</p>
+<hr>
+<h2>Your position</h2>
+<table>
+<thead><tr>
+<th>Metric</th>
+<th>Value</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Quantity</td>
+<td class="num">600 shares</td>
+</tr>
+<tr>
+<td>Avg cost</td>
+<td>₹120.00</td>
+</tr>
+<tr>
+<td>Cost basis</td>
+<td>₹72,000</td>
+</tr>
+<tr>
+<td>CMP (NSE)</td>
+<td>₹279.88</td>
+</tr>
+<tr>
+<td>CMP date</td>
+<td class="num">31 Aug 2026 (Trendlyne)</td>
+</tr>
+<tr>
+<td>Current value</td>
+<td>₹1,67,928</td>
+</tr>
+<tr>
+<td>Return (simple)</td>
+<td><strong>+133%</strong></td>
+</tr>
+<tr>
+<td>Portfolio weight</td>
+<td>~1.3% of book (approx.)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Verdict (one line)</h2>
+<p><strong>HOLD legacy winner · PAUSE ADDS · 0% surplus</strong></p>
+<hr>
+<h2>Valuation tier @ CMP (₹279.88)</h2>
+<table>
+<thead><tr>
+<th>Metric</th>
+<th>Value</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Rational PCCL (pessimistic)</td>
+<td>₹175–210</td>
+</tr>
+<tr>
+<td>Applied PCCL</td>
+<td>₹175–210 (gain book — no loss floor)</td>
+</tr>
+<tr>
+<td>Premium to Applied PCCL (mid)</td>
+<td><strong>~+40%</strong></td>
+</tr>
+<tr>
+<td><strong>Tier (1–5)</strong></td>
+<td><strong>2 — Expensive</strong></td>
+</tr>
+<tr>
+<td><strong>Current value @ CMP (Axis B)</strong></td>
+<td><strong>Expensive</strong> (trailing hypergrowth priced in)</td>
+</tr>
+<tr>
+<td><strong>Framework read</strong></td>
+<td>Quality export niche + execution proof; price reflects FY27 bull case; governance L1</td>
+</tr>
+<tr>
+<td><strong>SIP stance</strong></td>
+<td><strong>Pause</strong> — no salary surplus</td>
+</tr>
+<tr>
+<td><strong>Monthly pace</strong></td>
+<td><strong>0 sh/mo</strong> (optional token 1 sh/qtr only if user insists on satellite)</td>
+</tr>
+<tr>
+<td><strong>Blended avg ceiling</strong></td>
+<td><strong>₹140</strong> (do not dilute legacy cost edge)</td>
+</tr>
+<tr>
+<td>Surplus slice</td>
+<td><strong>0%</strong></td>
+</tr>
+</tbody></table>
+<p><em>Continuous SIP doctrine: legacy @ ₹120 is a massive winner — do not chase CMP with surplus. PCCL protects book, not FOMO.</em></p>
+<hr>
+<h2>Action summary</h2>
+<table>
+<thead><tr>
+<th>Action</th>
+<th>Detail</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>HOLD</strong></td>
+<td>All 600 shares (wealth mandate — no trim for valuation)</td>
+</tr>
+<tr>
+<td><strong>Continuous SIP</strong></td>
+<td><strong>Pause</strong> @ tier 2 expensive</td>
+</tr>
+<tr>
+<td><strong>Blended cap</strong></td>
+<td>Any add above <strong>₹140</strong> worsens book unnecessarily</td>
+</tr>
+<tr>
+<td><strong>Surplus rank</strong></td>
+<td><strong>#0</strong> vs ranked names (Max, ICICI, Lupin, Bharti, etc.)</td>
+</tr>
+<tr>
+<td><strong>Fresh capital</strong></td>
+<td><strong>Not recommended</strong> at CMP — HIGH ALERT micro-cap re-rating</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Key facts (31 Aug 2026)</h2>
+<table>
+<thead><tr>
+<th>Item</th>
+<th>Detail</th>
+<th>Type</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Q1 FY27 revenue</td>
+<td>₹156.98 cr (+142% YoY)</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>Q1 FY27 PAT</td>
+<td>₹44.15 cr (+194% YoY)</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>Q1 EBITDA margin</td>
+<td class="num">~39%</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>FY27 guidance (upgraded)</td>
+<td>Rev ₹725–750 cr · PAT ₹210–225 cr</td>
+<td>MANAGEMENT CLAIM</td>
+</tr>
+<tr>
+<td>FY29 target</td>
+<td>Revenue ₹1,500 cr</td>
+<td>MANAGEMENT CLAIM</td>
+</tr>
+<tr>
+<td>FY26 PAT</td>
+<td>~₹108 cr</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>Export mix</td>
+<td>~85% B2B (WHO/UNFPA pre-qualified)</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>Promoter holding</td>
+<td class="num">~46.5%</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>CMD open-market buy</td>
+<td class="num">97,392 sh (25 Aug 2026)</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>SEBI admin warning</td>
+<td>Apr 2026 — Reg 30(7) preferential-issue disclosure</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>Cash (FY26)</td>
+<td>~₹186 cr · largely net-debt-free</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td class="num">52W range</td>
+<td>~₹33 – ~₹299 (UNVERIFIED exact low date)</td>
+<td>UNVERIFIED</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>PCCL snapshot</h2>
+<table>
+<thead><tr>
+<th>Scenario</th>
+<th>Normalized EPS (₹)</th>
+<th>Multiple</th>
+<th>Value (₹)</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Pessimistic (PCCL)</td>
+<td class="num">8–9</td>
+<td class="num">20–22×</td>
+<td><strong>175–210</strong></td>
+</tr>
+<tr>
+<td>Normal</td>
+<td class="num">14–16</td>
+<td class="num">22–25×</td>
+<td class="num">308–400</td>
+</tr>
+<tr>
+<td>Optimistic (FY27 bull)</td>
+<td class="num">17–18</td>
+<td class="num">25–28×</td>
+<td class="num">425–504</td>
+</tr>
+</tbody></table>
+<p><strong>Core-problem test:</strong> No structural moat break — export order book + FMCG expansion intact. <strong>Risk = valuation + governance disclosure</strong>, not business collapse.</p>
+<hr>
+<h2>Report files &amp; lenses</h2>
+<table>
+<thead><tr>
+<th>File</th>
+<th>Purpose</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>summary-analysis.md</code></td>
+<td>Verdict + integrated lens snapshot</td>
+</tr>
+<tr>
+<td><code>suggested-approach.md</code></td>
+<td>Lens-driven SIP plan</td>
+</tr>
+<tr>
+<td><code>detail-analysis.md</code></td>
+<td>Full framework</td>
+</tr>
+<tr>
+<td><code>faq.md</code></td>
+<td>Q&amp;A + Quotes lens</td>
+</tr>
+<tr>
+<td><code>PARAMETERS_CUPID.md</code></td>
+<td class="num">10Y rear-view + 5Y forward</td>
+</tr>
+<tr>
+<td><code>BROKER_CUPID.md</code></td>
+<td>Street targets by broker</td>
+</tr>
+<tr>
+<td><code>CAGR_CUPID.md</code></td>
+<td>Holding return per lot</td>
+</tr>
+<tr>
+<td><code>external-negative-risk.md</code></td>
+<td>Macro / FX / sector risks</td>
+</tr>
+<tr>
+<td><code>internal-negative-risk.md</code></td>
+<td>Governance / execution risks</td>
+</tr>
+<tr>
+<td><code>cupid-report.html</code></td>
+<td><strong>Full combined report</strong> (all sections — shareable HTML)</td>
+</tr>
+</tbody></table>
+<p><strong>Refresh:</strong> After Q2 FY27 results · run <code>StockBook/_sync-analysis-lenses.ps1 -Ticker CUPID</code></p>
+<h2>Report files &amp; lenses</h2>
+<table>
+<thead><tr>
+<th>File</th>
+<th>Purpose</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><code>summary-analysis.md</code></td>
+<td>Verdict + integrated lens snapshot</td>
+</tr>
+<tr>
+<td><code>suggested-approach.md</code></td>
+<td>Lens-driven SIP plan</td>
+</tr>
+<tr>
+<td><code>detail-analysis.md</code></td>
+<td>Full framework</td>
+</tr>
+<tr>
+<td><code>faq.md</code></td>
+<td>Q&amp;A + Quotes lens</td>
+</tr>
+<tr>
+<td><code>PARAMETERS_CUPID.md</code></td>
+<td class="num">10Y rear-view + 5Y forward</td>
+</tr>
+<tr>
+<td><code>BROKER_CUPID.md</code></td>
+<td>Street targets by broker</td>
+</tr>
+<tr>
+<td><code>CAGR_CUPID.md</code></td>
+<td>Holding return per lot</td>
+</tr>
+</tbody></table>
+<p><strong>Refresh:</strong> After news run, parameters/broker batch, or verdict change - run lens sync.</p>
+      </div>
+    </section>
+
+    <section id="detail">
+      <span class="section-label label-detail">Section 2</span>
+      <h2 class="section-title">Detail Analysis</h2>
+      <div class="section-body">
+<p><strong>Ticker:</strong> CUPID (NSE) · BSE 530843 <strong>Analysis date:</strong> 31 Aug 2026 <strong>CMP:</strong> ₹279.88 (31 Aug 2026, Trendlyne NSE)</p>
+<hr>
+<h2>1. Business model &amp; moat</h2>
+<p><strong>How it makes money:</strong> Manufacturer and exporter of male/female condoms, water-based lubricants, and in-vitro diagnostic (IVD) kits. Nashik-based plant; <strong>~85% revenue from international B2B</strong> (UNFPA, WHO pre-qualified supplier lists, government health programmes). Domestic consumer healthcare / FMCG expansion via retail (~1.5 lakh+ outlets cited in company materials — MANAGEMENT CLAIM).</p>
+<table>
+<thead><tr>
+<th>Moat element</th>
+<th>Evidence</th>
+<th>Rating</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Regulatory pre-qualification (WHO/UNFPA)</td>
+<td>Long-standing exporter credentials</td>
+<td><strong>Moderate</strong> — replicable with capital/time</td>
+</tr>
+<tr>
+<td>Export order book</td>
+<td>Q1 FY27 scale + upgraded FY27 guide</td>
+<td><strong>Moderate</strong> — customer concentration risk</td>
+</tr>
+<tr>
+<td>Brand (Cupid) in condoms</td>
+<td>Niche; not HUL-scale consumer</td>
+<td><strong>Low–Moderate</strong></td>
+</tr>
+<tr>
+<td>Cost / margin</td>
+<td>EBITDA ~39% Q1 FY27</td>
+<td><strong>Strong</strong> — FACT</td>
+</tr>
+<tr>
+<td>Switching costs</td>
+<td>Institutional tenders</td>
+<td><strong>Moderate</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Why competitors cannot easily replicate:</strong> Pre-qualification + audit trail + scale at 39% margins create friction, but this is <strong>not</strong> a wide consumer moat like Nestlé/HUL. Moat is <strong>B2B institutional + execution</strong>, not pricing power with end consumers.</p>
+<p><strong>Classification:</strong> Real moat in <strong>export niche</strong> · Management narrative on ₹1,500 cr FY29 is <strong>ASSUMPTION</strong> until repeated in filings.</p>
+<hr>
+<h2>2. Earnings quality (Q1 FY27)</h2>
+<table>
+<thead><tr>
+<th>Metric</th>
+<th>Q1 FY27</th>
+<th>YoY</th>
+<th>QoQ</th>
+<th>Type</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Revenue from operations</td>
+<td>₹154.72 cr</td>
+<td class="num">+159%</td>
+<td class="num">+29%</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>Total income</td>
+<td>₹156.98 cr</td>
+<td class="num">+142%</td>
+<td class="num">+19%</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>EBITDA</td>
+<td>₹60.1 cr</td>
+<td class="num">+264%</td>
+<td class="num">+60%</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>EBITDA margin</td>
+<td class="num">38.8%</td>
+<td>+1,130 bps</td>
+<td>—</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>PAT</td>
+<td>₹44.15 cr</td>
+<td class="num">+194%</td>
+<td class="num">+22%</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>Total comprehensive income</td>
+<td>₹1.69 cr</td>
+<td>−89%</td>
+<td>—</td>
+<td>FACT</td>
+</tr>
+</tbody></table>
+<p><strong>Earnings quality flags:</strong></p>
+<ul class="bullet">
+<li>Operating PAT growth <strong>supported by EBITDA expansion</strong> — positive (FACT).</li>
+<li><strong>Other comprehensive loss</strong> depressed TCI in Q1 — investigate FX/hedging; <strong>not</strong> core operating issue but adds volatility (FACT).</li>
+<li><strong>Working capital / receivables</strong> — UNVERIFIED this quarter; monitor in AR.</li>
+<li>Do <strong>not</strong> extrapolate Q1 × 4 as base case without H2 seasonality check — <strong>HYPOTHESIS</strong>.</li>
+</ul>
+<p><strong>FY26 base:</strong> PAT ~₹108 cr on revenue ~₹380 cr (FACT from news/filings).</p>
+<hr>
+<h2>3. Growth reality check</h2>
+<table>
+<thead><tr>
+<th>Scenario</th>
+<th>FY27 PAT</th>
+<th>Revenue</th>
+<th>Assumption</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>Pessimistic</strong></td>
+<td>₹120–140 cr</td>
+<td>₹550–600 cr</td>
+<td>Export slowdown; margin mean-reverts to ~32%</td>
+</tr>
+<tr>
+<td><strong>Normal</strong></td>
+<td>₹170–190 cr</td>
+<td>₹650–700 cr</td>
+<td>Partial guide achievement</td>
+</tr>
+<tr>
+<td><strong>Optimistic</strong></td>
+<td>₹210–225 cr</td>
+<td>₹725–750 cr</td>
+<td>Management guide — MANAGEMENT CLAIM</td>
+</tr>
+<tr>
+<td><strong>Bull / FY29</strong></td>
+<td>—</td>
+<td>₹1,500 cr</td>
+<td>Requires sustained 40%+ CAGR — HYPOTHESIS</td>
+</tr>
+</tbody></table>
+<p><strong>Industry:</strong> Global contraceptive / sexual wellness demand stable; India FMCG adjacency competitive. Export realisations benefited from <strong>~10% price hike + USD/INR</strong> (MANAGEMENT COMMENTARY, ET Aug 2026). <strong>Growth must translate to sustainable EPS</strong> — share count dilution from past corporate actions must be tracked (UNVERIFIED exact diluted count; ~12.5 cr shares <strong>HYPOTHESIS</strong> from mcap/CMP).</p>
+<hr>
+<h2>4. Management, governance &amp; integrity</h2>
+<table>
+<thead><tr>
+<th>Check</th>
+<th>Status</th>
+<th>Type</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Promoter holding</td>
+<td class="num">~46.5%</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>CMD open-market purchase</td>
+<td class="num">97,392 shares (25 Aug 2026)</td>
+<td>FACT — positive signal</td>
+</tr>
+<tr>
+<td>SEBI administrative warning</td>
+<td class="num">23 Apr 2026 letter received 28 Apr — Reg 30(7) failure to disclose preferential issue <strong>cancellation</strong></td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>SEBI settlement (Unistone / insider trading)</td>
+<td class="num">16 Jun 2026 — ₹67.34 lakh settlement</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>BSE reclassification</td>
+<td>Group A (Jul 2026)</td>
+<td>FACT (per news)</td>
+</tr>
+</tbody></table>
+<p><strong>Management rating:</strong> <strong>B+</strong> — strong operational delivery but <strong>disclosure lapse</strong> keeps governance at <strong>L1 internal risk</strong>, not fraud tier. <strong>Not accounting fraud</strong> — administrative warning + settled proceedings. <strong>Do not ignore</strong> repeat disclosure failures.</p>
+<hr>
+<h2>5. Balance sheet &amp; capital allocation</h2>
+<table>
+<thead><tr>
+<th>Item</th>
+<th>Approx.</th>
+<th>Type</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Cash (FY26)</td>
+<td>~₹186 cr</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>Net debt</td>
+<td>Largely nil</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>Equity</td>
+<td>~₹451 cr</td>
+<td>FACT</td>
+</tr>
+<tr>
+<td>Capex</td>
+<td>Capacity expansion (Palava cited in news)</td>
+<td>MANAGEMENT CLAIM</td>
+</tr>
+</tbody></table>
+<p><strong>Exclusion guards:</strong> CMP &gt; ₹20 ✓ · Not persistent loss-maker ✓ · Debt manageable ✓ · <strong>Micro/small-cap + extreme re-rating → HIGH ALERT for fresh BUY</strong></p>
+<hr>
+<h2>6. Valuation &amp; PCCL</h2>
+<p><strong>Share count assumption:</strong> ~12.5 cr shares (mcap ~₹35,000 cr / ₹280) — <strong>HYPOTHESIS</strong></p>
+<table>
+<thead><tr>
+<th>Lens</th>
+<th>EPS (₹)</th>
+<th>Multiple</th>
+<th>Price (₹)</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>Rational PCCL</strong></td>
+<td class="num">8.5</td>
+<td class="num">22×</td>
+<td><strong>187</strong></td>
+</tr>
+<tr>
+<td>Normal IV</td>
+<td class="num">15</td>
+<td class="num">24×</td>
+<td class="num">360</td>
+</tr>
+<tr>
+<td>Optimistic</td>
+<td class="num">17.5</td>
+<td class="num">26×</td>
+<td class="num">455</td>
+</tr>
+</tbody></table>
+<table>
+<thead><tr>
+<th>Metric @ ₹279.88</th>
+<th>Value</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>MoS vs normal IV (~₹360)</td>
+<td><strong>−22%</strong> (price above normal)</td>
+</tr>
+<tr>
+<td>Premium to Applied PCCL (~₹190)</td>
+<td><strong>+47%</strong></td>
+</tr>
+<tr>
+<td>P/E on FY26 EPS (~8.6)</td>
+<td>~33×</td>
+</tr>
+<tr>
+<td>P/E on FY27 guide (~17)</td>
+<td>~16×</td>
+</tr>
+</tbody></table>
+<p><strong>Dual anchor:</strong> Rational PCCL <strong>₹175–210</strong> · No user Conviction PCCL stated · Applied = Base.</p>
+<hr>
+<h2>7. Structural threat</h2>
+<table>
+<thead><tr>
+<th>Threat</th>
+<th>Verdict</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>AI / tech disruption</td>
+<td><strong>Not material</strong> — physical products</td>
+</tr>
+<tr>
+<td>Substitutes / competition</td>
+<td><strong>L1</strong> — global condom suppliers; tender competition</td>
+</tr>
+<tr>
+<td>Regulatory (export)</td>
+<td><strong>L1</strong> — quality standards are barrier and risk</td>
+</tr>
+<tr>
+<td>FMCG pivot execution</td>
+<td><strong>L2</strong> — if domestic retail fails to scale</td>
+</tr>
+</tbody></table>
+<p><strong>Not</strong> IT-style permanent structural threat. <strong>Core problem = valuation + governance</strong>, not moat destruction.</p>
+<hr>
+<h2>8. Legal &amp; regulatory</h2>
+<table>
+<thead><tr>
+<th>Proceeding</th>
+<th>Status</th>
+<th>Impact</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>SEBI Reg 30(7) warning</td>
+<td>Closed as admin warning</td>
+<td><strong>L1</strong> — monitor repeats</td>
+</tr>
+<tr>
+<td>Unistone insider trading settlement</td>
+<td>Settled Jun 2026</td>
+<td><strong>L1</strong> — linked party trades</td>
+</tr>
+</tbody></table>
+<p>No existential legal overhang. <strong>Not</strong> Delta Corp–style liability.</p>
+<hr>
+<h2>9. Dynamic context (31 Aug 2026)</h2>
+<table>
+<thead><tr>
+<th>Factor</th>
+<th>Read</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>USD/INR</td>
+<td>Favourable for export realisations Q1 — may normalize</td>
+</tr>
+<tr>
+<td>Global health procurement</td>
+<td>Stable demand post-COVID normalisation</td>
+</tr>
+<tr>
+<td>India consumption</td>
+<td>FMCG rollout early stage</td>
+</tr>
+<tr>
+<td>Geopolitical</td>
+<td>No direct material impact identified — UNVERIFIED</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>10. Comparative rank (fresh surplus)</h2>
+<table>
+<thead><tr>
+<th>vs portfolio names</th>
+<th>Cupid @ CMP</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Max Healthcare</td>
+<td>Lower — Max has clearer moat + tier 3 SIP</td>
+</tr>
+<tr>
+<td>ICICI Bank</td>
+<td>Lower — governance cleaner, better surplus rank</td>
+</tr>
+<tr>
+<td>Lupin / Dr Reddy's</td>
+<td>Lower — pharma quality at better PCCL gaps</td>
+</tr>
+<tr>
+<td><strong>Cupid</strong></td>
+<td><strong>Satellite only</strong> — legacy hold; <strong>0% surplus</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Better business momentum ≠ better buy today</strong> at +47% premium to PCCL.</p>
+<hr>
+<h2>11. Decision matrix</h2>
+<table>
+<thead><tr>
+<th>Matrix cell</th>
+<th>Applies?</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Excellent business + attractive valuation</td>
+<td><strong>No</strong> — excellent <strong>momentum</strong>, expensive vs PCCL</td>
+</tr>
+<tr>
+<td>Excellent business + expensive valuation</td>
+<td><strong>Yes</strong> → <strong>HOLD legacy · PAUSE adds</strong></td>
+</tr>
+<tr>
+<td>Core problem + falling price</td>
+<td><strong>No</strong> — price near highs</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>12. Monitoring checklist</h2>
+<ul class="bullet">
+<li>&amp;#9744; Q2 FY27 revenue/PAT vs ₹725 cr annualised run-rate</li>
+<li>&amp;#9744; Export order book commentary</li>
+<li>&amp;#9744; SEBI / exchange disclosures — any repeat Reg 30 breach</li>
+<li>&amp;#9744; Promoter pledge / related-party trades</li>
+<li>&amp;#9744; Diluted share count after any equity issue</li>
+</ul>
+<p><strong>Next material date:</strong> Q2 FY27 results (~Nov 2026) — UNVERIFIED exact date.</p>
+      </div>
+    </section>
+
+    <section id="approach">
+      <span class="section-label label-approach">Section 3</span>
+      <h2 class="section-title">Suggested Approach</h2>
+      <div class="section-body">
+<p><strong>Analysis date:</strong> 31 Aug 2026 <strong>For:</strong> 600 shares @ ₹120.00 <strong>Investor mandate:</strong> Continuous salary SIP in quality names · <strong>PCCL protects</strong> pace + blended book</p>
+<hr>
+<h2>Philosophy</h2>
+<pre class="code-block">Wealth = Quantity × Time × Business quality
+Your legacy lot @ ₹120 is a +133% winner — protect it
+PCCL = protection (pace + book floor), NOT chase a +150% YTD micro-cap</pre>
+<p>Cross-ref: <code>pccl-analysis/continuous-sip-valuation-tiers.md</code> · <code>investor-wisdom/personal-discipline.md</code></p>
+<hr>
+<h2>Dual-axis @ CMP (₹279.88) — <strong>divergence</strong></h2>
+<table>
+<thead><tr>
+<th></th>
+<th><strong>Axis A — SIP tier</strong></th>
+<th><strong>Axis B — Current value</strong></th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>Question</strong></td>
+<td>Price vs PCCL/IV?</td>
+<td>Good buy <strong>today</strong> (forward)?</td>
+</tr>
+<tr>
+<td><strong>Reading</strong></td>
+<td>Tier <strong>2</strong> (+40% vs PCCL)</td>
+<td><strong>Expensive</strong> on trailing; <strong>fair-to-rich</strong> on FY27 guide</td>
+</tr>
+<tr>
+<td><strong>Divergence?</strong></td>
+<td><strong>Yes</strong> — forward looks OK only if FY27 PAT ₹210+ cr delivers</td>
+<td></td>
+</tr>
+</tbody></table>
+<p><strong>Resolution:</strong> <strong>PCCL + tier win</strong> — pause surplus. Do not add because management guidance makes forward P/E ~16×; that embeds <strong>65–70% execution probability</strong> without margin of safety.</p>
+<hr>
+<h2>Valuation tier @ CMP (₹279.88) — Axis A</h2>
+<table>
+<thead><tr>
+<th>Metric</th>
+<th>Value</th>
+<th>Tier</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Applied PCCL (mid)</td>
+<td>₹190</td>
+<td></td>
+</tr>
+<tr>
+<td>Premium to PCCL</td>
+<td class="num">~+47%</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Label</strong></td>
+<td><strong>Expensive</strong></td>
+<td><strong>2</strong></td>
+</tr>
+<tr>
+<td><strong>Current value @ CMP</strong></td>
+<td><strong>Expensive</strong> (trailing)</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>SIP stance</strong></td>
+<td><strong>Pause</strong></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Monthly pace</strong></td>
+<td><strong>0 sh/mo</strong></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Blended ceiling</strong></td>
+<td><strong>₹140</strong></td>
+<td></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Current value @ CMP — Axis B (P/E + industry + macro)</h2>
+<table>
+<thead><tr>
+<th>Metric</th>
+<th>Cupid</th>
+<th>Sector / peer</th>
+<th>Read</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Normalized EPS (₹)</td>
+<td>~8.6 (FY26) · ~14 ann. Q1</td>
+<td>—</td>
+<td>ASSUMPTION</td>
+</tr>
+<tr>
+<td>P/E @ CMP (FY26 EPS)</td>
+<td><strong>~33×</strong></td>
+<td>Personal products 25–45×</td>
+<td>Rich vs history</td>
+</tr>
+<tr>
+<td>P/E @ CMP (FY27 guide EPS)</td>
+<td><strong>~16×</strong></td>
+<td>—</td>
+<td>Cheap <strong>if</strong> guide hits</td>
+</tr>
+<tr>
+<td>Legacy return on your cost</td>
+<td><strong>+133%</strong></td>
+<td>—</td>
+<td>Winner — don't chase</td>
+</tr>
+<tr>
+<td>Export / FX</td>
+<td>~85% export · USD tailwind Q1</td>
+<td>—</td>
+<td>Cyclical support</td>
+</tr>
+</tbody></table>
+<table>
+<thead><tr>
+<th>Factor</th>
+<th>Read</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Sector band</td>
+<td><strong>Medium–High</strong> (niche exporter + FMCG pivot)</td>
+</tr>
+<tr>
+<td>India macro</td>
+<td>GDP ~6.7%; RBI 5.25% (Aug 2026)</td>
+</tr>
+<tr>
+<td>Catalyst probability (FY27 guide)</td>
+<td><strong>~65–70%</strong></td>
+</tr>
+<tr>
+<td><strong>Current value (B)</strong></td>
+<td><strong>Expensive</strong> for fresh capital @ CMP</td>
+</tr>
+</tbody></table>
+<p><strong>Conflict resolution:</strong> A=2 Expensive, B=Expensive for <strong>fresh</strong> capital → <strong>0% surplus · pause adds</strong>.</p>
+<hr>
+<h2>Default action</h2>
+<table>
+<thead><tr>
+<th><strong>HOLD</strong></th>
+<th>All 600 shares</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>Tier @ CMP</strong></td>
+<td><strong>2</strong> — Expensive vs PCCL</td>
+</tr>
+<tr>
+<td><strong>Current value @ CMP</strong></td>
+<td><strong>Expensive</strong> (surplus lens)</td>
+</tr>
+<tr>
+<td><strong>Continuous SIP</strong></td>
+<td><strong>0 sh/mo</strong></td>
+</tr>
+<tr>
+<td><strong>Surplus slice</strong></td>
+<td><strong>0%</strong></td>
+</tr>
+<tr>
+<td><strong>Surplus action</strong></td>
+<td><strong>PAUSE</strong> — deploy to higher-ranked names</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Blended average protection</h2>
+<table>
+<thead><tr>
+<th>Item</th>
+<th>Value</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Your avg cost</td>
+<td>₹120.00</td>
+</tr>
+<tr>
+<td>Blended ceiling</td>
+<td>₹140</td>
+</tr>
+<tr>
+<td>Rule</td>
+<td>Any add @ CMP <strong>more than doubles</strong> effective book avg vs legacy edge</td>
+</tr>
+</tbody></table>
+<p><strong>Do not add to &quot;participate&quot; in a stock already +133% on your book.</strong></p>
+<hr>
+<h2>Price zones &amp; actions</h2>
+<table>
+<thead><tr>
+<th>Zone</th>
+<th>vs PCCL</th>
+<th>Tier</th>
+<th>Action</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>At/below PCCL (~₹175–210)</td>
+<td>Stress / fair</td>
+<td><strong>4–5</strong></td>
+<td>Core-problem test — <strong>staged only</strong> if thesis intact</td>
+</tr>
+<tr>
+<td>+15% to +30%</td>
+<td>Little premium</td>
+<td><strong>3</strong></td>
+<td>Slow SIP (not applicable today)</td>
+</tr>
+<tr>
+<td>+30% to +50%</td>
+<td>Expensive</td>
+<td><strong>2</strong></td>
+<td><strong>Token / pause</strong> ← <strong>@ CMP</strong></td>
+</tr>
+<tr>
+<td>Above +50%</td>
+<td>Very expensive</td>
+<td><strong>1</strong></td>
+<td><strong>Minimal / zero</strong></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>New-tranche risk @ PCCL</h2>
+<table>
+<thead><tr>
+<th>Buy @ CMP</th>
+<th>PCCL mid (₹190)</th>
+<th>Loss on new ₹ if revisits PCCL</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>₹279.88</td>
+<td>₹190</td>
+<td><strong>~−32%</strong> on fresh tranche</td>
+</tr>
+</tbody></table>
+<p>Legacy @ ₹120 remains a huge winner even if stock revisits PCCL.</p>
+<hr>
+<h2>Triggers — upgrade or downgrade <strong>pace</strong></h2>
+<h3>Upgrade (only if ALL)</h3>
+<ul class="bullet">
+<li>&amp;#9744; CMP falls to tier 4–5 band (~₹210 or below) <strong>without</strong> governance escalation</li>
+<li>&amp;#9744; Q2/Q3 FY27 PAT on track for ≥₹180 cr run-rate</li>
+<li>&amp;#9744; Surplus rank rises vs portfolio (user explicitly wants micro-cap sleeve)</li>
+</ul>
+<h3>Downgrade (already minimal)</h3>
+<ul class="bullet">
+<li>&amp;#9745; </li>
+<li>&amp;#9744; SEBI repeat disclosure breach or material export order loss</li>
+<li>&amp;#9744; FY27 guidance cut &gt;15%</li>
+</ul>
+<hr>
+<h2>One-page decision card</h2>
+<pre class="code-block">HOLD 600 @ ₹120 (+133%)
+Axis A — SIP tier 2 vs PCCL (+47% vs ₹190)
+Axis B — Current value: Expensive for fresh capital
+DIVERGENCE: Forward cheap only if FY27 guide hits — insufficient MoS
+Surplus: 0% · Pause adds
+Blended cap: ₹140 — do not chase</pre>
+<p><strong>Next refresh:</strong> Q2 FY27 results (expected Nov 2026) · FX / export order book</p>
+      </div>
+    </section>
+
+    <section id="faq">
+      <span class="section-label label-faq">Section 4</span>
+      <h2 class="section-title">FAQ</h2>
+      <div class="section-body">
+<p><strong>Ticker:</strong> CUPID <strong>Last updated:</strong> 31 Aug 2026</p>
+<hr>
+<h2>Q1. I hold 600 @ ₹120. What should I do?</h2>
+<p><strong>A:</strong> <strong>HOLD all 600 shares.</strong> You are <strong>+133%</strong> on cost (~₹1.68L market value). Under the long-term wealth mandate, do <strong>not</strong> trim for valuation. <strong>Pause any new adds</strong> at CMP ~₹280 — premium to PCCL is ~+47%; surplus capital ranks <strong>0%</strong> vs Max, ICICI, Lupin, etc.</p>
+<hr>
+<h2>Q2. Should I add with salary surplus today?</h2>
+<p><strong>A:</strong> <strong>No — PAUSE ADDS · 0% surplus slice.</strong></p>
+<table>
+<thead><tr>
+<th>Check</th>
+<th>Result</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Personal discipline pre-flight</td>
+<td>Not in pause registry ✓ · but <strong>not</strong> a fix-avg-cost case (winner)</td>
+</tr>
+<tr>
+<td>Exclusion guards</td>
+<td>Pass — but <strong>HIGH ALERT</strong> micro-cap re-rating</td>
+</tr>
+<tr>
+<td>PCCL tier</td>
+<td><strong>Tier 2 — Expensive</strong></td>
+</tr>
+<tr>
+<td>Catalyst probability (FY27 guide)</td>
+<td>~65–70% — staged only if at PCCL, not @ CMP</td>
+</tr>
+<tr>
+<td>Opportunity cost</td>
+<td>Higher-ranked names available</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Q3. What is PCCL for Cupid?</h2>
+<p><strong>A:</strong></p>
+<table>
+<thead><tr>
+<th>Layer</th>
+<th>Value (₹)</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Rational PCCL</td>
+<td><strong>175–210</strong> (pessimistic EPS ~₹8.5 × 20–22×)</td>
+</tr>
+<tr>
+<td>Applied PCCL</td>
+<td>Same (gain book)</td>
+</tr>
+<tr>
+<td>Normal IV</td>
+<td>~₹320–360</td>
+</tr>
+<tr>
+<td>@ CMP ₹279.88</td>
+<td><strong>+47% premium to PCCL</strong> · <strong>−22% vs normal IV</strong></td>
+</tr>
+</tbody></table>
+<p>PCCL is a <strong>stress floor</strong>, not a buy target in normal markets when execution is priced in.</p>
+<hr>
+<h2>Q4. Why is the stock up so much?</h2>
+<p><strong>A (FACT + MANAGEMENT CLAIM):</strong></p>
+<ul class="bullet">
+<li>Q1 FY27 PAT <strong>+194% YoY</strong> to ₹44.15 cr</li>
+<li>FY27 guidance <strong>upgraded</strong> to ₹725–750 cr revenue / ₹210–225 cr PAT</li>
+<li>Export price hike ~10% + favourable USD/INR</li>
+<li>Re-rating from micro-cap to small-cap (~₹35k cr mcap)</li>
+<li>CMD <strong>open-market buy</strong> 97,392 shares (25 Aug 2026)</li>
+</ul>
+<p><strong>Section 22 not triggered</strong> — stock near highs, not a drawdown averaging question.</p>
+<hr>
+<h2>Q5. SEBI warning — should I exit?</h2>
+<p><strong>A:</strong> <strong>No exit</strong> under wealth mandate. <strong>FACT:</strong> Administrative warning (Apr 2026) for delayed disclosure on <strong>preferential issue cancellation</strong> (Reg 30(7)). Separate <strong>Jun 2026 settlement</strong> on insider-trading proceedings (Unistone Capital). <strong>Not accounting fraud.</strong> Classify <strong>L1 governance</strong> — pause <strong>new</strong> capital until clean disclosure track record; <strong>HOLD</strong> legacy.</p>
+<hr>
+<h2>Q6. What would change the view?</h2>
+<table>
+<thead><tr>
+<th>Trigger</th>
+<th>Action</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>CMP → ₹210 or below + thesis intact</td>
+<td>Revisit <strong>staged starter</strong> (3–5 sh)</td>
+</tr>
+<tr>
+<td>Q2 FY27 miss vs guide (&gt;15% PAT shortfall)</td>
+<td>Cut PCCL · <strong>HOLD</strong> legacy</td>
+</tr>
+<tr>
+<td>Repeat SEBI disclosure breach</td>
+<td><strong>Pause</strong> indefinitely · PCCL cut</td>
+</tr>
+<tr>
+<td>FY27 PAT ≥ ₹210 cr delivered</td>
+<td>Raise normal IV · still may stay <strong>pause adds</strong> if CMP rerates further</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Quotes lens (31 Aug 2026 — surplus / pause decision)</h2>
+<table>
+<thead><tr>
+<th>Theme</th>
+<th>Quote</th>
+<th>Author</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>§3 Expensive buying</td>
+<td><em>&quot;It's far better to buy a wonderful company at a fair price than a fair company at a wonderful price.&quot;</em></td>
+<td><strong>Warren Buffett</strong></td>
+</tr>
+<tr>
+<td>§1 Patience</td>
+<td><em>&quot;The stock market is a device for transferring money from the impatient to the patient.&quot;</em></td>
+<td><strong>Warren Buffett</strong></td>
+</tr>
+<tr>
+<td>§6 Quality vs price</td>
+<td><em>&quot;Price is what you pay. Value is what you get.&quot;</em></td>
+<td><strong>Warren Buffett</strong></td>
+</tr>
+<tr>
+<td>§2 Don't chase</td>
+<td><em>&quot;Don't average down on a losing position unless the thesis has improved — not because the price fell.&quot;</em></td>
+<td><strong>Framework synthesis</strong></td>
+</tr>
+</tbody></table>
+<p><strong>Verdict tie-in:</strong> Legacy <strong>HOLD</strong> · Surplus <strong>PAUSE</strong> — do not deploy salary into a +47% PCCL premium name when ranked alternatives offer better MoS.</p>
+<hr>
+<h2>Change log</h2>
+<table>
+<thead><tr>
+<th>Date</th>
+<th>Entry</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class="num">31 Aug 2026</td>
+<td>Initial FAQ — 600 @ ₹120 · HOLD · pause adds · quotes lens</td>
+</tr>
+</tbody></table>
+      </div>
+    </section>
+
+    <section id="ext-risk">
+      <span class="section-label label-ext-risk">Section 5</span>
+      <h2 class="section-title">External Risks</h2>
+      <div class="section-body">
+<p><strong>Analysis date:</strong> 31 Aug 2026 <strong>Scope:</strong> Macro · geopolitical · policy · sector · FX · export demand <strong>Pair file:</strong> <code>internal-negative-risk.md</code> <strong>Base-case sustainable EPS growth:</strong> <strong>25–35% CAGR near-term · normalising to 15–20% (ASSUMPTION)</strong></p>
+<p>Cross-ref: <code>News/TICKER-INDEX.md</code> · <code>detail-analysis.md</code></p>
+<hr>
+<h2>Three-level impact scale (growth rate)</h2>
+<table>
+<thead><tr>
+<th>Level</th>
+<th>Label</th>
+<th><strong>Growth haircut</strong></th>
+<th>Duration</th>
+<th>Structural vs temporary</th>
+<th>Framework action</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>L1</strong></td>
+<td>Low</td>
+<td><strong>0–2 pp</strong></td>
+<td>&lt;4 quarters</td>
+<td>Temporary</td>
+<td><strong>HOLD</strong> pace</td>
+</tr>
+<tr>
+<td><strong>L2</strong></td>
+<td>Medium</td>
+<td><strong>3–7 pp</strong></td>
+<td class="num">1–3 years</td>
+<td>Mixed</td>
+<td><strong>Slow SIP</strong></td>
+</tr>
+<tr>
+<td><strong>L3</strong></td>
+<td>High</td>
+<td><strong>&gt;=8 pp</strong></td>
+<td>Structural</td>
+<td>Permanent sector shock</td>
+<td><strong>PCCL cut / EXIT</strong></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Risk register — external</h2>
+<table>
+<thead><tr>
+<th>#</th>
+<th>Risk</th>
+<th>Type</th>
+<th>Level</th>
+<th>Growth impact</th>
+<th>Transmission to CUPID</th>
+<th>Status (31 Aug 2026)</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>E1</strong></td>
+<td>USD/INR reversal</td>
+<td>FX</td>
+<td><strong>L1–L2</strong></td>
+<td><strong>−2 to −5 pp</strong> on export realisations</td>
+<td>~85% export revenue</td>
+<td>USD tailwind helped Q1 — may fade</td>
+</tr>
+<tr>
+<td><strong>E2</strong></td>
+<td>Global aid / procurement budget cuts</td>
+<td>Policy / geo</td>
+<td><strong>L2</strong></td>
+<td><strong>−3 to −6 pp</strong></td>
+<td>UNFPA / institutional orders</td>
+<td>Monitor; no active cut flagged</td>
+</tr>
+<tr>
+<td><strong>E3</strong></td>
+<td>India FMCG slowdown</td>
+<td>Macro</td>
+<td><strong>L1</strong></td>
+<td><strong>−1 to −3 pp</strong> on domestic leg</td>
+<td>Retail expansion</td>
+<td>GDP ~6.7% — neutral</td>
+</tr>
+<tr>
+<td><strong>E4</strong></td>
+<td>Commodity / latex input inflation</td>
+<td>Commodity</td>
+<td><strong>L1</strong></td>
+<td><strong>−0 to −2 pp</strong> margin</td>
+<td>COGS</td>
+<td>Margins expanded Q1 — watch</td>
+</tr>
+<tr>
+<td><strong>E5</strong></td>
+<td>Geopolitical shipping / trade friction</td>
+<td>Geo</td>
+<td><strong>L1</strong></td>
+<td><strong>−1 to −2 pp</strong></td>
+<td>Export logistics</td>
+<td>UNVERIFIED material impact</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Combined external stress (scenario)</h2>
+<table>
+<thead><tr>
+<th>Scenario</th>
+<th>Trigger combo</th>
+<th>Level</th>
+<th>EPS growth band</th>
+<th>PCCL / action</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>Base</strong></td>
+<td>Export + FMCG thesis intact</td>
+<td>—</td>
+<td><strong>25–35% near-term</strong></td>
+<td>Per suggested-approach</td>
+</tr>
+<tr>
+<td><strong>Stress A</strong></td>
+<td>USD/INR + procurement delay</td>
+<td><strong>L2</strong></td>
+<td>Haircut 3–7 pp</td>
+<td>Pause surplus</td>
+</tr>
+<tr>
+<td><strong>Stress B</strong></td>
+<td>Aid cut + margin squeeze</td>
+<td><strong>L3</strong></td>
+<td>Haircut &gt;=8 pp</td>
+<td>PCCL cut · HOLD legacy</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Monitoring checklist</h2>
+<ul class="bullet">
+<li>&amp;#9744; USD/INR trend vs export realisation commentary</li>
+<li>&amp;#9744; UNFPA / global health procurement headlines</li>
+<li>&amp;#9744; Q2 export mix and geography in results</li>
+</ul>
+<p><strong>Next refresh:</strong> Q2 FY27 results.</p>
+      </div>
+    </section>
+
+    <section id="int-risk">
+      <span class="section-label label-int-risk">Section 6</span>
+      <h2 class="section-title">Internal Risks</h2>
+      <div class="section-body">
+<p><strong>Analysis date:</strong> 31 Aug 2026 <strong>Scope:</strong> Governance · execution · balance sheet · competition · customer concentration <strong>Pair file:</strong> <code>external-negative-risk.md</code> <strong>Base-case sustainable EPS growth:</strong> <strong>25–35% CAGR near-term (ASSUMPTION)</strong></p>
+<p>Cross-ref: <code>management-governance-analysis</code> · <code>fraud-detection-analysis</code> · <code>detail-analysis.md</code></p>
+<hr>
+<h2>Three-level impact scale (growth rate)</h2>
+<table>
+<thead><tr>
+<th>Level</th>
+<th>Label</th>
+<th><strong>Growth haircut</strong></th>
+<th>Duration</th>
+<th>Structural vs temporary</th>
+<th>Framework action</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>L1</strong></td>
+<td>Low</td>
+<td><strong>0–2 pp</strong></td>
+<td>&lt;4 quarters</td>
+<td>Temporary</td>
+<td><strong>HOLD</strong> pace</td>
+</tr>
+<tr>
+<td><strong>L2</strong></td>
+<td>Medium</td>
+<td><strong>3–7 pp</strong></td>
+<td class="num">1–3 years</td>
+<td>Partial structural</td>
+<td><strong>Slow SIP</strong></td>
+</tr>
+<tr>
+<td><strong>L3</strong></td>
+<td>High</td>
+<td><strong>&gt;=8 pp</strong></td>
+<td>Structural / fraud</td>
+<td>Moat destroyed</td>
+<td><strong>EXIT</strong> review</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Risk register — internal</h2>
+<table>
+<thead><tr>
+<th>#</th>
+<th>Risk</th>
+<th>Type</th>
+<th>Level</th>
+<th>Growth impact</th>
+<th>Evidence / trigger</th>
+<th>Status (31 Aug 2026)</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>I1</strong></td>
+<td>SEBI disclosure lapse (Reg 30(7))</td>
+<td>Governance</td>
+<td><strong>L1</strong></td>
+<td><strong>−1 to −2 pp</strong> trust premium</td>
+<td>Admin warning Apr 2026 — preferential issue cancellation</td>
+<td><strong>Active monitor</strong></td>
+</tr>
+<tr>
+<td><strong>I2</strong></td>
+<td>Insider-trading settlement (Unistone)</td>
+<td>Governance</td>
+<td><strong>L1</strong></td>
+<td><strong>−1 pp</strong></td>
+<td>Settled Jun 2026 · ₹67.34L</td>
+<td>Closed — watch repeats</td>
+</tr>
+<tr>
+<td><strong>I3</strong></td>
+<td>FY27 guidance miss / order book</td>
+<td>Execution</td>
+<td><strong>L2</strong></td>
+<td><strong>−5 to −10 pp</strong></td>
+<td>Guide ₹210–225 cr PAT</td>
+<td>Q1 strong — H2 proof needed</td>
+</tr>
+<tr>
+<td><strong>I4</strong></td>
+<td>Customer / geography concentration</td>
+<td>Concentration</td>
+<td><strong>L2</strong></td>
+<td><strong>−3 to −6 pp</strong></td>
+<td>~85% export B2B</td>
+<td>Structural for model</td>
+</tr>
+<tr>
+<td><strong>I5</strong></td>
+<td>Valuation de-rating (hypergrowth priced in)</td>
+<td>Market</td>
+<td><strong>L2</strong></td>
+<td>N/A (price)</td>
+<td>+150% YTD</td>
+<td><strong>Pause adds</strong></td>
+</tr>
+<tr>
+<td><strong>I6</strong></td>
+<td>Share dilution / corporate actions</td>
+<td>Capital</td>
+<td><strong>L1–L2</strong></td>
+<td><strong>−2 to −4 pp</strong> EPS</td>
+<td>Past preferential issue history</td>
+<td>Track diluted count</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Combined internal stress (scenario)</h2>
+<table>
+<thead><tr>
+<th>Scenario</th>
+<th>Trigger</th>
+<th>Level</th>
+<th>EPS growth band</th>
+<th>PCCL / action</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>Base</strong></td>
+<td>Q1 momentum continues</td>
+<td>—</td>
+<td><strong>25–35%</strong></td>
+<td>HOLD legacy · pause surplus</td>
+</tr>
+<tr>
+<td><strong>Stress</strong></td>
+<td>Guide miss + repeat SEBI breach</td>
+<td><strong>L2–L3</strong></td>
+<td>See rows</td>
+<td>PCCL cut · HOLD unless fraud</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Monitoring checklist</h2>
+<ul class="bullet">
+<li>&amp;#9744; Exchange filings — disclosure timeliness</li>
+<li>&amp;#9744; Promoter / related-party trades</li>
+<li>&amp;#9744; Quarterly PAT vs ₹52–56 cr/qtr implied by FY27 guide</li>
+<li>&amp;#9744; Receivables / inventory vs revenue growth</li>
+</ul>
+<p><strong>Next refresh:</strong> Q2 FY27 results.</p>
+      </div>
+    </section>
+
+    <section id="parameters">
+      <span class="section-label label-parameters">Section 7</span>
+      <h2 class="section-title">Parameters</h2>
+      <div class="section-body">
+<p><strong>Ticker:</strong> CUPID | <strong>CMP:</strong> Rs 279.88 (2026-08-31) <strong>Part 1:</strong> FY2016–FY2025 (10Y rear-view) | <strong>Part 2:</strong> FY2027–FY2031 (5Y forward)</p>
+<blockquote><p><strong>Initial build</strong> — Part 1 from hypergrowth re-rating context; Part 2 from normalized + guidance scenarios. Refresh Blocks B/C from annual report after Q2 FY27.</p></blockquote>
+<hr>
+<h2>How to read this (30 seconds)</h2>
+<table>
+<thead><tr>
+<th>Lens</th>
+<th>Question</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>Part 1 — 10Y</strong></td>
+<td>Cheap or expensive vs <strong>own history</strong>?</td>
+</tr>
+<tr>
+<td><strong>Part 2 — 5Y forward</strong></td>
+<td>At CMP, if <strong>average</strong> earnings grow, is 5Y return OK?</td>
+</tr>
+<tr>
+<td><strong>Rule</strong></td>
+<td>History does not repeat hypergrowth — read <strong>both</strong> before ADD</td>
+</tr>
+</tbody></table>
+<hr>
+<h1>Part 1 — Rear-view (10Y history)</h1>
+<h2>Master table — Today vs 10Y average</h2>
+<h3>A — Price vs value</h3>
+<table>
+<thead><tr>
+<th>Parameter</th>
+<th>What it measures</th>
+<th>Link to stock price</th>
+<th>10Y avg (normal)</th>
+<th>10Y avg (incl. COVID)</th>
+<th><strong>Today @ CMP</strong></th>
+<th><strong>vs normal avg</strong></th>
+<th><strong>Read</strong></th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>Owner Earnings Yield</strong></td>
+<td>EPS / price</td>
+<td><strong>Higher = cheaper</strong></td>
+<td><strong>~4.5%</strong></td>
+<td class="num">~3.8%</td>
+<td><strong>~3.0%</strong> (FY26 EPS)</td>
+<td>−33%</td>
+<td><strong>Expensive</strong> vs 10Y</td>
+</tr>
+<tr>
+<td><strong>P/E</strong></td>
+<td>Price / EPS</td>
+<td><strong>Higher = pays more per Rs profit</strong></td>
+<td><strong>~22×</strong></td>
+<td>~28×</td>
+<td><strong>~33×</strong> (FY26)</td>
+<td class="num">+50%</td>
+<td><strong>Expensive</strong> vs 10Y</td>
+</tr>
+<tr>
+<td><strong>P/E (on ann. Q1 FY27)</strong></td>
+<td>Forward trailing</td>
+<td>Hypergrowth year</td>
+<td>—</td>
+<td>—</td>
+<td><strong>~20×</strong></td>
+<td>—</td>
+<td><strong>Fair–rich</strong> if sustained</td>
+</tr>
+<tr>
+<td><strong>Premium to IV (@24× norm EPS)</strong></td>
+<td>vs ₹15 norm EPS</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><strong>−22%</strong> to IV</td>
+<td>—</td>
+<td>Below normal IV</td>
+</tr>
+</tbody></table>
+<p><em>10Y averages <strong>ASSUMPTION</strong> — Cupid was micro-cap most of decade; pre-FY26 P/E distorted. Treat Part 1 as <strong>directional</strong>.</em></p>
+<h3>B — Business quality</h3>
+<table>
+<thead><tr>
+<th>Parameter</th>
+<th>What it measures</th>
+<th><strong>Today @ CMP</strong></th>
+<th><strong>Read</strong></th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>ROE</strong></td>
+<td>Return on equity</td>
+<td><strong>~24–28%</strong> (FY26 est.)</td>
+<td><strong>Strong</strong> — UNVERIFIED exact</td>
+</tr>
+<tr>
+<td><strong>EBITDA margin</strong></td>
+<td>Operating leverage</td>
+<td><strong>~39%</strong> Q1 FY27</td>
+<td><strong>Strong</strong> — FACT</td>
+</tr>
+<tr>
+<td><strong>Revenue CAGR (3Y)</strong></td>
+<td>Scale</td>
+<td><strong>&gt;80%</strong></td>
+<td><strong>Hypergrowth</strong> — FACT/HYPOTHESIS</td>
+</tr>
+</tbody></table>
+<h3>C — Safety</h3>
+<table>
+<thead><tr>
+<th>Parameter</th>
+<th>What it measures</th>
+<th><strong>Today @ CMP</strong></th>
+<th><strong>Read</strong></th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>Net debt / EBITDA</strong></td>
+<td>Leverage</td>
+<td><strong>~0×</strong></td>
+<td><strong>Strong</strong> — FACT</td>
+</tr>
+<tr>
+<td><strong>Cash (FY26)</strong></td>
+<td>Buffer</td>
+<td><strong>~₹186 cr</strong></td>
+<td><strong>Adequate</strong> — FACT</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>One-page verdict (Part 1) @ Rs 279.88</h2>
+<table>
+<thead><tr>
+<th>Question</th>
+<th>Answer</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>Cheap or expensive vs own 10Y?</strong></td>
+<td><strong>Expensive</strong> on FY26 EPS · <strong>fair-ish</strong> only on ann. Q1 run-rate</td>
+</tr>
+<tr>
+<td><strong>Owner yield vs history?</strong></td>
+<td><strong>Lower</strong> — price ran ahead of earnings base</td>
+</tr>
+<tr>
+<td><strong>Trap?</strong></td>
+<td><strong>YES</strong> — 10Y avg P/E meaningless vs current scale</td>
+</tr>
+</tbody></table>
+<hr>
+<h1>Part 2 — Forward vision (next 5 years)</h1>
+<p><strong>Horizon:</strong> FY2027–FY2031 | <strong>Base:</strong> norm EPS <strong>₹15</strong>; EPS CAGR <strong>18%</strong>; forward fair P/E <strong>24×</strong></p>
+<h2>Assumptions</h2>
+<table>
+<thead><tr>
+<th>Input</th>
+<th>Pessimistic</th>
+<th><strong>Base (average)</strong></th>
+<th>Optimistic</th>
+<th>Type</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Normalized EPS (Year 0)</td>
+<td>₹10</td>
+<td><strong>₹15</strong></td>
+<td>₹17.5</td>
+<td>ASSUMPTION</td>
+</tr>
+<tr>
+<td>EPS CAGR (5Y)</td>
+<td class="num">8%</td>
+<td><strong>18%</strong></td>
+<td class="num">28%</td>
+<td>ASSUMPTION</td>
+</tr>
+<tr>
+<td>Forward fair P/E</td>
+<td class="num">18×</td>
+<td><strong>24×</strong></td>
+<td class="num">28×</td>
+<td>ASSUMPTION</td>
+</tr>
+<tr>
+<td>EPS FY31</td>
+<td>₹14.7</td>
+<td><strong>₹34.4</strong></td>
+<td>₹60.5</td>
+<td>Calculated</td>
+</tr>
+<tr>
+<td class="num">5Y fair price</td>
+<td>₹265</td>
+<td><strong>₹826</strong></td>
+<td>₹1,694</td>
+<td>Calculated</td>
+</tr>
+</tbody></table>
+<h2>Forward @ CMP — Block A</h2>
+<table>
+<thead><tr>
+<th>Parameter</th>
+<th><strong>Base</strong></th>
+<th>Pessimistic</th>
+<th>Optimistic</th>
+<th><strong>Implied 5Y CAGR (base)</strong></th>
+<th><strong>Read</strong></th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Forward P/E @ norm EPS</td>
+<td><strong>18.7×</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>In line with fair 24× only if EPS grows</td>
+</tr>
+<tr>
+<td class="num">5Y fair price</td>
+<td><strong>₹826</strong></td>
+<td>₹265</td>
+<td>₹1,694</td>
+<td><strong>+23.8%</strong></td>
+<td>Bull case if execution continues</td>
+</tr>
+<tr>
+<td><strong>Historical multiple trap</strong></td>
+<td class="num">10Y avg &lt;&lt; hypergrowth forward</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td><strong>YES</strong></td>
+</tr>
+</tbody></table>
+<h2>Past-vs-forward snapshot</h2>
+<table>
+<thead><tr>
+<th>Question</th>
+<th>Part 1 (10Y)</th>
+<th>Part 2 (5Y)</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Cheap vs expensive?</td>
+<td><strong>Expensive</strong> vs old base</td>
+<td><strong>+24%</strong> implied 5Y CAGR if base hits</td>
+</tr>
+<tr>
+<td>ADD at CMP?</td>
+<td>—</td>
+<td><strong>No</strong> — return requires <strong>continued hypergrowth</strong>; insufficient MoS for surplus</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>Appendix — data notes</h2>
+<table>
+<thead><tr>
+<th>Item</th>
+<th>Source</th>
+<th>Date</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>CMP</td>
+<td>Trendlyne NSE</td>
+<td class="num">31 Aug 2026</td>
+</tr>
+<tr>
+<td>Q1 FY27 PAT</td>
+<td>Company results / ET</td>
+<td>Aug 2026</td>
+</tr>
+<tr>
+<td>FY27 guide</td>
+<td>Management</td>
+<td>Aug 2026</td>
+</tr>
+</tbody></table>
+<p><strong>Next refresh:</strong> Q2 FY27 — update norm EPS from H1 annualised PAT.</p>
+      </div>
+    </section>
+
+    <section id="cagr">
+      <span class="section-label label-cagr">Section 8</span>
+      <h2 class="section-title">Holding CAGR</h2>
+      <div class="section-body">
+<p><strong>Ticker:</strong> CUPID (NSE) <strong>CMP:</strong> <strong>Rs 279.88</strong> | <strong>CMP date:</strong> 2026-08-31 | <strong>Source:</strong> Trendlyne NSE <strong>Last calculated:</strong> 2026-08-31</p>
+<p>Cross-ref: <code>CAGR-FRAMEWORK.md</code> | <code>.cursor/portfolio/holdings.md</code> | <code>summary-analysis.md</code></p>
+<hr>
+<h2>Lots (live)</h2>
+<table>
+<thead><tr>
+<th>Lot</th>
+<th>Qty</th>
+<th>Buy date</th>
+<th>Buy price (Rs)</th>
+<th>Days held</th>
+<th>CMP (Rs)</th>
+<th>Simple return %</th>
+<th>CAGR %</th>
+<th>Notes</th>
+</tr></thead>
+<tbody>
+<tr>
+<td><strong>L1</strong></td>
+<td class="num">600</td>
+<td><strong>2025-04-01</strong></td>
+<td><strong>120.00</strong></td>
+<td class="num">517</td>
+<td class="num">279.88</td>
+<td><strong>+133.23%</strong></td>
+<td><strong>~68%</strong></td>
+<td>LEGACY — assumed purchase date until user supplies actual lots</td>
+</tr>
+</tbody></table>
+<p><em>Holding period: 517 days ≈ 1.42 years (synthetic buy date to CMP date). <strong>User stated avg Rs 120</strong> — replace L1 date when actual purchase history provided.</em></p>
+<hr>
+<h2>Portfolio summary (this ticker)</h2>
+<table>
+<thead><tr>
+<th>Metric</th>
+<th>Value</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Total qty</td>
+<td class="num">600</td>
+</tr>
+<tr>
+<td>Total cost (Rs)</td>
+<td class="num">72,000</td>
+</tr>
+<tr>
+<td>Market value @ CMP (Rs)</td>
+<td class="num">167,928</td>
+</tr>
+<tr>
+<td>Blended simple return %</td>
+<td><strong>+133.23%</strong></td>
+</tr>
+<tr>
+<td>Cost-weighted CAGR %</td>
+<td><strong>~68%</strong> (legacy date assumed)</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>When user adds real purchase history</h2>
+<p>Replace L1 with dated lots. Archive synthetic L1 when superseded.</p>
+<hr>
+<h2>Change log</h2>
+<table>
+<thead><tr>
+<th>Date</th>
+<th>Change</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class="num">2026-08-31</td>
+<td>Initial — 600 @ Rs 120 · legacy lot 2025-04-01 · CMP Rs 279.88</td>
+</tr>
+</tbody></table>
+      </div>
+    </section>
+
+    <section id="broker">
+      <span class="section-label label-broker">Section 9</span>
+      <h2 class="section-title">Broker Targets</h2>
+      <div class="section-body">
+<p><strong>Ticker:</strong> CUPID (NSE) | <strong>CMP:</strong> Rs 279.88 | <strong>CMP date:</strong> 2026-08-31 <strong>Trendlyne consensus:</strong> Not available (stale / no recent coverage on page) <strong>As of:</strong> 2026-08-31 | <strong>Horizon:</strong> ~12-month broker targets (typical)</p>
+<p>Cross-ref: <code>BROKER-TARGET-FRAMEWORK.md</code> | <code>summary-analysis.md</code></p>
+<hr>
+<h2>Latest target by broker (most recent report per house)</h2>
+<table>
+<thead><tr>
+<th>Broker</th>
+<th>Date</th>
+<th>Reco</th>
+<th>Target (Rs)</th>
+<th>Upside %</th>
+<th>Source</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>BOB Capital Markets</td>
+<td class="num">30 May 2017</td>
+<td>Buy</td>
+<td class="num">390</td>
+<td>Target met (stale)</td>
+<td>Trendlyne</td>
+</tr>
+<tr>
+<td>BOB Capital Markets</td>
+<td class="num">18 Jul 2016</td>
+<td>Buy</td>
+<td class="num">432</td>
+<td>Pre-bonus/split (stale)</td>
+<td>Trendlyne</td>
+</tr>
+</tbody></table>
+<p><strong>No fresh broker row parsed on Trendlyne as of 31 Aug 2026</strong> — stock re-rated beyond historical coverage.</p>
+<hr>
+<h2>Supplementary (UNVERIFIED — third-party aggregators)</h2>
+<table>
+<thead><tr>
+<th>Broker</th>
+<th>Date</th>
+<th>Reco</th>
+<th>Target (Rs)</th>
+<th>Upside vs CMP</th>
+<th>Source</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>JM Financial</td>
+<td class="num">2026 (UNVERIFIED)</td>
+<td>Neutral</td>
+<td class="num">208</td>
+<td><strong>−26%</strong></td>
+<td>Univest blog — verify</td>
+</tr>
+<tr>
+<td>Kotak Securities</td>
+<td class="num">2026 (UNVERIFIED)</td>
+<td>Neutral</td>
+<td class="num">192</td>
+<td><strong>−31%</strong></td>
+<td>Univest blog — verify</td>
+</tr>
+<tr>
+<td><strong>Aggregator consensus</strong></td>
+<td class="num">2026</td>
+<td>—</td>
+<td><strong>~200</strong></td>
+<td><strong>−29%</strong></td>
+<td>Univest — <strong>STALE vs CMP</strong></td>
+</tr>
+</tbody></table>
+<blockquote><p><strong>Read:</strong> Street targets near <strong>Rs 200</strong> imply <strong>downside vs CMP ~280</strong> — consistent with <strong>pause adds</strong> framework. Do <strong>not</strong> treat aggregator data as live until verified against original broker PDFs post Q1 FY27.</p></blockquote>
+<hr>
+<h2>Agent use</h2>
+<ul class="bullet">
+<li><strong>Secondary</strong> to PCCL — street appears <strong>behind</strong> re-rating; consensus <strong>does not</strong> justify chasing CMP.</li>
+<li>Portfolio matrix blanks were <strong>not</strong> authoritative; this file lists only verified or flagged-unverified brokers.</li>
+</ul>
+<hr>
+<h2>Change log</h2>
+<table>
+<thead><tr>
+<th>Date</th>
+<th>Change</th>
+</tr></thead>
+<tbody>
+<tr>
+<td class="num">2026-08-31</td>
+<td>Initial — Trendlyne ID 3405 · stale BOB 2016–17 only · Univest supplement flagged UNVERIFIED</td>
+</tr>
+</tbody></table>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    Cupid Ltd (CUPID) Â· My-agent investment framework Â· 01 Sep 2026<br>
+    Not investment advice. Verify all figures against exchange filings before acting.
+  </footer>
+</body>
+</html>

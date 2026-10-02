@@ -1,0 +1,36 @@
+{
+  "asOf": "2026-09-13",
+  "label": "FY26 trailing total dividend per share (₹)",
+  "yocAddGatePct": 8,
+  "entries": {
+    "ONGC": { "divPerShare": 13.25, "evidence": "FACT", "source": "BSE FY26 total" },
+    "SBIN": { "divPerShare": 17.35, "evidence": "FACT", "source": "StockBook detail" },
+    "ASHOKLEY": { "divPerShare": 3.5, "evidence": "FACT", "source": "FY26 interim total" },
+    "GICRE": { "divPerShare": 13.25, "evidence": "FACT", "source": "proposed AGM Sep 2026" },
+    "PNB": { "divPerShare": 3.0, "evidence": "FACT", "source": "StockBook detail" },
+    "BANKINDIA": { "divPerShare": 4.65, "evidence": "FACT", "source": "StockBook detail" },
+    "ITC": { "divPerShare": 14.5, "evidence": "FACT", "source": "ITC IR FY26" },
+    "HCLTECH": { "divPerShare": 60, "evidence": "FACT", "source": "FY26 total incl special" },
+    "HEROMOTOCO": { "divPerShare": 120, "evidence": "UNVERIFIED", "source": "typical FY div est." },
+    "INDHOTEL": { "divPerShare": 3.25, "evidence": "FACT", "source": "IHCL FY26 AGM" },
+    "TCS": { "divPerShare": 110, "evidence": "FACT", "source": "FY26 total" },
+    "INFY": { "divPerShare": 48, "evidence": "FACT", "source": "FY26 total" },
+    "HDFCBANK": { "divPerShare": 15.5, "evidence": "FACT", "source": "FY26 total" },
+    "HINDUNILVR": { "divPerShare": 41, "evidence": "FACT", "source": "FY26 total" },
+    "MARUTI": { "divPerShare": 140, "evidence": "FACT", "source": "FY26 total" },
+    "LT": { "divPerShare": 38, "evidence": "FACT", "source": "FY26 total" },
+    "IOC": { "divPerShare": 1.25, "evidence": "FACT", "source": "FY26 final only — see normalized note" },
+    "MUTHOOTFIN": { "divPerShare": 40, "evidence": "UNVERIFIED", "source": "est. FY26" },
+    "TATACONSUM": { "divPerShare": 8, "evidence": "UNVERIFIED", "source": "est. FY26" },
+    "KOTAKBANK": { "divPerShare": 2.5, "evidence": "UNVERIFIED", "source": "est. FY26" },
+    "ICICIBANK": { "divPerShare": 11, "evidence": "UNVERIFIED", "source": "est. FY26" },
+    "WIPRO": { "divPerShare": 5, "evidence": "UNVERIFIED", "source": "est. FY26" },
+    "TECHM": { "divPerShare": 45, "evidence": "UNVERIFIED", "source": "est. FY26" },
+    "SUNPHARMA": { "divPerShare": 11, "evidence": "UNVERIFIED", "source": "est. FY26" },
+    "CIPLA": { "divPerShare": 4, "evidence": "UNVERIFIED", "source": "est. FY26" },
+    "BAJAJFINSV": { "divPerShare": 4, "evidence": "UNVERIFIED", "source": "est. FY26" }
+  },
+  "normalizedOverrides": {
+    "IOC": { "divPerShare": 5.25, "label": "OUR ASSUMPTION — mid-cycle normalized" }
+  }
+}

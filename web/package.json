@@ -1,0 +1,32 @@
+{
+  "name": "my-agent-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "verify-paths": "npx tsx scripts/verify-framework-paths.ts",
+    "verify-supabase": "npx tsx scripts/verify-supabase.ts",
+    "import-holdings": "npx tsx scripts/import-cursor-holdings.ts",
+    "refresh-sector-mcap": "npx tsx scripts/refresh-sector-mcap.ts",
+    "daily-market-pack": "npx tsx scripts/run-daily-market-pack.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.6",
+    "@supabase/supabase-js": "^2.115.0",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

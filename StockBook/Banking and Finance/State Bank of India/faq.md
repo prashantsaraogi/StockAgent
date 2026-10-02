@@ -1,0 +1,37 @@
+# State Bank of India — FAQ
+
+**Ticker:** SBIN · **Updated:** 23 Aug 2026
+
+---
+
+## Q1. What is the framework action?
+
+**HOLD · YoC · token SIP** — **HOLD** all shares; continuous SIP: **4-8 sh/mo** (tier **3**).
+
+---
+
+## Q2. Should I wait for PCCL or a crash before adding?
+
+**No.** Continuous salary SIP at **tier 3** pace. PCCL (₹880-950) **protects** via pace + blended cap (₹240) — not a wait target.
+
+---
+
+## Q3. Is CMP very expensive, expensive, fair, or low?
+
+**Fair** — Legacy +446%; +10-19% vs PCCL. YoC ~9% trail; PSU ~60% · token SIP.
+
+---
+
+## Q4. What if the stock is expensive?
+
+**HOLD** legacy. **Slow to token SIP** (tier 1-2) — never zero on Strong quality unless core-problem. Rank **fresh salary** using surplus slice **0-5%**.
+
+---
+
+## Q5. Where does this rank for salary capital?
+
+**HOLD** — **0-5%** of monthly investable. See `quadrant-map.md`.
+
+---
+
+**Next refresh:** Q2 FY27 or user trade.

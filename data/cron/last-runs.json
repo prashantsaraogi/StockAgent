@@ -1,0 +1,882 @@
+{
+  "version": 1,
+  "runs": {
+    "daily-market-pack": {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-10-02T03:10:13.435Z",
+      "finishedAt": "2026-10-02T03:10:14.406Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-02",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-10-02",
+          "details": {
+            "newsWebPath": "/journal/news/2026/10/02"
+          }
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-10-02T03:10:13.435Z",
+      "finishedAt": "2026-10-02T03:10:14.406Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-02",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-10-02",
+          "details": {
+            "newsWebPath": "/journal/news/2026/10/02"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-10-01T03:15:44.824Z",
+      "finishedAt": "2026-10-01T03:15:46.073Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-01",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-10-01",
+          "details": {
+            "newsWebPath": "/journal/news/2026/10/01"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-30T04:48:47.013Z",
+      "finishedAt": "2026-09-30T04:48:47.975Z",
+      "ok": false,
+      "summary": "1/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": false,
+          "summary": "CMP refreshed for 0/3 holdings · cache 2026-09-30",
+          "details": {
+            "failed": [
+              "MARUTI",
+              "ITC",
+              "MAXHEALTH"
+            ],
+            "updated": 0
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-30",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/30"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-29T04:24:31.936Z",
+      "finishedAt": "2026-09-29T04:24:34.796Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-09-29",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-29",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/29"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-28T04:09:18.774Z",
+      "finishedAt": "2026-09-28T04:09:19.171Z",
+      "ok": false,
+      "summary": "1/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": false,
+          "summary": "CMP refreshed for 0/3 holdings · cache 2026-09-28",
+          "details": {
+            "failed": [
+              "MARUTI",
+              "ITC",
+              "MAXHEALTH"
+            ],
+            "updated": 0
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-28",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/28"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-27T04:44:50.973Z",
+      "finishedAt": "2026-09-27T04:44:51.781Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-09-27",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-27",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/27"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-26T06:35:25.798Z",
+      "finishedAt": "2026-09-26T06:35:29.179Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-09-26",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-26",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/26"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-25T04:11:25.222Z",
+      "finishedAt": "2026-09-25T04:11:26.107Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-09-25",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-25",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/25"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-24T02:30:40.427Z",
+      "finishedAt": "2026-09-24T02:30:42.245Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-09-24",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-24",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/24"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-23T04:01:40.307Z",
+      "finishedAt": "2026-09-23T04:01:41.971Z",
+      "ok": false,
+      "summary": "1/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": false,
+          "summary": "CMP refreshed for 0/3 holdings · cache 2026-09-23",
+          "details": {
+            "failed": [
+              "MARUTI",
+              "ITC",
+              "MAXHEALTH"
+            ],
+            "updated": 0
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-23",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/23"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-22T03:26:47.148Z",
+      "finishedAt": "2026-09-22T03:26:48.082Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-09-22",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-22",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/22"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-21T03:31:55.945Z",
+      "finishedAt": "2026-09-21T03:31:58.426Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-09-21",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-21",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/21"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-16T04:02:53.863Z",
+      "finishedAt": "2026-09-16T04:02:54.736Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-09-16",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-16",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/16"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-15T02:57:22.036Z",
+      "finishedAt": "2026-09-15T02:57:23.188Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-09-15",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-15",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/15"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "services-ui",
+      "startedAt": "2026-09-14T09:18:28.636Z",
+      "finishedAt": "2026-09-14T09:19:05.323Z",
+      "ok": false,
+      "summary": "2/3 steps completed",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 50/51 holdings · cache 2026-09-14",
+          "details": {
+            "failed": [
+              "RAAJINFRA"
+            ],
+            "updated": 50
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-14",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/14"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-14T03:43:26.827Z",
+      "finishedAt": "2026-09-14T03:43:27.254Z",
+      "ok": false,
+      "summary": "1/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": false,
+          "summary": "CMP refreshed for 0/3 holdings · cache 2026-09-14",
+          "details": {
+            "failed": [
+              "MARUTI",
+              "ITC",
+              "MAXHEALTH"
+            ],
+            "updated": 0
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-14",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/14"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "services-ui",
+      "startedAt": "2026-09-13T09:38:55.123Z",
+      "finishedAt": "2026-09-13T09:39:21.649Z",
+      "ok": false,
+      "summary": "2/3 steps completed",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 49/51 holdings · cache 2026-09-13",
+          "details": {
+            "failed": [
+              "RAAJINFRA"
+            ],
+            "updated": 49
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-13",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/13"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-13T04:48:59.664Z",
+      "finishedAt": "2026-09-13T04:49:00.488Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-09-13",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-13",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/13"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-12T05:18:27.548Z",
+      "finishedAt": "2026-09-12T05:18:29.950Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-09-12",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-12",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/12"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-11T04:37:22.196Z",
+      "finishedAt": "2026-09-11T04:37:23.820Z",
+      "ok": false,
+      "summary": "1/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": false,
+          "summary": "CMP refreshed for 0/3 holdings · cache 2026-09-11",
+          "details": {
+            "failed": [
+              "MARUTI",
+              "ITC",
+              "MAXHEALTH"
+            ],
+            "updated": 0
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-11",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/11"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "services-ui",
+      "startedAt": "2026-09-10T14:10:14.291Z",
+      "finishedAt": "2026-09-10T14:15:18.680Z",
+      "ok": true,
+      "summary": "3/3 steps completed",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 2/2 holdings · cache 2026-09-10",
+          "details": {
+            "failed": [],
+            "updated": 2
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": true,
+          "summary": "2/2 holdings may need Q2 FY27 results refresh",
+          "details": {
+            "scannedAt": "2026-09-10",
+            "expectedQuarter": "Q2 FY27",
+            "items": [
+              {
+                "ticker": "DRREDDY",
+                "company": "Dr Reddys Laboratories",
+                "lastMention": "Q1 FY27",
+                "expectedQuarter": "Q2 FY27",
+                "stale": true,
+                "reason": "No Q2 FY27 mention — last seen: Q1 FY27"
+              },
+              {
+                "ticker": "LT",
+                "company": "Larsen and Toubro",
+                "lastMention": "Q1 FY27",
+                "expectedQuarter": "Q2 FY27",
+                "stale": true,
+                "reason": "No Q2 FY27 mention — last seen: Q1 FY27"
+              }
+            ],
+            "staleCount": 2
+          }
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-10",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/10"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "services-ui",
+      "startedAt": "2026-09-09T04:59:09.236Z",
+      "finishedAt": "2026-09-09T04:59:52.285Z",
+      "ok": false,
+      "summary": "2/3 steps completed",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 50/51 holdings · cache 2026-09-09",
+          "details": {
+            "failed": [
+              "RAAJINFRA"
+            ],
+            "updated": 50
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-09",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/09"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-09-09T04:10:31.175Z",
+      "finishedAt": "2026-09-09T04:10:31.937Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-09-09",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-09",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/09"
+          }
+        }
+      ]
+    },
+    {
+      "action": "daily-market-pack",
+      "trigger": "services-ui",
+      "startedAt": "2026-09-08T09:29:19.626Z",
+      "finishedAt": "2026-09-08T09:29:45.718Z",
+      "ok": false,
+      "summary": "2/3 steps completed",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 50/51 holdings · cache 2026-09-08",
+          "details": {
+            "failed": [
+              "RAAJINFRA"
+            ],
+            "updated": 50
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-09-08",
+          "details": {
+            "newsWebPath": "/journal/news/2026/09/08"
+          }
+        }
+      ]
+    }
+  ]
+}

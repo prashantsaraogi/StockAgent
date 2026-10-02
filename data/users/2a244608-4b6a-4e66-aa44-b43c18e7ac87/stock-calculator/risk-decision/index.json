@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "564f4469-29ba-4c74-a83a-9035330fbea4",
+      "createdAt": "2026-09-15T04:12:32.488Z",
+      "ticker": "AZAD",
+      "stockName": "Azad Engineering Limited",
+      "sector": "Specialty Industrial Machinery",
+      "cmp": 2819,
+      "quantitativeScore100": 59,
+      "investmentVerdict": "🟡 HOLD / WAIT",
+      "thesisStatus": "HOLD",
+      "report": "# Risk & Decision — Azad Engineering Limited (AZAD)\n\n**Score:** 59/100 · **Verdict:** 🟡 HOLD / WAIT\n**CMP:** ₹2,819\n\n## Investment Thesis\n\n- Status: HOLD\n- Valuation: Stretched\n- Business: Average\n- Earnings: Mixed\n- Risk: Low-Medium\n- Why own: Healthy balance sheet / manageable risk profile\n- Why not aggressive: Current valuation is not cheap vs history or forward fair value\n- Change mind if: Sustained EPS deterioration or material moat erosion\n- Next review: Next quarterly results\n\n## Component scores\n\n| Component | Weight | Score |\n|-----------|-------:|------:|\n| Valuation | 25% | 5.5/10 |\n| Earnings Quality | 25% | 6.5/10 |\n| Business Quality | 25% | 5/10 |\n| Growth / CAGR | 15% | 5.5/10 |\n| Risk | 10% | 8/10 |\n\n## Positives\n- Healthy balance sheet / manageable risk profile\n- Strong franchise and scale\n- Long-term sector tailwind\n\n## Concerns\n- Current valuation is not cheap vs history or forward fair value\n- Earnings quality mixed — monitor quarterly translation\n- Monitor next quarter margins\n\n## Next quarter watch\n- Revenue growth\n- Operating margin\n- EPS vs prior year\n\n---\n_Stock Calculator Tab 5 — not investment advice._",
+      "analysis": {
+        "ticker": "AZAD",
+        "stockName": "Azad Engineering Limited",
+        "sector": "Specialty Industrial Machinery",
+        "cmp": 2819,
+        "cmpSource": "nse-yahoo",
+        "analyzedAt": "2026-09-15T04:12:24.434Z",
+        "dataSource": "Live tab synthesis + StockBook risk registers",
+        "riskDecisionFile": null,
+        "stockbookUrl": "/stockbook/specialty-industrial-machinery/azad-engineering-limited/summary",
+        "thesis": {
+          "status": "HOLD",
+          "score100": 59,
+          "valuationLabel": "Stretched",
+          "businessLabel": "Average",
+          "earningsLabel": "Mixed",
+          "riskLabel": "Low-Medium",
+          "whyOwn": "Healthy balance sheet / manageable risk profile",
+          "whyNotAggressive": "Current valuation is not cheap vs history or forward fair value",
+          "changeMind": "Sustained EPS deterioration or material moat erosion",
+          "nextReview": "Next quarterly results"
+        },
+        "riskFactors": [],
+        "riskBuckets": [
+          {
+            "bucket": "Business risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "Financial risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "Valuation risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "Governance risk",
+            "signal": "🟢",
+            "factorCount": 0
+          },
+          {
+            "bucket": "External risk",
+            "signal": "🟢",
+            "factorCount": 0
+          }
+        ],
+        "catalysts": [],
+        "thesisBreakers": [],
+        "components": [
+          {
+            "id": "valuation",
+            "label": "Valuation",
+            "weightPct": 25,
+            "score10": 5.5,
+            "weightedContribution": 13.750000000000002,
+            "source": "PE Evaluation / PARAMETERS"
+          },
+          {
+            "id": "earningsQuality",
+            "label": "Earnings Quality",
+            "weightPct": 25,
+            "score10": 6.5,
+            "weightedContribution": 16.25,
+            "source": "Tab 3 — earnings quality engine"
+          },
+          {
+            "id": "businessQuality",
+            "label": "Business Quality",
+            "weightPct": 25,
+            "score10": 5,
+            "weightedContribution": 12.5,
+            "source": "Tab 4 — business quality engine"
+          },
+          {
+            "id": "growth",
+            "label": "Growth / CAGR",
+            "weightPct": 15,
+            "score10": 5.5,
+            "weightedContribution": 8.25,
+            "source": "PARAMETERS forward EPS / volume"
+          },
+          {
+            "id": "risk",
+            "label": "Risk",
+            "weightPct": 10,
+            "score10": 8,
+            "weightedContribution": 8,
+            "source": "Section A + risk registers"
+          }
+        ],
+        "quantitativeScore100": 59,
+        "investmentVerdict": "🟡 HOLD / WAIT",
+        "verdictTone": "wait",
+        "verdictEmoji": "🟡",
+        "positives": [
+          "Healthy balance sheet / manageable risk profile",
+          "Strong franchise and scale",
+          "Long-term sector tailwind"
+        ],
+        "concerns": [
+          "Current valuation is not cheap vs history or forward fair value",
+          "Earnings quality mixed — monitor quarterly translation",
+          "Monitor next quarter margins"
+        ],
+        "nextQuarterWatch": [
+          "Revenue growth",
+          "Operating margin",
+          "EPS vs prior year"
+        ],
+        "narrativeSummary": "Not a screaming BUY — excellent business qualities with valuation and/or near-term earnings caveats.",
+        "notScreamingBuy": true
+      }
+    }
+  ]
+}
