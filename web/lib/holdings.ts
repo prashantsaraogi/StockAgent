@@ -18,7 +18,14 @@ export interface HoldingRow {
 export async function parseHoldingsTable(tenantId: string): Promise<HoldingRow[]> {
   assertSafeTenantId(tenantId);
   const { holdingsFile } = getUserPaths(tenantId);
-  const md = await fs.readFile(holdingsFile, 'utf8');
+  let md: string;
+  try {
+    md = await fs.readFile(holdingsFile, 'utf8');
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code === 'ENOENT') return [];
+    throw err;
+  }
   const rows: HoldingRow[] = [];
 
   for (const m of md.matchAll(

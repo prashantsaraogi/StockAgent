@@ -76,11 +76,21 @@ async function getSupabaseSession(): Promise<AppSession | null> {
 
 /** Current session — Supabase when configured, else cookie dev fallback. */
 export async function getSession(): Promise<AppSession | null> {
+  let session: AppSession | null = null;
   if (isSupabaseConfigured()) {
-    const sb = await getSupabaseSession();
-    if (sb) return sb;
+    session = await getSupabaseSession();
   }
-  return getCookieDevSession();
+  if (!session) {
+    session = await getCookieDevSession();
+  }
+  if (session) {
+    try {
+      await ensureUserDataDir(session.tenantId);
+    } catch {
+      /* Vercel/serverless: /var/task is read-only except traced files — avoid crashing pages */
+    }
+  }
+  return session;
 }
 
 export async function requireSession(): Promise<AppSession> {

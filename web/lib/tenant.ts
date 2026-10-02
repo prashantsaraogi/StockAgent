@@ -40,9 +40,22 @@ function emptyHoldingsTemplate(tenantId: string): string {
  * - Supabase users: empty portfolio (no other user's stocks)
  * - dev tenant: sample 3-stock file for local cookie mode only
  */
+function isServerlessReadOnlyFs(): boolean {
+  return process.env.VERCEL === '1';
+}
+
 export async function ensureUserDataDir(tenantId: string): Promise<void> {
   assertSafeTenantId(tenantId);
   const paths = getUserPaths(tenantId);
+
+  if (await fileExists(paths.holdingsFile)) {
+    return;
+  }
+
+  if (isServerlessReadOnlyFs()) {
+    return;
+  }
+
   await fs.mkdir(paths.portfolioDir, { recursive: true });
   await fs.mkdir(paths.stockbookDir, { recursive: true });
   await fs.mkdir(path.join(paths.portfolioDir, '../analysis-log'), { recursive: true });
