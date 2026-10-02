@@ -64,8 +64,6 @@ async function getSupabaseSession(): Promise<AppSession | null> {
     await supabase.from('profiles').update({ tenant_id: user.id }).eq('id', user.id);
   }
 
-  await ensureUserDataDir(tenantId);
-
   return {
     userId: user.id,
     email: user.email,

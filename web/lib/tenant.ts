@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { getDevUserPaths, getRepoRoot } from './framework-paths';
+import { isServerlessReadOnlyFs, safeMkdir } from './serverless-fs';
 
 const DEV_TENANT = 'dev';
 
@@ -40,50 +41,50 @@ function emptyHoldingsTemplate(tenantId: string): string {
  * - Supabase users: empty portfolio (no other user's stocks)
  * - dev tenant: sample 3-stock file for local cookie mode only
  */
-function isServerlessReadOnlyFs(): boolean {
-  return process.env.VERCEL === '1';
-}
+export { isServerlessReadOnlyFs } from './serverless-fs';
 
+/** Local dev: create tenant folders. Serverless: no-op (never mkdir /var/task/data). */
 export async function ensureUserDataDir(tenantId: string): Promise<void> {
   assertSafeTenantId(tenantId);
-  const paths = getUserPaths(tenantId);
+  if (isServerlessReadOnlyFs()) return;
 
-  if (await fileExists(paths.holdingsFile)) {
-    return;
-  }
+  try {
+    const paths = getUserPaths(tenantId);
+    if (await fileExists(paths.holdingsFile)) {
+      return;
+    }
 
-  if (isServerlessReadOnlyFs()) {
-    return;
-  }
+    await safeMkdir(paths.portfolioDir);
+    await safeMkdir(paths.stockbookDir);
+    await safeMkdir(path.join(paths.portfolioDir, '../analysis-log'));
+    await safeMkdir(path.join(paths.portfolioDir, '../stock-calculator'));
+    await safeMkdir(path.dirname(paths.newsTickerIndex));
 
-  await fs.mkdir(paths.portfolioDir, { recursive: true });
-  await fs.mkdir(paths.stockbookDir, { recursive: true });
-  await fs.mkdir(path.join(paths.portfolioDir, '../analysis-log'), { recursive: true });
-  await fs.mkdir(path.join(paths.portfolioDir, '../stock-calculator'), { recursive: true });
-  await fs.mkdir(path.dirname(paths.newsTickerIndex), { recursive: true });
-
-  const holdingsExists = await fileExists(paths.holdingsFile);
-  if (!holdingsExists) {
-    let seed: string;
-    if (tenantId === DEV_TENANT) {
-      const devHoldings = path.join(getRepoRoot(), 'data/users/dev/portfolio/holdings.md');
-      if (await fileExists(devHoldings)) {
-        seed = await fs.readFile(devHoldings, 'utf8');
+    const holdingsExists = await fileExists(paths.holdingsFile);
+    if (!holdingsExists) {
+      let seed: string;
+      if (tenantId === DEV_TENANT) {
+        const devHoldings = path.join(getRepoRoot(), 'data/users/dev/portfolio/holdings.md');
+        if (await fileExists(devHoldings)) {
+          seed = await fs.readFile(devHoldings, 'utf8');
+        } else {
+          seed = emptyHoldingsTemplate(tenantId);
+        }
       } else {
         seed = emptyHoldingsTemplate(tenantId);
       }
-    } else {
-      seed = emptyHoldingsTemplate(tenantId);
+      await fs.writeFile(paths.holdingsFile, seed, 'utf8');
     }
-    await fs.writeFile(paths.holdingsFile, seed, 'utf8');
-  }
 
-  if (!(await fileExists(paths.newsTickerIndex))) {
-    await fs.writeFile(
-      paths.newsTickerIndex,
-      `# Ticker index — ${tenantId}\n\nPer-user news links (private to this login).\n`,
-      'utf8'
-    );
+    if (!(await fileExists(paths.newsTickerIndex))) {
+      await fs.writeFile(
+        paths.newsTickerIndex,
+        `# Ticker index — ${tenantId}\n\nPer-user news links (private to this login).\n`,
+        'utf8'
+      );
+    }
+  } catch {
+    /* Do not fail login or SSR when disk is unavailable */
   }
 }
 

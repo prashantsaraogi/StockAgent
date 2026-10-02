@@ -48,11 +48,24 @@ export interface PortfolioDividendRank {
 
 let registryCache: DividendRegistry | null = null;
 
+const EMPTY_DIVIDEND_REGISTRY: DividendRegistry = {
+  asOf: 'unavailable',
+  label: 'empty',
+  yocAddGatePct: 8,
+  entries: {},
+};
+
 export async function loadDividendRegistry(): Promise<DividendRegistry> {
   if (registryCache) return registryCache;
   const file = path.join(getRepoRoot(), '.cursor/portfolio/dividend-fy26.json');
-  const raw = await fs.readFile(file, 'utf8');
-  registryCache = JSON.parse(raw) as DividendRegistry;
+  try {
+    const raw = await fs.readFile(file, 'utf8');
+    registryCache = JSON.parse(raw) as DividendRegistry;
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code !== 'ENOENT') throw err;
+    registryCache = EMPTY_DIVIDEND_REGISTRY;
+  }
   return registryCache;
 }
 
@@ -146,11 +159,18 @@ export async function getPortfolioDividendRank(tenantId: string): Promise<Portfo
   const cmpCoveragePct =
     dividendRows.length > 0 ? Math.round((cmpRows.length / dividendRows.length) * 100) : null;
 
-  const notes: string[] = [
-    'List 1 (YoC) = FY26 dividend per share ÷ your avg cost — primary lens for add gate on existing holders.',
-    `8% YoC add gate: only names above ${registry.yocAddGatePct}% on trailing div qualify for scale adds on income logic alone.`,
-    'List 3 (CMP yield) = div/sh ÷ live CMP — useful for fresh-entry comparison; not the primary metric for your legacy book.',
-  ];
+  const notes: string[] = [];
+  if (registry.asOf === 'unavailable') {
+    notes.push(
+      'Dividend registry file not available on this server (deploy bundle). Rank lists are empty; portfolio lots still load.'
+    );
+  } else {
+    notes.push(
+      'List 1 (YoC) = FY26 dividend per share ÷ your avg cost — primary lens for add gate on existing holders.',
+      `8% YoC add gate: only names above ${registry.yocAddGatePct}% on trailing div qualify for scale adds on income logic alone.`,
+      'List 3 (CMP yield) = div/sh ÷ live CMP — useful for fresh-entry comparison; not the primary metric for your legacy book.'
+    );
+  }
 
   const iocOverride = registry.normalizedOverrides?.IOC;
   const iocHolding = holdings.find((h) => h.ticker === 'IOC');

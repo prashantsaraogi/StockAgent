@@ -18,10 +18,12 @@ const nextConfig: NextConfig = {
       './GLOSSARY.md',
       './.cursor/skills/**/*',
       './.cursor/rules/**/*',
-      './.cursor/portfolio/holdings.md',
+      './.cursor/portfolio/**/*',
       './data/users/dev/**/*',
     ],
-    '/api/**/*': ['./data/users/**/*'],
+    '/home': ['./data/users/dev/**/*', './.cursor/portfolio/**/*'],
+    '/portfolio': ['./data/users/dev/**/*', './.cursor/portfolio/**/*'],
+    '/api/**/*': ['./data/users/**/*', './.cursor/portfolio/**/*'],
   },
   experimental: {
     serverActions: {

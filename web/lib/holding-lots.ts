@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { getUserPaths, assertSafeTenantId } from './tenant';
+import { isServerlessReadOnlyFs, safeMkdir } from './serverless-fs';
 import { parseHoldingsTable, type HoldingRow } from './holdings';
 import { resolveStock } from './stock-search';
 import { getStockbookByTicker } from './stockbook-index';
@@ -54,8 +55,12 @@ async function readLotsFile(tenantId: string): Promise<LotsFile> {
 }
 
 async function writeLotsFile(tenantId: string, data: LotsFile): Promise<void> {
+  if (isServerlessReadOnlyFs()) {
+    throw new Error('Saving portfolio lots is not supported on read-only hosting (use local dev).');
+  }
   const file = lotsPath(tenantId);
-  await fs.mkdir(path.dirname(file), { recursive: true });
+  const ok = await safeMkdir(path.dirname(file));
+  if (!ok) throw new Error('Could not create portfolio directory');
   await fs.writeFile(file, JSON.stringify(data, null, 2), 'utf8');
 }
 
@@ -97,8 +102,14 @@ export async function ensureLotsInitialized(tenantId: string): Promise<HoldingLo
     legacy: true,
   }));
 
-  await writeLotsFile(tenantId, { version: 1, lots: imported });
-  await syncHoldingsMarkdown(tenantId, imported);
+  if (!isServerlessReadOnlyFs()) {
+    try {
+      await writeLotsFile(tenantId, { version: 1, lots: imported });
+      await syncHoldingsMarkdown(tenantId, imported);
+    } catch {
+      /* read-only host — serve imported lots for this request only */
+    }
+  }
   return imported;
 }
 
@@ -221,7 +232,9 @@ ${summaryRows || ''}
 ${lotRows || ''}
 `;
 
-  await fs.mkdir(path.dirname(holdingsFile), { recursive: true });
+  if (isServerlessReadOnlyFs()) return;
+  const ok = await safeMkdir(path.dirname(holdingsFile));
+  if (!ok) return;
   await fs.writeFile(holdingsFile, md, 'utf8');
 }
 
