@@ -6,24 +6,29 @@ const webDir = path.dirname(fileURLToPath(import.meta.url));
 /** Monorepo root (parent of web/) — required for Vercel/serverless fs.readFile outside web/ */
 const repoRoot = path.join(webDir, '..');
 
+/** Files outside web/ read at runtime (fs.readFile / readdir) — must ship with each serverless route. */
+const repoRuntimeTrace = [
+  './StockBook/**/*',
+  './News/**/*',
+  './investor-wisdom/**/*',
+  './GLOSSARY.md',
+  './.cursor/skills/**/*',
+  './.cursor/rules/**/*',
+  './.cursor/portfolio/**/*',
+  './data/users/**/*',
+];
+
 const nextConfig: NextConfig = {
   // Repo root is parent of web/ — agent reads framework files outside web/
   outputFileTracingRoot: repoRoot,
-  // Runtime fs paths are not auto-traced; bundle framework + dev tenant seed for serverless.
+  // App routes use '/*'; API routes need explicit globs — '/api/**/*' alone omitted StockBook before.
   outputFileTracingIncludes: {
-    '/*': [
-      './StockBook/**/*',
-      './News/**/*',
-      './investor-wisdom/**/*',
-      './GLOSSARY.md',
-      './.cursor/skills/**/*',
-      './.cursor/rules/**/*',
-      './.cursor/portfolio/**/*',
-      './data/users/dev/**/*',
-    ],
-    '/home': ['./data/users/dev/**/*', './.cursor/portfolio/**/*'],
-    '/portfolio': ['./data/users/dev/**/*', './.cursor/portfolio/**/*'],
-    '/api/**/*': ['./data/users/**/*', './.cursor/portfolio/**/*'],
+    '/*': repoRuntimeTrace,
+    '/chat': repoRuntimeTrace,
+    '/home': repoRuntimeTrace,
+    '/portfolio': repoRuntimeTrace,
+    '/api/chat': repoRuntimeTrace,
+    '/api/**/*': repoRuntimeTrace,
   },
   experimental: {
     serverActions: {

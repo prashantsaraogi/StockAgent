@@ -29,33 +29,51 @@ export async function buildStockbookTickerIndex(): Promise<Map<string, Stockbook
   const index = new Map<string, StockbookLocation>();
   const root = path.join(getRepoRoot(), 'StockBook');
 
+  if (!(await exists(root))) {
+    cachedIndex = index;
+    return index;
+  }
+
   async function walk(sectorDir: string, sector: string): Promise<void> {
-    const stocks = await fs.readdir(sectorDir, { withFileTypes: true });
+    let stocks;
+    try {
+      stocks = await fs.readdir(sectorDir, { withFileTypes: true });
+    } catch {
+      return;
+    }
     for (const st of stocks) {
       if (!st.isDirectory()) continue;
       const stock = st.name;
       const summaryPath = path.join(sectorDir, st.name, 'summary-analysis.md');
       if (!(await exists(summaryPath))) continue;
 
-      const md = await fs.readFile(summaryPath, 'utf8');
-      const match = md.match(/\*\*Ticker:\*\*\s*([A-Z0-9]+)/);
-      if (!match) continue;
+      try {
+        const md = await fs.readFile(summaryPath, 'utf8');
+        const match = md.match(/\*\*Ticker:\*\*\s*([A-Z0-9]+)/);
+        if (!match) continue;
 
-      const ticker = match[1].toUpperCase();
-      index.set(ticker, {
-        sector,
-        stock,
-        sectorSlug: toSlug(sector),
-        stockSlug: toSlug(stock),
-        ticker,
-      });
+        const ticker = match[1].toUpperCase();
+        index.set(ticker, {
+          sector,
+          stock,
+          sectorSlug: toSlug(sector),
+          stockSlug: toSlug(stock),
+          ticker,
+        });
+      } catch {
+        /* skip unreadable summary */
+      }
     }
   }
 
-  const sectors = await fs.readdir(root, { withFileTypes: true });
-  for (const s of sectors) {
-    if (!s.isDirectory() || s.name.startsWith('.')) continue;
-    await walk(path.join(root, s.name), s.name);
+  try {
+    const sectors = await fs.readdir(root, { withFileTypes: true });
+    for (const s of sectors) {
+      if (!s.isDirectory() || s.name.startsWith('.')) continue;
+      await walk(path.join(root, s.name), s.name);
+    }
+  } catch {
+    /* hosted deploy without StockBook bundle — Ask Agent still runs on framework text */
   }
 
   cachedIndex = index;

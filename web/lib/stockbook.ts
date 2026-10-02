@@ -61,7 +61,15 @@ export async function writeDevStockbookFile(
 
 export async function readRepoFile(relativeFromRoot: string): Promise<string> {
   const fullPath = path.join(getRepoRoot(), relativeFromRoot);
-  return fs.readFile(fullPath, 'utf8');
+  try {
+    return await fs.readFile(fullPath, 'utf8');
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code;
+    if (code === 'ENOENT') {
+      throw new Error(`Framework file not found on server: ${relativeFromRoot}`);
+    }
+    throw err;
+  }
 }
 
 export async function fileExists(filePath: string): Promise<boolean> {
