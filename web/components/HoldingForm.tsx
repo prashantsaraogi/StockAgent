@@ -65,7 +65,8 @@ export function HoldingForm() {
       });
       const data = await res.json();
       if (!data.ok) {
-        setError(data.error ?? 'Could not save holding');
+        const code = typeof data.code === 'string' ? `[${data.code}] ` : '';
+        setError(`${code}${data.error ?? 'Could not save holding'}`);
         return;
       }
 

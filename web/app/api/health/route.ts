@@ -3,12 +3,16 @@ import { verifyAllPaths } from '@/lib/verify-paths';
 import { getDevUserPaths, getSharedFrameworkPaths } from '@/lib/framework-paths';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
 import { isServerlessReadOnlyFs } from '@/lib/serverless-fs';
+import { probePortfolioLotsTable } from '@/lib/portfolio-lots-supabase';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function GET() {
   const verification = await verifyAllPaths();
   const shared = getSharedFrameworkPaths();
   const dev = getDevUserPaths();
   const supabaseReady = isSupabaseConfigured();
+  const portfolioLots = supabaseReady ? await probePortfolioLotsTable() : null;
+  const hasServiceRole = Boolean(createAdminClient());
 
   return NextResponse.json({
     status: verification.ok ? 'ok' : 'degraded',
@@ -21,6 +25,8 @@ export async function GET() {
     },
     hosting: {
       serverlessReadOnlyFs: isServerlessReadOnlyFs(),
+      hasServiceRoleKey: hasServiceRole,
+      portfolioLotsTable: portfolioLots,
       portfolioSaveOnVercel:
         'Supabase login (uuid tenant) + migration 010_portfolio_lots.sql — not cookie-dev',
     },

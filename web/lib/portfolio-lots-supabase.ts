@@ -28,7 +28,7 @@ async function ensureProfileRow(userId: string, email?: string): Promise<void> {
 
   const { error } = await admin.from('profiles').upsert(row);
   if (error) {
-    console.error('profiles upsert before portfolio_lots:', error.message);
+    throw new Error(`Could not upsert profile before portfolio save: ${error.message}`);
   }
 }
 
@@ -113,8 +113,16 @@ export async function writeLotsToSupabase(
 
 function formatPortfolioSaveError(message: string): string {
   const lower = message.toLowerCase();
-  if (lower.includes('portfolio_lots') && lower.includes('does not exist')) {
+  if (
+    (lower.includes('portfolio_lots') &&
+      (lower.includes('does not exist') || lower.includes('could not find'))) ||
+    lower.includes('schema cache') ||
+    lower.includes('pgrst205')
+  ) {
     return 'Portfolio table missing — run supabase/migrations/010_portfolio_lots.sql in Supabase SQL Editor.';
+  }
+  if (lower.includes('invalid api key') || lower.includes('invalid jwt')) {
+    return 'Supabase API key rejected — check NEXT_PUBLIC_SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY in Vercel (Secret type, no typos).';
   }
   if (lower.includes('foreign key') && lower.includes('profiles')) {
     return 'Profile row missing for this user — sign out, sign in again, then retry.';
@@ -123,4 +131,24 @@ function formatPortfolioSaveError(message: string): string {
     return `Portfolio save blocked by RLS — add SUPABASE_SERVICE_ROLE_KEY on Vercel. (${message})`;
   }
   return `Could not save portfolio: ${message}`;
+}
+
+/** Server health — can admin client reach portfolio_lots? */
+export async function probePortfolioLotsTable(): Promise<{
+  ok: boolean;
+  detail: string;
+}> {
+  const admin = createAdminClient();
+  if (!admin) {
+    return {
+      ok: false,
+      detail: 'SUPABASE_SERVICE_ROLE_KEY missing or Supabase not configured',
+    };
+  }
+
+  const { error } = await admin.from(TABLE).select('user_id').limit(1);
+  if (error) {
+    return { ok: false, detail: formatPortfolioSaveError(error.message) };
+  }
+  return { ok: true, detail: 'portfolio_lots reachable' };
 }
