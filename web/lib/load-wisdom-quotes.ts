@@ -1,15 +1,7 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { readRepoMarkdown } from './content';
+import { WISDOM_QUOTES_MARKDOWN } from './bundled/wisdom-quotes.generated';
 
-const bundledQuotesPath = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  'bundled',
-  'investor-wisdom-quotes.md'
-);
-
-/** Repo file when monorepo is on disk; bundled copy on Vercel without StockBook trace. */
+/** Repo file when monorepo is on disk; generated string fallback on Vercel. */
 export async function loadWisdomQuotes(): Promise<{
   content: string;
   badge: string;
@@ -19,10 +11,9 @@ export async function loadWisdomQuotes(): Promise<{
     return { content: fromRepo, badge: 'investor-wisdom/quotes.md' };
   }
 
-  try {
-    const content = await fs.readFile(bundledQuotesPath, 'utf8');
-    return { content, badge: 'investor-wisdom/quotes.md' };
-  } catch {
-    return null;
+  if (WISDOM_QUOTES_MARKDOWN?.trim()) {
+    return { content: WISDOM_QUOTES_MARKDOWN, badge: 'investor-wisdom/quotes.md' };
   }
+
+  return null;
 }
