@@ -4,6 +4,7 @@ import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
 import { MarkdownView } from '@/components/MarkdownView';
 import { BusinessQualityPanel } from '@/components/BusinessQualityPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
+import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
 import {
   groupBusinessQualityByDate,
   listBusinessQualityRecords,
@@ -44,7 +45,7 @@ export default async function BusinessQualityPage() {
   return (
     <div className="page page-prose">
       <header className="page-header">
-        <h1>Stock Calculator</h1>
+        <h1>{STOCK_ANALYSIS_TITLE}</h1>
         <p className="muted">
           Business Quality &amp; Moat — private to <strong>{session.email}</strong>. Each run saved
           to your history.

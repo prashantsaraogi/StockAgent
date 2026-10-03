@@ -3,6 +3,7 @@ import { requireSession } from '@/lib/auth';
 import { StockCalculatorHub } from '@/components/StockCalculatorHub';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { groupFullAnalysisByDate, listFullAnalysisRecords } from '@/lib/stock-calculator-full-history';
+import { STOCK_ANALYSIS_INTRO, STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
 
 function formatTime(iso: string): string {
   try {
@@ -28,23 +29,14 @@ export default async function StockCalculatorHubPage() {
   return (
     <div className="page">
       <header className="page-header">
-        <h1>Stock Calculator</h1>
+        <h1>{STOCK_ANALYSIS_TITLE}</h1>
         <p className="muted">
-          One stock · six framework modules — private to <strong>{session.email}</strong>.{' '}
-          <strong>Not linked</strong> to <Link href="/portfolio">Portfolio</Link> holdings.
+          {STOCK_ANALYSIS_INTRO} Private to <strong>{session.email}</strong>.{' '}
+          <strong>Not linked</strong> to <Link href="/portfolio">Portfolio</Link> lots — use this
+          for any name you hold or are researching.
         </p>
         <StockCalculatorSubNav />
       </header>
-
-      <div className="journal-section-intro card wide">
-        <h2 className="journal-section-title">Full analysis</h2>
-        <p className="muted small">
-          Enter the stock once below. We run <strong>CAGR</strong>, <strong>PE</strong>,{' '}
-          <strong>Earnings Quality</strong>, <strong>Margin</strong>,{' '}
-          <strong>Business Quality &amp; Moat</strong>, and <strong>Risk &amp; Decision</strong> in
-          parallel and show tabbed results. Individual sub-tabs remain for single-module history.
-        </p>
-      </div>
 
       <StockCalculatorHub />
 
@@ -57,7 +49,7 @@ export default async function StockCalculatorHubPage() {
         </section>
       ) : (
         <>
-          <h2 className="section-heading">Full analysis history</h2>
+          <h2 className="section-heading">Past analysis runs</h2>
           <p className="muted small analysis-log-summary">
             <strong>{entries.length}</strong> run{entries.length !== 1 ? 's' : ''} ·{' '}
             <strong>{timeline.length}</strong> year{timeline.length !== 1 ? 's' : ''}

@@ -536,16 +536,16 @@ Update dividend-fy26.json · regenerate portfolio-dividend-rank.md (YoC top 10 +
   },
   {
     id: 'stock-calculator',
-    label: 'Stock Calculator',
+    label: 'Stock Analysis',
     description:
-      'CAGR · PE · Earnings Quality · Business Quality · Risk — populate StockBook files the tabs read.',
+      'Holdings & buy candidates — CAGR · P/E · PEG · Earnings Quality · Margin · Business Quality · Risk. Populate StockBook files the tabs read.',
     services: [
       {
         id: 'refresh-earnings-quality',
         categoryId: 'stock-calculator',
         title: 'Refresh Earnings Quality — Part A + Part B',
         description:
-          '5Y rear-view EPS table (Part A) + risk-adjusted forward path inputs (Part B via internal/external risk files). Powers Stock Calculator → Earnings Quality tab.',
+          '5Y rear-view EPS table (Part A) + risk-adjusted forward path inputs (Part B via internal/external risk files). Powers Stock Analysis → Earnings Quality tab.',
         cadence: 'quarterly',
         actionType: 'prompt',
         channel: 'both',
@@ -564,7 +564,7 @@ Update dividend-fy26.json · regenerate portfolio-dividend-rank.md (YoC top 10 +
 5. Update external factors if macro shifted (e.g. oil L1/L2 for auto/OMC in current FY)
 6. Refresh section D quarterly table + cross-check warnings (revenue ↑ profit ↓)
 
-Run Stock Calculator → Earnings Quality to verify Part A/B render. Write-back faq if verdict changes.`,
+Run Stock Analysis → Earnings Quality to verify Part A/B render. Write-back faq if verdict changes.`,
       },
       {
         id: 'earnings-quality-forward-context',
@@ -589,7 +589,7 @@ Part B engine: base EPS CAGR minus max(internal, external haircut); temporary ex
         categoryId: 'stock-calculator',
         title: 'PE Evaluation — Gordon fair P/E + implied growth',
         description:
-          'Fair P/E = 1/(R−G) · inverse implied G · sensitivity tables — Stock Calculator PE tab Part D.',
+          'Fair P/E = 1/(R−G) · inverse implied G · sensitivity tables — Stock Analysis P/E tab Part D.',
         cadence: 'on-demand',
         actionType: 'prompt',
         channel: 'both',
@@ -625,7 +625,7 @@ Label ASSUMPTION on R and G. Run PE Evaluation tab to verify scorecard.`,
 **Part D:** Sync EARNINGS_QUALITY section D margin row (8 quarters)
 
 Live-search latest quarter if results published. Label FACT vs ASSUMPTION.
-Run Stock Calculator → Margin Analysis tab to verify.`,
+Run Stock Analysis → Margin tab to verify.`,
       },
       {
         id: 'refresh-peg-evaluation',
@@ -645,18 +645,18 @@ Update PEG_{TICKER}.md FY26 overrides: ttmPe, epsGrowthPct, revenue/PAT growth, 
 Cross-check PARAMETERS + detail-analysis. Label FACT vs OUR ASSUMPTION.
 Note infra FCF lens for EPC names (L&T) vs consumer (Hero, ITC).
 
-Run Stock Calculator → PEG Evaluation tab to verify scorecard + 100-pt total.`,
+Run Stock Analysis → PEG tab to verify scorecard + 100-pt total.`,
       },
       {
         id: 'stock-calculator-full',
         categoryId: 'stock-calculator',
-        title: 'Full analysis — all 6 modules (one form)',
+        title: 'Analyze stock — basic or advanced (6 modules)',
         description:
-          'Stock Calculator home: enter ticker once → CAGR + PE + Earnings Quality + Margin + Business Quality + Risk in parallel.',
+          'Stock Analysis home: **Basic** = stock name only (default TTM P/E, 12% CAGR, 5Y). **Advanced** = set P/E basis + expected CAGR. Runs CAGR, P/E, earnings, margin, business quality, risk.',
         cadence: 'on-demand',
         actionType: 'link',
         href: '/stock-calculator',
-        hrefLabel: 'Full Analysis tab',
+        hrefLabel: 'Analyze tab',
         channel: 'web',
       },
     ],

@@ -8,7 +8,7 @@ export function StockCalculatorSubNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="sub-nav calc-sub-nav" aria-label="Stock Calculator sections">
+    <nav className="sub-nav calc-sub-nav" aria-label="Stock Analysis sections">
       {STOCK_CALCULATOR_NAV.map((item) => {
         const active =
           item.href === '/stock-calculator'

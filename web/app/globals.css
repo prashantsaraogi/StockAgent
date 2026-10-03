@@ -3145,7 +3145,48 @@ td.gain-neg {
   font-size: 0.9rem;
 }
 
-/* Stock Calculator — Full Analysis hub */
+/* Stock Analysis — Analyze hub (basic / advanced) */
+.calc-analysis-mode {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+  padding: 0.25rem;
+  border-radius: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  width: fit-content;
+  max-width: 100%;
+}
+
+.calc-analysis-mode-btn {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.calc-analysis-mode-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.calc-analysis-mode-btn.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.calc-analysis-mode-hint {
+  margin: 0 0 1rem;
+  line-height: 1.45;
+}
+
 .calc-full-hub {
   gap: 1rem;
 }

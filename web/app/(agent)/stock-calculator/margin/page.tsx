@@ -4,6 +4,7 @@ import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
 import { MarkdownView } from '@/components/MarkdownView';
 import { MarginAnalysisPanel } from '@/components/MarginAnalysisPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
+import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
 import { groupMarginByDate, listMarginRecords } from '@/lib/margin-history';
 
 function clipFrameworkIntro(md: string): string {
@@ -37,7 +38,7 @@ export default async function MarginAnalysisPage() {
   return (
     <div className="page page-prose">
       <header className="page-header">
-        <h1>Stock Calculator</h1>
+        <h1>{STOCK_ANALYSIS_TITLE}</h1>
         <p className="muted">
           Margin Analysis — private to <strong>{session.email}</strong>. Each run saved to your
           history.

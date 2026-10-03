@@ -9,22 +9,27 @@ export const JOURNAL_NAV = [
   { href: '/journal/analysis', label: 'Analysis Log' },
 ] as const;
 
-/** Stock Calculator sub-tabs */
+/** Stock Analysis area — routes stay under /stock-calculator */
+export const STOCK_ANALYSIS_TITLE = 'Stock Analysis';
+export const STOCK_ANALYSIS_INTRO =
+  'For stocks you hold or are planning to buy — valuation, quality, earnings, and risk in one place.';
+
+/** Stock Analysis sub-tabs (module drill-down + history) */
 export const STOCK_CALCULATOR_NAV = [
-  { href: '/stock-calculator', label: 'Full Analysis' },
-  { href: '/stock-calculator/cagr', label: 'CAGR Evaluation' },
-  { href: '/stock-calculator/pe', label: 'PE Evaluation Framework' },
-  { href: '/stock-calculator/peg', label: 'PEG Evaluation' },
+  { href: '/stock-calculator', label: 'Analyze' },
+  { href: '/stock-calculator/cagr', label: 'CAGR' },
+  { href: '/stock-calculator/pe', label: 'P/E' },
+  { href: '/stock-calculator/peg', label: 'PEG' },
   { href: '/stock-calculator/earnings-quality', label: 'Earnings Quality' },
-  { href: '/stock-calculator/margin', label: 'Margin Analysis' },
-  { href: '/stock-calculator/business-quality', label: 'Business Quality & Moat' },
+  { href: '/stock-calculator/margin', label: 'Margin' },
+  { href: '/stock-calculator/business-quality', label: 'Business Quality' },
   { href: '/stock-calculator/risk-decision', label: 'Risk & Decision' },
 ] as const;
 
 export const MAIN_NAV = [
   { href: '/home', label: 'Dashboard', icon: '⌂' },
   { href: '/portfolio', label: 'Portfolio', icon: '◧' },
-  { href: '/stock-calculator', label: 'Stock Calculator', icon: '⊕' },
+  { href: '/stock-calculator', label: STOCK_ANALYSIS_TITLE, icon: '⊕' },
   { href: '/journal', label: 'Journal', icon: '▤' },
   { href: '/industry-analysis', label: 'Industry Growth', icon: '◫' },
   { href: '/services', label: 'Services', icon: '⚙' },

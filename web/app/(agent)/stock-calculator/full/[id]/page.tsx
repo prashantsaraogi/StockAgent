@@ -4,6 +4,7 @@ import { requireSession } from '@/lib/auth';
 import { getFullAnalysisRecord } from '@/lib/stock-calculator-full-history';
 import { StockCalculatorFullResults } from '@/components/StockCalculatorFullResults';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
+import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -28,7 +29,7 @@ export default async function FullAnalysisDetailPage({ params }: Props) {
   return (
     <div className="page">
       <Link href="/stock-calculator" className="back-link">
-        ← Stock Calculator
+        ← {STOCK_ANALYSIS_TITLE}
       </Link>
 
       <header className="page-header">

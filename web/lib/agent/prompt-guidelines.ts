@@ -502,20 +502,21 @@ Cheap or expensive vs history? Forward IV premium? ADD case from PARAMETERS quic
   },
   {
     id: 'stock-calculator',
-    label: 'Stock Calculator',
+    label: 'Stock Analysis',
     description:
-      'Web tabs — populate StockBook files; run tab to verify Part A/B, Gordon PE, scorecards.',
+      'Web tabs — populate StockBook files; run Analyze (basic or advanced) to verify Part A/B, Gordon PE, scorecards.',
     prompts: [
       {
         id: 'full-analysis-all-tabs',
-        title: 'Full Stock Calculator — all 6 modules',
+        title: 'Stock Analysis — all 6 modules (basic or advanced)',
         description:
-          'Populate StockBook then run web Full Analysis — CAGR, PE, EQ, Margin, BQ, Risk together.',
-        prompt: `Prepare StockBook for {TICKER} then verify all Stock Calculator modules.
+          'Populate StockBook then run **Analyze** — basic (stock only) or advanced (TTM/forward P/E + CAGR).',
+        prompt: `Prepare StockBook for {TICKER} then verify all Stock Analysis modules.
 
 1. Refresh PARAMETERS · MARGIN · EARNINGS_QUALITY · BUSINESS_QUALITY · RISK_DECISION files
-2. User runs **Stock Calculator → Full Analysis** (one form, all six tabs)
+2. User runs **Stock Analysis → Analyze** — **Basic** (stock name only; default TTM P/E, 12% CAGR, 5Y) or **Advanced** (custom P/E basis + CAGR)
 3. Cross-check overview verdicts — flag conflicts (e.g. margin 🔴 but BQ 🟢)
+4. **PEG** tab separately for combined P/E + growth scorecard
 
 Modules: CAGR · PE (optional purchase for scorecard) · Earnings Quality · Margin · Business Quality · Risk.`,
         channel: 'both',

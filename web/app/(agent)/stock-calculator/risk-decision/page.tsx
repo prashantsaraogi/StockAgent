@@ -4,6 +4,7 @@ import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
 import { MarkdownView } from '@/components/MarkdownView';
 import { RiskDecisionPanel } from '@/components/RiskDecisionPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
+import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
 import {
   groupRiskDecisionByDate,
   listRiskDecisionRecords,
@@ -43,7 +44,7 @@ export default async function RiskDecisionPage() {
   return (
     <div className="page page-prose">
       <header className="page-header">
-        <h1>Stock Calculator</h1>
+        <h1>{STOCK_ANALYSIS_TITLE}</h1>
         <p className="muted">
           Risk &amp; Decision — final engine · private to <strong>{session.email}</strong>
         </p>

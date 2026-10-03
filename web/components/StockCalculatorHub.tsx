@@ -9,13 +9,19 @@ import { StockCalculatorFullResults } from '@/components/StockCalculatorFullResu
 import { StockSearchSuggestions } from '@/components/StockSearchSuggestions';
 import type { StockSearchResult } from '@/lib/stock-search';
 
+const DEFAULT_CAGR = '12';
+const DEFAULT_YEARS = '5';
+
+type AnalysisMode = 'basic' | 'advanced';
+
 export function StockCalculatorHub() {
   const router = useRouter();
+  const [mode, setMode] = useState<AnalysisMode>('basic');
   const [stockName, setStockName] = useState('');
   const [selected, setSelected] = useState<StockSearchResult | null>(null);
   const [peBasis, setPeBasis] = useState<'ttm' | 'forward'>('ttm');
-  const [expectedCagr, setExpectedCagr] = useState('12');
-  const [years, setYears] = useState('5');
+  const [expectedCagr, setExpectedCagr] = useState(DEFAULT_CAGR);
+  const [years, setYears] = useState(DEFAULT_YEARS);
   const [usePeOverride, setUsePeOverride] = useState(false);
   const [manualPe, setManualPe] = useState('');
   const [investmentAmount, setInvestmentAmount] = useState('');
@@ -68,35 +74,41 @@ export function StockCalculatorHub() {
     setError('');
     setLoading(true);
     resetResults();
-    setLoadingStep('Running CAGR, PE, Earnings Quality, Margin, Business Quality, Risk…');
+    setLoadingStep('Running CAGR, P/E, earnings quality, margin, business quality, and risk…');
 
     const ticker = selected?.ticker ?? stockName.trim();
     if (!ticker) {
-      setError('Enter a stock name or ticker and pick from suggestions.');
+      setError('Enter a stock name or ticker and pick from suggestions when offered.');
       setLoading(false);
       return;
     }
+
+    const cagrPct = mode === 'basic' ? Number(DEFAULT_CAGR) : Number(expectedCagr);
+    const periodYears = mode === 'basic' ? Number(DEFAULT_YEARS) : Number(years);
+    const basis = mode === 'basic' ? 'ttm' : peBasis;
 
     try {
       const payload: Record<string, unknown> = {
         stockQuery: ticker,
         ticker: selected?.ticker,
-        peBasis,
-        expectedCagrPct: Number(expectedCagr),
-        years: Number(years),
+        peBasis: basis,
+        expectedCagrPct: cagrPct,
+        years: periodYears,
       };
 
-      if (usePeOverride && manualPe.trim()) {
-        payload.manualPeOverride = Number(manualPe);
-      }
-      if (investmentAmount.trim()) {
-        payload.investmentAmountInr = Number(investmentAmount);
-      }
-      if (purchasePrice.trim()) {
-        payload.purchasePrice = Number(purchasePrice);
-      }
-      if (purchaseDate.trim()) {
-        payload.purchaseDate = purchaseDate.trim();
+      if (mode === 'advanced') {
+        if (usePeOverride && manualPe.trim()) {
+          payload.manualPeOverride = Number(manualPe);
+        }
+        if (investmentAmount.trim()) {
+          payload.investmentAmountInr = Number(investmentAmount);
+        }
+        if (purchasePrice.trim()) {
+          payload.purchasePrice = Number(purchasePrice);
+        }
+        if (purchaseDate.trim()) {
+          payload.purchaseDate = purchaseDate.trim();
+        }
       }
 
       const res = await fetch('/api/stock-calculator/full', {
@@ -126,23 +138,52 @@ export function StockCalculatorHub() {
   return (
     <div className="calculator-layout calc-full-hub">
       <section className="card wide">
-        <h2>Analyze stock — all modules</h2>
-        <p className="muted small">
-          Enter stock once · runs <strong>CAGR</strong>, <strong>PE</strong>,{' '}
-          <strong>Earnings Quality</strong>, <strong>Margin</strong>,{' '}
-          <strong>Business Quality</strong>, and <strong>Risk &amp; Decision</strong> together.
-          Each module is saved to its tab history.
-        </p>
+        <div className="calc-analysis-mode" role="tablist" aria-label="Analysis type">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'basic'}
+            className={`calc-analysis-mode-btn ${mode === 'basic' ? 'active' : ''}`}
+            onClick={() => setMode('basic')}
+          >
+            Basic analysis
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={mode === 'advanced'}
+            className={`calc-analysis-mode-btn ${mode === 'advanced' ? 'active' : ''}`}
+            onClick={() => setMode('advanced')}
+          >
+            Advanced analysis
+          </button>
+        </div>
+
+        {mode === 'basic' ? (
+          <p className="muted small calc-analysis-mode-hint">
+            Enter the stock only. We use <strong>TTM P/E</strong>,{' '}
+            <strong>{DEFAULT_CAGR}% expected CAGR</strong>, and a{' '}
+            <strong>{DEFAULT_YEARS}-year</strong> horizon, then run all six modules:{' '}
+            <strong>CAGR</strong>, <strong>P/E</strong>, <strong>earnings quality</strong>,{' '}
+            <strong>margin</strong>, <strong>business quality</strong>, and <strong>risk</strong>.
+            Open the <strong>PEG</strong> tab for the combined P/E + growth scorecard.
+          </p>
+        ) : (
+          <p className="muted small calc-analysis-mode-hint">
+            Set your <strong>P/E lens</strong> (TTM or forward) and <strong>growth assumptions</strong>{' '}
+            before the same six-module run. Use optional fields for legacy purchase P/E scorecard.
+          </p>
+        )}
 
         <form onSubmit={submit} className="holding-form calculator-form">
           <div className="form-row" ref={wrapRef}>
-            <label htmlFor="hub-stock">Stock name</label>
+            <label htmlFor="hub-stock">Stock name or ticker</label>
             <input
               id="hub-stock"
               type="text"
               value={stockName}
               onChange={(e) => onStockInput(e.target.value)}
-              placeholder="Search e.g. Maruti, HDFCBANK"
+              placeholder="e.g. Maruti, HDFC Bank, MARUTI"
               autoComplete="off"
               required
             />
@@ -151,129 +192,137 @@ export function StockCalculatorHub() {
             )}
           </div>
 
-          <div className="form-row">
-            <label>PE basis (CAGR anchor)</label>
-            <div className="radio-group">
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="hubPeBasis"
-                  value="ttm"
-                  checked={peBasis === 'ttm'}
-                  onChange={() => setPeBasis('ttm')}
-                />
-                TTM P/E
-              </label>
-              <label className="radio-label">
-                <input
-                  type="radio"
-                  name="hubPeBasis"
-                  value="forward"
-                  checked={peBasis === 'forward'}
-                  onChange={() => setPeBasis('forward')}
-                />
-                Forward P/E
-              </label>
-            </div>
-          </div>
-
-          <div className="form-grid">
-            <div className="form-row">
-              <label htmlFor="hub-cagr">Expected CAGR (%)</label>
-              <input
-                id="hub-cagr"
-                type="number"
-                step="0.1"
-                min="-50"
-                max="100"
-                value={expectedCagr}
-                onChange={(e) => setExpectedCagr(e.target.value)}
-                required
-              />
-            </div>
-            <div className="form-row">
-              <label htmlFor="hub-years">Investment period (years)</label>
-              <input
-                id="hub-years"
-                type="number"
-                step="1"
-                min="1"
-                max="30"
-                value={years}
-                onChange={(e) => setYears(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <details className="calc-hub-optional">
-            <summary>Optional inputs</summary>
-            <div className="form-grid optional-fields">
+          {mode === 'advanced' && (
+            <>
               <div className="form-row">
-                <label className="checkbox-label">
+                <label>P/E basis (for CAGR &amp; valuation modules)</label>
+                <div className="radio-group">
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="hubPeBasis"
+                      value="ttm"
+                      checked={peBasis === 'ttm'}
+                      onChange={() => setPeBasis('ttm')}
+                    />
+                    TTM P/E
+                  </label>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      name="hubPeBasis"
+                      value="forward"
+                      checked={peBasis === 'forward'}
+                      onChange={() => setPeBasis('forward')}
+                    />
+                    Forward P/E
+                  </label>
+                </div>
+              </div>
+
+              <div className="form-grid">
+                <div className="form-row">
+                  <label htmlFor="hub-cagr">Expected CAGR (%)</label>
                   <input
-                    type="checkbox"
-                    checked={usePeOverride}
-                    onChange={(e) => setUsePeOverride(e.target.checked)}
+                    id="hub-cagr"
+                    type="number"
+                    step="0.1"
+                    min="-50"
+                    max="100"
+                    value={expectedCagr}
+                    onChange={(e) => setExpectedCagr(e.target.value)}
+                    required
                   />
-                  Manual P/E override
-                </label>
-                <input
-                  type="number"
-                  step="0.1"
-                  min="1"
-                  max="500"
-                  value={manualPe}
-                  onChange={(e) => setManualPe(e.target.value)}
-                  placeholder="e.g. 28"
-                  disabled={!usePeOverride}
-                />
+                </div>
+                <div className="form-row">
+                  <label htmlFor="hub-years">Investment period (years)</label>
+                  <input
+                    id="hub-years"
+                    type="number"
+                    step="1"
+                    min="1"
+                    max="30"
+                    value={years}
+                    onChange={(e) => setYears(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-              <div className="form-row">
-                <label htmlFor="hub-invest">Investment amount (₹)</label>
-                <input
-                  id="hub-invest"
-                  type="number"
-                  step="1000"
-                  min="1"
-                  value={investmentAmount}
-                  onChange={(e) => setInvestmentAmount(e.target.value)}
-                  placeholder="e.g. 100000"
-                />
-              </div>
-              <div className="form-row">
-                <label htmlFor="hub-purchase">Purchase price (₹) — PE scorecard</label>
-                <input
-                  id="hub-purchase"
-                  type="number"
-                  step="0.01"
-                  min="1"
-                  value={purchasePrice}
-                  onChange={(e) => setPurchasePrice(e.target.value)}
-                  placeholder="Legacy holder avg cost"
-                />
-              </div>
-              <div className="form-row">
-                <label htmlFor="hub-pdate">Purchase date — PE scorecard</label>
-                <input
-                  id="hub-pdate"
-                  type="date"
-                  value={purchaseDate}
-                  onChange={(e) => setPurchaseDate(e.target.value)}
-                />
-              </div>
-            </div>
-            <p className="muted small">
-              PE scorecard runs only when both purchase price and date are set. Otherwise PARAMETERS
-              + Gordon fair P/E summary is shown.
-            </p>
-          </details>
+
+              <details className="calc-hub-optional">
+                <summary>Optional inputs</summary>
+                <div className="form-grid optional-fields">
+                  <div className="form-row">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={usePeOverride}
+                        onChange={(e) => setUsePeOverride(e.target.checked)}
+                      />
+                      Manual P/E override
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="1"
+                      max="500"
+                      value={manualPe}
+                      onChange={(e) => setManualPe(e.target.value)}
+                      placeholder="e.g. 28"
+                      disabled={!usePeOverride}
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label htmlFor="hub-invest">Investment amount (₹)</label>
+                    <input
+                      id="hub-invest"
+                      type="number"
+                      step="1000"
+                      min="1"
+                      value={investmentAmount}
+                      onChange={(e) => setInvestmentAmount(e.target.value)}
+                      placeholder="e.g. 100000"
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label htmlFor="hub-purchase">Your purchase price (₹)</label>
+                    <input
+                      id="hub-purchase"
+                      type="number"
+                      step="0.01"
+                      min="1"
+                      value={purchasePrice}
+                      onChange={(e) => setPurchasePrice(e.target.value)}
+                      placeholder="If you already hold the stock"
+                    />
+                  </div>
+                  <div className="form-row">
+                    <label htmlFor="hub-pdate">Purchase date</label>
+                    <input
+                      id="hub-pdate"
+                      type="date"
+                      value={purchaseDate}
+                      onChange={(e) => setPurchaseDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <p className="muted small">
+                  Purchase price + date unlock the full legacy-holder P/E scorecard. Otherwise we
+                  show PARAMETERS and Gordon fair P/E summary.
+                </p>
+              </details>
+            </>
+          )}
 
           {error && <p className="form-error">{error}</p>}
           {loading && loadingStep && <p className="muted small calc-hub-loading">{loadingStep}</p>}
 
           <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? 'Running full analysis…' : 'Run full analysis (all 6 modules)'}
+            {loading
+              ? 'Running analysis…'
+              : mode === 'basic'
+                ? 'Run analysis (all 6 modules)'
+                : 'Run advanced analysis (all 6 modules)'}
           </button>
         </form>
       </section>
