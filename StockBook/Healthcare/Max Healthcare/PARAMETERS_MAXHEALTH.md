@@ -1,6 +1,6 @@
 ﻿# Max Healthcare - Stock Parameters
 
-**Ticker:** MAXHEALTH | **CMP:** Rs 940.95 (2026-10-02)  
+**Ticker:** MAXHEALTH | **CMP:** Rs 940.95 (2026-10-03)  
 **Part 1 window:** FY2016-FY2025 (10Y rear-view) | **Part 2 window:** FY2027-FY2031 (5Y forward)
 
 ---

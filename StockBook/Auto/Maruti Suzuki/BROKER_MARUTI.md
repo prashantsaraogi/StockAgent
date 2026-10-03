@@ -1,6 +1,6 @@
 # Maruti Suzuki - Broker Target Prices
 
-**Ticker:** MARUTI (NSE) | **CMP:** Rs 11,386 (2026-10-02) | **CMP date:** 2026-10-02  
+**Ticker:** MARUTI (NSE) | **CMP:** Rs 11,386 (2026-10-03) | **CMP date:** 2026-10-03  
 **Trendlyne consensus:** Rs 16983 (upside 26.96%) | 11 analysts  
 **As of:** 2026-08-29 | **Horizon:** ~12-month broker targets (typical)
 

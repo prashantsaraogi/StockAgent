@@ -14,6 +14,7 @@ import { readLotsFromSupabase, writeLotsToSupabase } from './portfolio-lots-supa
 /** Pass `userId` on Vercel so Supabase-backed lots load/save (tenantId must equal auth user id). */
 export interface LotPersistenceContext {
   userId?: string;
+  email?: string;
 }
 
 export interface HoldingLot {
@@ -89,7 +90,7 @@ async function writeLotsFile(
   ctx?: LotPersistenceContext
 ): Promise<void> {
   if (useSupabaseLots(tenantId, ctx)) {
-    await writeLotsToSupabase(ctx!.userId!, tenantId, data);
+    await writeLotsToSupabase(ctx!.userId!, tenantId, data, { email: ctx?.email });
     return;
   }
 

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { createClientIfConfigured } from '@/lib/supabase/server';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
 import { ensureUserDataDir } from '@/lib/tenant';
+import type { LotPersistenceContext } from '@/lib/holding-lots';
 
 export const SESSION_COOKIE = 'my-agent-session';
 export const EMAIL_COOKIE = 'my-agent-email';
@@ -20,10 +21,10 @@ const SUPABASE_TENANT_ID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Vercel: persist lots in Supabase when tenant folder is a real auth user uuid (not `dev`). */
-export function portfolioLotContext(session: AppSession): { userId?: string } {
+export function portfolioLotContext(session: AppSession): LotPersistenceContext {
   const id = session.tenantId;
   if (SUPABASE_TENANT_ID.test(id) && id === session.userId) {
-    return { userId: id };
+    return { userId: id, email: session.email };
   }
   return {};
 }
