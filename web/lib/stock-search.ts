@@ -206,9 +206,17 @@ async function resolveFromNse(query: string): Promise<StockSearchResult | null> 
   return toResult(pick, 'nse', false);
 }
 
+/** "Maruti Suzuki (MARUTI)" → MARUTI; else trimmed query. */
+export function normalizeStockQuery(raw: string): string {
+  const q = raw.trim();
+  const paren = q.match(/\(([A-Z][A-Z0-9.&-]{1,20})\)\s*$/);
+  if (paren) return paren[1];
+  return q;
+}
+
 /** Resolve a single stock — StockBook, aliases, then live NSE lookup. */
 export async function resolveStock(query: string): Promise<StockSearchResult | null> {
-  const q = query.trim();
+  const q = normalizeStockQuery(query);
   if (!q) return null;
 
   const index = await buildStockbookTickerIndex();

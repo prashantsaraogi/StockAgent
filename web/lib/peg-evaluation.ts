@@ -296,11 +296,9 @@ export async function runPegEvaluation(
   if (!resolved) return null;
 
   const loc = await getStockbookByTicker(resolved.ticker);
-  if (!loc) return null;
-
   const ticker = resolved.ticker;
-  const sector = loc.sector;
-  const stockName = loc.stock;
+  const sector = loc?.sector ?? resolved.sector;
+  const stockName = loc?.stock ?? resolved.company;
 
   const [cmpMeta, paramFile, pegFile, detailFile, eq] = await Promise.all([
     fetchLiveNseCmp(ticker),
@@ -641,7 +639,9 @@ export async function runPegEvaluation(
       ? `PEG_${ticker}.md + PARAMETERS`
       : parametersMd
         ? 'PARAMETERS + framework parse'
-        : 'Limited — add PEG file',
+        : loc
+          ? 'StockBook — add PARAMETERS or PEG file'
+          : 'NSE resolve + live CMP (StockBook folder not on server)',
     pegFile: pegFile?.filename ?? null,
     parametersFile: paramFile?.filename ?? null,
     stockbookUrl: stockbookPath(sector, stockName, 'parameters'),

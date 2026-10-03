@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { runPegEvaluation } from '@/lib/peg-evaluation';
 import { savePegRecord } from '@/lib/peg-history';
+import { resolveStock } from '@/lib/stock-search';
 
 export async function GET(request: Request) {
   const session = await getSession();
@@ -15,9 +16,24 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: 'ticker required' }, { status: 400 });
   }
 
-  const analysis = await runPegEvaluation({ ticker, tenantId: session.tenantId });
+  const resolved = await resolveStock(ticker);
+  if (!resolved) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          'Stock not found — use NSE ticker (e.g. MARUTI) or pick a name from search suggestions.',
+      },
+      { status: 404 }
+    );
+  }
+
+  const analysis = await runPegEvaluation({
+    ticker: resolved.ticker,
+    tenantId: session.tenantId,
+  });
   if (!analysis) {
-    return NextResponse.json({ ok: false, error: 'Stock not found in StockBook' }, { status: 404 });
+    return NextResponse.json({ ok: false, error: 'PEG analysis could not run for this ticker.' }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true, analysis });
@@ -36,14 +52,29 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const ticker = String(body.ticker ?? body.stockQuery ?? '').trim();
-  if (!ticker) {
+  const query = String(body.stockQuery ?? body.ticker ?? '').trim();
+  if (!query) {
     return NextResponse.json({ ok: false, error: 'Stock ticker required' }, { status: 400 });
   }
 
-  const analysis = await runPegEvaluation({ ticker, tenantId: session.tenantId });
+  const resolved = await resolveStock(query);
+  if (!resolved) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          'Stock not found — use NSE ticker (e.g. MARUTI) or pick a name from search suggestions.',
+      },
+      { status: 404 }
+    );
+  }
+
+  const analysis = await runPegEvaluation({
+    ticker: resolved.ticker,
+    tenantId: session.tenantId,
+  });
   if (!analysis) {
-    return NextResponse.json({ ok: false, error: 'Stock not found in StockBook' }, { status: 404 });
+    return NextResponse.json({ ok: false, error: 'PEG analysis could not run for this ticker.' }, { status: 500 });
   }
 
   const record = await savePegRecord({

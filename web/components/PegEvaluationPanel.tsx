@@ -56,9 +56,9 @@ export function PegEvaluationPanel() {
     setRecordId(null);
     setSavedAt(null);
 
-    const ticker = selected?.ticker ?? stockName.trim();
-    if (!ticker) {
-      setError('Select a stock from StockBook.');
+    const stockQuery = selected?.ticker ?? stockName.trim();
+    if (!stockQuery) {
+      setError('Enter a ticker or company name and pick from suggestions when offered.');
       setLoading(false);
       return;
     }
@@ -67,7 +67,10 @@ export function PegEvaluationPanel() {
       const res = await fetch('/api/stock-calculator/peg', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticker }),
+        body: JSON.stringify({
+          stockQuery,
+          ticker: selected?.ticker,
+        }),
       });
       const json = await res.json();
       if (!json.ok) {
