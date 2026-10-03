@@ -1,10 +1,10 @@
-import { readRepoMarkdown } from '@/lib/content';
 import { GLOSSARY_PATH } from '@/lib/documentation-index';
+import { loadGlossaryMarkdown } from '@/lib/load-glossary';
 import { ReadMeSubNav } from '@/components/ReadMeSubNav';
 import { MarkdownView } from '@/components/MarkdownView';
 
 export default async function ReadMeGlossaryPage() {
-  const content = await readRepoMarkdown(GLOSSARY_PATH);
+  const content = await loadGlossaryMarkdown();
 
   return (
     <div className="page page-prose">

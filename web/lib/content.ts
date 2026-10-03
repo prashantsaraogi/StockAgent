@@ -155,9 +155,19 @@ export async function readStockTabContent(
 }
 
 export async function readRepoMarkdown(relativePath: string): Promise<string | null> {
-  const full = path.join(getRepoRoot(), relativePath);
-  if (!(await exists(full))) return null;
-  return fs.readFile(full, 'utf8');
+  const roots = [
+    getRepoRoot(),
+    process.cwd(),
+    path.resolve(process.cwd(), '..'),
+  ];
+  const tried = new Set<string>();
+  for (const root of roots) {
+    const full = path.normalize(path.join(root, relativePath));
+    if (tried.has(full)) continue;
+    tried.add(full);
+    if (await exists(full)) return fs.readFile(full, 'utf8');
+  }
+  return null;
 }
 
 export async function listSectorOutlookFiles(): Promise<{ name: string; path: string; label: string }[]> {

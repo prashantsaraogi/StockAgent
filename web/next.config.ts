@@ -16,6 +16,10 @@ const repoRuntimeTrace = [
   './.cursor/rules/**/*',
   './.cursor/portfolio/**/*',
   './data/users/**/*',
+  './docs/**/*',
+  './.cursor/prompts/**/*',
+  './web/README.md',
+  './web/lib/agent/**/*.md',
 ];
 
 const nextConfig: NextConfig = {
@@ -27,6 +31,13 @@ const nextConfig: NextConfig = {
     '/chat': repoRuntimeTrace,
     '/home': repoRuntimeTrace,
     '/portfolio': repoRuntimeTrace,
+    '/wisdom': repoRuntimeTrace,
+    '/readme': repoRuntimeTrace,
+    '/readme/documentation': repoRuntimeTrace,
+    '/readme/documentation/[slug]': repoRuntimeTrace,
+    '/readme/glossary': repoRuntimeTrace,
+    '/journal': repoRuntimeTrace,
+    '/glossary': repoRuntimeTrace,
     '/api/chat': repoRuntimeTrace,
     '/api/holdings': repoRuntimeTrace,
     '/api/holdings/search': repoRuntimeTrace,

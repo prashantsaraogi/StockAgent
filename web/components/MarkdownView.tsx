@@ -1,6 +1,8 @@
+import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { slugifyHeading } from '@/lib/documentation-index';
+import { resolveMarkdownHref } from '@/lib/markdown-links';
 
 interface MarkdownViewProps {
   content: string;
@@ -63,11 +65,32 @@ export function MarkdownView({
               <table className="md-table">{children}</table>
             </div>
           ),
-          a: ({ href, children }) => (
-            <a href={href} target="_blank" rel="noopener noreferrer">
-              {children}
-            </a>
-          ),
+          a: ({ href, children }) => {
+            const resolved = resolveMarkdownHref(href);
+            if (resolved?.kind === 'doc') {
+              return (
+                <Link href={`/readme/documentation/${resolved.slug}`}>{children}</Link>
+              );
+            }
+            if (resolved?.kind === 'app') {
+              return <Link href={resolved.href}>{children}</Link>;
+            }
+            if (resolved?.kind === 'same-page') {
+              return <a href={resolved.href}>{children}</a>;
+            }
+            if (resolved?.kind === 'external') {
+              return (
+                <a href={resolved.href} target="_blank" rel="noopener noreferrer">
+                  {children}
+                </a>
+              );
+            }
+            return (
+              <a href={href} target="_blank" rel="noopener noreferrer">
+                {children}
+              </a>
+            );
+          },
           code: ({ className: cn, children }) => {
             const isBlock = cn?.includes('language-');
             if (isBlock) {

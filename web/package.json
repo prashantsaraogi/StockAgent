@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "sync-bundled-docs": "npx tsx scripts/sync-bundled-docs.ts",
+    "prebuild": "npm run sync-bundled-docs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

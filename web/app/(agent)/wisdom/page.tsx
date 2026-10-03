@@ -1,8 +1,8 @@
-import { readRepoMarkdown } from '@/lib/content';
 import { ProseContent } from '@/components/ProsePanel';
+import { loadWisdomQuotes } from '@/lib/load-wisdom-quotes';
 
 export default async function WisdomPage() {
-  const content = await readRepoMarkdown('investor-wisdom/quotes.md');
+  const loaded = await loadWisdomQuotes();
 
   return (
     <div className="page page-prose">
@@ -13,8 +13,8 @@ export default async function WisdomPage() {
         </p>
       </header>
 
-      {content ? (
-        <ProseContent content={content} badge="investor-wisdom/quotes.md" />
+      {loaded ? (
+        <ProseContent content={loaded.content} badge={loaded.badge} />
       ) : (
         <p className="muted">Load investor-wisdom/quotes.md to populate.</p>
       )}

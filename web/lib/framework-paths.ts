@@ -4,12 +4,13 @@ import path from 'path';
 /** Monorepo root (parent of web/) — detect for local dev vs Vercel Root Directory = web */
 export function getRepoRoot(): string {
   const candidates = [
-    path.resolve(process.cwd(), '..'),
     process.cwd(),
+    path.resolve(process.cwd(), '..'),
     path.resolve(process.cwd(), '../..'),
   ];
   for (const root of candidates) {
     if (fs.existsSync(path.join(root, 'StockBook', 'AGENT-RULES.md'))) return root;
+    if (fs.existsSync(path.join(root, 'investor-wisdom', 'quotes.md'))) return root;
     if (fs.existsSync(path.join(root, 'data', 'users'))) return root;
   }
   return path.resolve(process.cwd(), '..');
