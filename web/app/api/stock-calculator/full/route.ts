@@ -28,6 +28,8 @@ export async function POST(request: Request) {
     const investmentAmountInr = optionalPositiveNumber(body.investmentAmountInr);
     const purchasePrice = optionalPositiveNumber(body.purchasePrice);
     const purchaseDate = body.purchaseDate ? String(body.purchaseDate) : null;
+    const basicAnalysis =
+      body.analysisMode !== 'advanced' && body.basicAnalysis !== false;
 
     if (!stockQuery && !ticker) {
       return NextResponse.json({ ok: false, error: 'Stock name required' }, { status: 400 });
@@ -49,6 +51,7 @@ export async function POST(request: Request) {
       investmentAmountInr,
       purchasePrice,
       purchaseDate,
+      basicAnalysis,
     });
 
     if (!analysis) {

@@ -176,6 +176,36 @@ async function fetchNseDirect(nseSymbol: string): Promise<CmpQuote | null> {
   }
 }
 
+async function fetchYahooFundamentals(
+  nseSymbol: string
+): Promise<{ trailingPe: number | null; trailingEps: number | null }> {
+  try {
+    const symbol = `${encodeURIComponent(nseSymbol)}.NS`;
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
+    const res = await fetch(url, {
+      headers: { ...BROWSER_HEADERS },
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!res.ok) return { trailingPe: null, trailingEps: null };
+
+    const json = (await res.json()) as {
+      quoteResponse?: { result?: Array<Record<string, unknown>> };
+    };
+    const q = json.quoteResponse?.result?.[0];
+    if (!q) return { trailingPe: null, trailingEps: null };
+
+    const trailingEps = pickPositiveNum(q.epsTrailingTwelveMonths, q.trailingEps);
+    let trailingPe = pickPositiveNum(q.trailingPE, q.forwardPE);
+    const price = pickPositiveNum(q.regularMarketPrice);
+    if (trailingPe == null && price != null && trailingEps != null) {
+      trailingPe = Math.round((price / trailingEps) * 10) / 10;
+    }
+    return { trailingPe, trailingEps };
+  } catch {
+    return { trailingPe: null, trailingEps: null };
+  }
+}
+
 async function fetchYahooNse(nseSymbol: string, originalTicker: string): Promise<CmpQuote | null> {
   try {
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(nseSymbol)}.NS?interval=1d&range=1d`;
@@ -194,12 +224,20 @@ async function fetchYahooNse(nseSymbol: string, originalTicker: string): Promise
     const asOf =
       typeof ts === 'number' ? new Date(ts * 1000).toISOString() : new Date().toISOString();
 
+    const fundamentals = await fetchYahooFundamentals(nseSymbol);
+    let { trailingPe, trailingEps } = fundamentals;
+    if (trailingPe == null && trailingEps != null && trailingEps > 0) {
+      trailingPe = Math.round((price / trailingEps) * 10) / 10;
+    }
+
     return {
       ticker: originalTicker.toUpperCase(),
       nseSymbol,
       price,
       source: 'nse-yahoo',
       asOf,
+      trailingEps,
+      trailingPe,
     };
   } catch {
     return null;

@@ -18,8 +18,12 @@ import {
   buildCalculatorTabAnalysis,
   type CalculatorTabAnalysis,
 } from './stock-calculator-tabs';
+import { getBundledParametersMd } from './load-bundled-stockbook';
 
 export type PeBasis = 'ttm' | 'forward';
+
+/** When Basic analysis cannot resolve P/E from live quote or PARAMETERS. */
+export const BASIC_ANALYSIS_ASSUMED_PE = 25;
 
 export interface StockCalculatorInput {
   stockQuery: string;
@@ -31,6 +35,8 @@ export interface StockCalculatorInput {
   manualPeOverride?: number | null;
   /** Optional lump-sum investment in ₹ for exit-value projection. */
   investmentAmountInr?: number | null;
+  /** Stock name only — never fail on missing P/E; use live → PARAMETERS → assumed 25×. */
+  basicAnalysis?: boolean;
 }
 
 export interface PeSnapshot {
@@ -81,6 +87,8 @@ export interface StockCalculatorResult {
   reportMode: 'framework-local' | 'gemini';
   report: string;
   tabAnalysis: CalculatorTabAnalysis;
+  /** True when anchor P/E uses BASIC_ANALYSIS_ASSUMED_PE (Basic mode only). */
+  peAssumed?: boolean;
 }
 
 function parseNum(s: string): number | null {
@@ -265,8 +273,13 @@ export async function runStockCalculator(
   const stockName = resolved.company;
 
   const quote = await fetchLiveNseCmp(resolved.ticker);
-  const paramFile = loc
+  const paramFileDisk = loc
     ? await readStockTabContent(loc.sector, loc.stock, 'parameters', 'dev')
+    : null;
+  const parametersMd =
+    paramFileDisk?.content ?? getBundledParametersMd(resolved.ticker) ?? null;
+  const paramFile = parametersMd
+    ? { content: parametersMd, filename: paramFileDisk?.filename ?? `PARAMETERS_${resolved.ticker}.md` }
     : null;
   const detailFile = loc
     ? await readStockTabContent(loc.sector, loc.stock, 'detail', 'dev')
@@ -349,10 +362,24 @@ export async function runStockCalculator(
   }
 
   let anchorPe: number | null = manualPe ?? frameworkPe;
+  let peAssumed = false;
+
+  if (anchorPe == null && snapshot.avg10yPe != null && snapshot.avg10yPe > 0) {
+    anchorPe = snapshot.avg10yPe;
+    frameworkPe = frameworkPe ?? snapshot.avg10yPe;
+  }
+
+  if (anchorPe == null && input.basicAnalysis) {
+    anchorPe = BASIC_ANALYSIS_ASSUMED_PE;
+    peAssumed = true;
+    if (input.peBasis === 'ttm' && snapshot.ttmPe == null) snapshot.ttmPe = anchorPe;
+    if (input.peBasis === 'forward' && snapshot.forwardPe == null) snapshot.forwardPe = anchorPe;
+    frameworkPe = frameworkPe ?? anchorPe;
+  }
 
   if (anchorPe == null) {
     throw new Error(
-      `${input.peBasis === 'ttm' ? 'TTM' : 'Forward'} P/E not available for ${resolved.ticker}. Enable StockBook on Vercel, enter a manual P/E override, or retry when NSE quote includes EPS.`
+      `${input.peBasis === 'ttm' ? 'TTM' : 'Forward'} P/E not available for ${resolved.ticker}. Switch to Advanced and enter a manual P/E, or retry when the live quote includes EPS.`
     );
   }
 
@@ -367,9 +394,11 @@ export async function runStockCalculator(
 
   const scenarios: ProjectionScenario[] = [
     buildScenario(
-      manualPe != null
-        ? `Manual ${input.peBasis === 'ttm' ? 'TTM' : 'forward'} P/E`
-        : `Same ${input.peBasis === 'ttm' ? 'TTM' : 'forward'} P/E`,
+      peAssumed
+        ? `Assumed ${anchorPe.toFixed(0)}× P/E (Basic — live/PARAMETERS missing)`
+        : manualPe != null
+          ? `Manual ${input.peBasis === 'ttm' ? 'TTM' : 'forward'} P/E`
+          : `Same ${input.peBasis === 'ttm' ? 'TTM' : 'forward'} P/E`,
       cmp,
       projectedEps,
       anchorPe,
@@ -441,6 +470,7 @@ export async function runStockCalculator(
     internalRisk,
     externalRisk,
     cagrGap,
+    peAssumed: peAssumed || undefined,
   };
 
   const stockCtx = buildStockbookReportContext(

@@ -91,6 +91,7 @@ export function StockCalculatorHub() {
       const payload: Record<string, unknown> = {
         stockQuery: ticker,
         ticker: selected?.ticker,
+        analysisMode: mode,
         peBasis: basis,
         expectedCagrPct: cagrPct,
         years: periodYears,
@@ -163,10 +164,10 @@ export function StockCalculatorHub() {
           <p className="muted small calc-analysis-mode-hint">
             Enter the stock only. We use <strong>TTM P/E</strong>,{' '}
             <strong>{DEFAULT_CAGR}% expected CAGR</strong>, and a{' '}
-            <strong>{DEFAULT_YEARS}-year</strong> horizon, then run all six modules:{' '}
-            <strong>CAGR</strong>, <strong>P/E</strong>, <strong>earnings quality</strong>,{' '}
-            <strong>margin</strong>, <strong>business quality</strong>, and <strong>risk</strong>.
-            Open the <strong>PEG</strong> tab for the combined P/E + growth scorecard.
+            <strong>{DEFAULT_YEARS}-year</strong> horizon. P/E comes from the{' '}
+            <strong>live NSE/Yahoo quote</strong> when available; if not, we use a{' '}
+            <strong>25× placeholder</strong> so all six modules still run (CAGR, P/E, earnings,
+            margin, business quality, risk). Use <strong>PEG</strong> tab for the growth scorecard.
           </p>
         ) : (
           <p className="muted small calc-analysis-mode-hint">

@@ -74,6 +74,7 @@ export async function runFullStockCalculatorAnalysis(input: {
   investmentAmountInr?: number | null;
   purchasePrice?: number | null;
   purchaseDate?: string | null;
+  basicAnalysis?: boolean;
 }): Promise<StockCalculatorFullResult | null> {
   const resolved = await resolveStock(input.ticker.trim());
   if (!resolved) return null;
@@ -102,6 +103,7 @@ export async function runFullStockCalculatorAnalysis(input: {
       years: input.years,
       manualPeOverride: input.manualPeOverride ?? null,
       investmentAmountInr: input.investmentAmountInr ?? null,
+      basicAnalysis: input.basicAnalysis ?? false,
     }),
     loadPeEvaluation(ticker, input.tenantId),
     canRunPeScorecard

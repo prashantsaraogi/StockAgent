@@ -3,6 +3,7 @@ import { getStockbookByTicker } from './stockbook-index';
 import { resolveStock } from './stock-search';
 import { fetchLiveNseCmp } from './nse-cmp';
 import { parseParametersMetrics } from './stock-calculator-engine';
+import { getBundledParametersMd } from './load-bundled-stockbook';
 import {
   parseForwardGrowthTab,
   parseHistoricalGrowthTab,
@@ -45,7 +46,7 @@ export async function loadPeEvaluation(
   const stockName = loc?.stock ?? resolved.company;
 
   const parameters = await readStockTabContent(sector, stockName, 'parameters', tenantId);
-  const md = parameters?.content ?? null;
+  const md = parameters?.content ?? getBundledParametersMd(resolved.ticker) ?? null;
 
   const metrics = md ? parseParametersMetrics(md) : {
     ttmPe: null,
@@ -64,6 +65,16 @@ export async function loadPeEvaluation(
     if (live?.price != null && live.price > 0) {
       cmp = live.price;
       cmpSource = live.source;
+      if (metrics.ttmPe == null && live.trailingPe != null && live.trailingPe > 0) {
+        metrics.ttmPe = live.trailingPe;
+      }
+      if (
+        metrics.ttmPe == null &&
+        live.trailingEps != null &&
+        live.trailingEps > 0
+      ) {
+        metrics.ttmPe = Math.round((live.price / live.trailingEps) * 10) / 10;
+      }
     }
   } catch {
     /* fallback below */
