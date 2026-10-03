@@ -257,6 +257,12 @@ export function getDocBySlug(slug: string): DocEntry | undefined {
   return DOC_ENTRIES.find((d) => d.slug === slug);
 }
 
+/** Map repo-relative markdown path → documentation slug (bundled on Vercel). */
+export function getDocSlugForRepoPath(repoPath: string): string | undefined {
+  const norm = repoPath.replace(/\\/g, '/').replace(/^\.\//, '');
+  return DOC_ENTRIES.find((d) => d.path.replace(/\\/g, '/') === norm)?.slug;
+}
+
 export function listDocCategories(): DocCategory[] {
   const byCategory = new Map<string, DocEntry[]>();
   for (const doc of DOC_ENTRIES) {

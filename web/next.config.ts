@@ -48,6 +48,12 @@ const nextConfig: NextConfig = {
     '/api/stock-calculator/full': repoRuntimeTrace,
     '/api/**/*': repoRuntimeTrace,
     '/stock-calculator': repoRuntimeTrace,
+    '/stock-calculator/peg': repoRuntimeTrace,
+    '/stock-calculator/pe': repoRuntimeTrace,
+    '/stock-calculator/margin': repoRuntimeTrace,
+    '/stock-calculator/earnings-quality': repoRuntimeTrace,
+    '/stock-calculator/business-quality': repoRuntimeTrace,
+    '/stock-calculator/risk-decision': repoRuntimeTrace,
   },
   experimental: {
     serverActions: {

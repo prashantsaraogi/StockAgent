@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
-import { readRepoMarkdown } from '@/lib/content';
+import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
 import { MarkdownView } from '@/components/MarkdownView';
 import { BusinessQualityPanel } from '@/components/BusinessQualityPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
@@ -31,7 +31,7 @@ function formatTime(iso: string): string {
 export default async function BusinessQualityPage() {
   const session = await requireSession();
   const frameworkMd =
-    (await readRepoMarkdown('StockBook/BUSINESS-QUALITY-MOAT-FRAMEWORK.md')) ??
+    (await loadFrameworkMarkdown('StockBook/BUSINESS-QUALITY-MOAT-FRAMEWORK.md')) ??
     '# Business Quality & Moat\n\nFramework file not found.';
 
   const entries = await listBusinessQualityRecords(

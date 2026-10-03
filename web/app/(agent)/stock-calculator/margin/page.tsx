@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
-import { readRepoMarkdown } from '@/lib/content';
+import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
 import { MarkdownView } from '@/components/MarkdownView';
 import { MarginAnalysisPanel } from '@/components/MarginAnalysisPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
@@ -28,7 +28,7 @@ function formatTime(iso: string): string {
 export default async function MarginAnalysisPage() {
   const session = await requireSession();
   const frameworkMd =
-    (await readRepoMarkdown('StockBook/MARGIN-FRAMEWORK.md')) ??
+    (await loadFrameworkMarkdown('StockBook/MARGIN-FRAMEWORK.md')) ??
     '# Margin Analysis\n\nFramework file not found in repo.';
 
   const entries = await listMarginRecords(session.tenantId, session.userId, session.authMode);

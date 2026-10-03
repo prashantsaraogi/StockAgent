@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
-import { readRepoMarkdown } from '@/lib/content';
+import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
 import { MarkdownView } from '@/components/MarkdownView';
 import { PeEvaluationPanel } from '@/components/PeEvaluationPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
@@ -36,7 +36,7 @@ function fmtPe(n: number | null): string {
 export default async function PeEvaluationFrameworkPage() {
   const session = await requireSession();
   const scorecardMd =
-    (await readRepoMarkdown('StockBook/PE-EVALUATION-FRAMEWORK.md')) ??
+    (await loadFrameworkMarkdown('StockBook/PE-EVALUATION-FRAMEWORK.md')) ??
     '# PE Evaluation Framework\n\nFramework file not found in repo.';
 
   const entries = await listPeEvaluationRecords(

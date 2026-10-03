@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
-import { readRepoMarkdown } from '@/lib/content';
+import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
 import { MarkdownView } from '@/components/MarkdownView';
 import { PegEvaluationPanel } from '@/components/PegEvaluationPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
@@ -28,7 +28,7 @@ function formatTime(iso: string): string {
 export default async function PegEvaluationPage() {
   const session = await requireSession();
   const frameworkMd =
-    (await readRepoMarkdown('StockBook/PEG-FRAMEWORK.md')) ??
+    (await loadFrameworkMarkdown('StockBook/PEG-FRAMEWORK.md')) ??
     '# PEG Evaluation\n\nFramework file not found in repo.';
 
   const entries = await listPegRecords(session.tenantId, session.userId, session.authMode);

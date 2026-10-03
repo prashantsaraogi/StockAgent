@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
-import { readRepoMarkdown } from '@/lib/content';
+import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
 import { MarkdownView } from '@/components/MarkdownView';
 import { EarningsQualityPanel } from '@/components/EarningsQualityPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
@@ -32,7 +32,7 @@ function formatTime(iso: string): string {
 export default async function EarningsQualityPage() {
   const session = await requireSession();
   const frameworkMd =
-    (await readRepoMarkdown('StockBook/EARNINGS-QUALITY-FRAMEWORK.md')) ??
+    (await loadFrameworkMarkdown('StockBook/EARNINGS-QUALITY-FRAMEWORK.md')) ??
     '# Earnings Quality\n\nFramework file not found in repo.';
 
   const entries = await listEarningsQualityRecords(

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
-import { readRepoMarkdown } from '@/lib/content';
+import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
 import { MarkdownView } from '@/components/MarkdownView';
 import { RiskDecisionPanel } from '@/components/RiskDecisionPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
@@ -30,7 +30,7 @@ function formatTime(iso: string): string {
 export default async function RiskDecisionPage() {
   const session = await requireSession();
   const frameworkMd =
-    (await readRepoMarkdown('StockBook/RISK-DECISION-FRAMEWORK.md')) ??
+    (await loadFrameworkMarkdown('StockBook/RISK-DECISION-FRAMEWORK.md')) ??
     '# Risk & Decision\n\nFramework not found.';
 
   const entries = await listRiskDecisionRecords(
