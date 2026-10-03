@@ -3187,6 +3187,21 @@ td.gain-neg {
   line-height: 1.45;
 }
 
+.calc-full-overview-open {
+  margin-top: 0.35rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  color: var(--accent);
+}
+
+.calc-full-overview-open:hover {
+  text-decoration: underline;
+}
+
 .calc-full-hub {
   gap: 1rem;
 }

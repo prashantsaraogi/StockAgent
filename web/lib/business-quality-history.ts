@@ -12,6 +12,7 @@ import {
   warnMissingTableOnce,
 } from './supabase/schema-errors';
 import type { BusinessQualityResult } from './business-quality-moat';
+import { findFullAnalysisByChildModuleId } from './full-analysis-child-lookup';
 
 export interface BusinessQualityRecord {
   id: string;
@@ -288,6 +289,12 @@ export async function getBusinessQualityRecord(
       return remote;
     }
   }
+
+  const full = await findFullAnalysisByChildModuleId(tenantId, id, userId, authMode);
+  if (full?.childIds.businessQuality === id) {
+    return analysisToRecord(full.analysis.businessQuality, id);
+  }
+
   return null;
 }
 

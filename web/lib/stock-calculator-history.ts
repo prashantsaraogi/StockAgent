@@ -24,6 +24,7 @@ import {
   buildFallbackTabAnalysis,
   type CalculatorTabAnalysis,
 } from './stock-calculator-tabs';
+import { findFullAnalysisByChildModuleId } from './full-analysis-child-lookup';
 
 export interface CalculatorRecord {
   id: string;
@@ -434,6 +435,11 @@ export async function getCalculatorRecord(
       await persistRecordToDisk(tenantId, remote);
       return remote;
     }
+  }
+
+  const full = await findFullAnalysisByChildModuleId(tenantId, id, userId, authMode);
+  if (full?.childIds.cagr === id) {
+    return normalizeRecord(resultToRecord(full.analysis.cagr, id));
   }
 
   return null;

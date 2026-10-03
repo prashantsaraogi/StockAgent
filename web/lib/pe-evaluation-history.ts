@@ -12,6 +12,7 @@ import {
   warnMissingTableOnce,
 } from './supabase/schema-errors';
 import type { PeScorecardResult } from './pe-evaluation-scorecard';
+import { findFullAnalysisByChildModuleId } from './full-analysis-child-lookup';
 
 export interface PeEvaluationRecord {
   id: string;
@@ -333,6 +334,11 @@ export async function getPeEvaluationRecord(
       await persistRecordToDisk(tenantId, remote);
       return remote;
     }
+  }
+
+  const full = await findFullAnalysisByChildModuleId(tenantId, id, userId, authMode);
+  if (full?.childIds.pe === id && full.analysis.peScorecard) {
+    return scorecardToRecord(full.analysis.peScorecard, id);
   }
 
   return null;

@@ -2,16 +2,33 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireSession } from '@/lib/auth';
 import { getFullAnalysisRecord } from '@/lib/stock-calculator-full-history';
-import { StockCalculatorFullResults } from '@/components/StockCalculatorFullResults';
+import {
+  StockCalculatorFullResults,
+  type FullResultTabId,
+} from '@/components/StockCalculatorFullResults';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
 
+const VALID_TABS = new Set<FullResultTabId>([
+  'overview',
+  'cagr',
+  'pe',
+  'earnings-quality',
+  'margin',
+  'business-quality',
+  'risk',
+]);
+
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }
 
-export default async function FullAnalysisDetailPage({ params }: Props) {
+export default async function FullAnalysisDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
+  const { tab } = await searchParams;
+  const initialTab =
+    tab && VALID_TABS.has(tab as FullResultTabId) ? (tab as FullResultTabId) : undefined;
   const session = await requireSession();
   const entry = await getFullAnalysisRecord(
     session.tenantId,
@@ -47,6 +64,7 @@ export default async function FullAnalysisDetailPage({ params }: Props) {
         fullRecordId={entry.id}
         childIds={entry.childIds}
         savedAt={entry.createdAt}
+        initialTab={initialTab}
       />
     </div>
   );

@@ -12,6 +12,7 @@ import {
   warnMissingTableOnce,
 } from './supabase/schema-errors';
 import type { MarginAnalysisResult } from './margin-analysis';
+import { findFullAnalysisByChildModuleId } from './full-analysis-child-lookup';
 
 export interface MarginAnalysisRecord {
   id: string;
@@ -312,6 +313,12 @@ export async function getMarginRecord(
       return remote;
     }
   }
+
+  const full = await findFullAnalysisByChildModuleId(tenantId, id, userId, authMode);
+  if (full?.childIds.margin === id) {
+    return analysisToRecord(full.analysis.margin, id);
+  }
+
   return null;
 }
 

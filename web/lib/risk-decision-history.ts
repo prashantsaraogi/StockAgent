@@ -12,6 +12,7 @@ import {
   warnMissingTableOnce,
 } from './supabase/schema-errors';
 import type { RiskDecisionResult } from './risk-decision';
+import { findFullAnalysisByChildModuleId } from './full-analysis-child-lookup';
 
 export interface RiskDecisionRecord {
   id: string;
@@ -257,6 +258,12 @@ export async function getRiskDecisionRecord(
       return remote;
     }
   }
+
+  const full = await findFullAnalysisByChildModuleId(tenantId, id, userId, authMode);
+  if (full?.childIds.riskDecision === id) {
+    return analysisToRecord(full.analysis.riskDecision, id);
+  }
+
   return null;
 }
 

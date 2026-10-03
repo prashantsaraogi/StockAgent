@@ -12,6 +12,7 @@ import {
   warnMissingTableOnce,
 } from './supabase/schema-errors';
 import type { EarningsQualityResult } from './earnings-quality';
+import { findFullAnalysisByChildModuleId } from './full-analysis-child-lookup';
 
 export interface EarningsQualityRecord {
   id: string;
@@ -362,6 +363,11 @@ export async function getEarningsQualityRecord(
       await persistRecordToDisk(tenantId, remote);
       return remote;
     }
+  }
+
+  const full = await findFullAnalysisByChildModuleId(tenantId, id, userId, authMode);
+  if (full?.childIds.earningsQuality === id) {
+    return analysisToRecord(full.analysis.earningsQuality, id);
   }
 
   return null;

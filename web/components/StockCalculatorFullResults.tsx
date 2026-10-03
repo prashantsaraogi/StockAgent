@@ -35,6 +35,8 @@ interface StockCalculatorFullResultsProps {
   fullRecordId?: string;
   childIds?: FullAnalysisChildIds;
   savedAt?: string;
+  /** Open a module tab from URL (?tab=cagr) on saved full analysis pages. */
+  initialTab?: FullResultTabId;
 }
 
 function verdictToneClass(verdict: string): string {
@@ -48,9 +50,61 @@ export function StockCalculatorFullResults({
   fullRecordId,
   childIds,
   savedAt,
+  initialTab,
 }: StockCalculatorFullResultsProps) {
-  const [activeTab, setActiveTab] = useState<FullResultTabId>('overview');
+  const [activeTab, setActiveTab] = useState<FullResultTabId>(initialTab ?? 'overview');
   const c = analysis.cagr;
+
+  const overviewModules: {
+    label: string;
+    verdict: string;
+    tab: FullResultTabId;
+    childId?: string | null;
+    historyBase: string;
+  }[] = [
+    {
+      label: 'CAGR Evaluation',
+      verdict: analysis.overview.cagrVerdict,
+      tab: 'cagr',
+      childId: childIds?.cagr,
+      historyBase: '/stock-calculator/cagr',
+    },
+    {
+      label: 'PE Evaluation',
+      verdict: analysis.overview.peVerdict,
+      tab: 'pe',
+      childId: childIds?.pe,
+      historyBase: '/stock-calculator/pe',
+    },
+    {
+      label: 'Earnings Quality',
+      verdict: analysis.overview.earningsQualityVerdict,
+      tab: 'earnings-quality',
+      childId: childIds?.earningsQuality,
+      historyBase: '/stock-calculator/earnings-quality',
+    },
+    {
+      label: 'Margin Analysis',
+      verdict: analysis.overview.marginVerdict,
+      tab: 'margin',
+      childId: childIds?.margin,
+      historyBase: '/stock-calculator/margin',
+    },
+    {
+      label: 'Business Quality',
+      verdict: analysis.overview.businessQualityVerdict,
+      tab: 'business-quality',
+      childId: childIds?.businessQuality,
+      historyBase: '/stock-calculator/business-quality',
+    },
+    {
+      label: 'Risk & Decision',
+      verdict: analysis.overview.riskVerdict,
+      tab: 'risk',
+      childId: childIds?.riskDecision,
+      historyBase: '/stock-calculator/risk-decision',
+    },
+  ];
 
   return (
     <div className="calc-full-results">
@@ -84,40 +138,26 @@ export function StockCalculatorFullResults({
         <section className="card wide calc-full-overview">
           <h3>Module verdicts</h3>
           <div className="calc-full-overview-grid">
-            {(
-              [
-                ['CAGR Evaluation', analysis.overview.cagrVerdict, childIds?.cagr, '/stock-calculator/cagr'],
-                ['PE Evaluation', analysis.overview.peVerdict, childIds?.pe, '/stock-calculator/pe'],
-                [
-                  'Earnings Quality',
-                  analysis.overview.earningsQualityVerdict,
-                  childIds?.earningsQuality,
-                  '/stock-calculator/earnings-quality',
-                ],
-                ['Margin Analysis', analysis.overview.marginVerdict, childIds?.margin, '/stock-calculator/margin'],
-                [
-                  'Business Quality',
-                  analysis.overview.businessQualityVerdict,
-                  childIds?.businessQuality,
-                  '/stock-calculator/business-quality',
-                ],
-                ['Risk & Decision', analysis.overview.riskVerdict, childIds?.riskDecision, '/stock-calculator/risk-decision'],
-              ] as const
-            ).map(([label, verdict, childId, basePath]) => (
-              <article key={label} className="calc-full-overview-card">
-                <span className="pe-eval-label">{label}</span>
-                <p className={`calc-full-overview-verdict ${verdictToneClass(verdict)}`}>{verdict}</p>
-                {childId && (
-                  <a href={`${basePath}/${childId}`} className="muted small">
-                    Open saved module →
-                  </a>
-                )}
+            {overviewModules.map((mod) => (
+              <article key={mod.label} className="calc-full-overview-card">
+                <span className="pe-eval-label">{mod.label}</span>
+                <p className={`calc-full-overview-verdict ${verdictToneClass(mod.verdict)}`}>
+                  {mod.verdict}
+                </p>
+                <button
+                  type="button"
+                  className="btn-link muted small calc-full-overview-open"
+                  onClick={() => setActiveTab(mod.tab)}
+                >
+                  View module detail →
+                </button>
               </article>
             ))}
           </div>
           <p className="muted small">
-            Use the tabs above for full detail on each module. All six analyses were saved to their
-            respective histories.
+            Use the tabs above or <strong>View module detail</strong> on each card — full results are
+            in this report. Saved copies also appear under each module&apos;s history tab when
+            Supabase history is enabled.
           </p>
         </section>
       )}
