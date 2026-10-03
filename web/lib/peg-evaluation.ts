@@ -14,6 +14,7 @@ import { stockbookPath } from './navigation';
 import { parseParametersMetrics } from './stock-calculator-engine';
 import { parseFrameworkQualityMetrics } from './stock-calculator-framework';
 import { runEarningsQualityAnalysis } from './earnings-quality';
+import { getBundledParametersMd, getBundledPegMd } from './load-bundled-stockbook';
 
 export type PegZone = '🟢' | '🟡' | '🟠' | '🔴' | '—';
 export type QualityTone = 'good' | 'neutral' | 'warn' | 'bad';
@@ -257,6 +258,8 @@ async function readPegFile(
       /* next */
     }
   }
+  const bundled = getBundledPegMd(ticker);
+  if (bundled) return { content: bundled, filename: `PEG_${ticker.toUpperCase()}.md` };
   return null;
 }
 
@@ -310,12 +313,20 @@ export async function runPegEvaluation(
 
   const cmp = cmpMeta?.price ?? null;
   const cmpSource = cmpMeta?.source ?? 'NSE';
-  const parametersMd = paramFile?.content ?? null;
+  const parametersMd =
+    paramFile?.content ?? getBundledParametersMd(ticker) ?? null;
+  const parametersFromBundle = !paramFile?.content && parametersMd != null;
   const overrides = pegFile ? parseOverridesFromPegMd(pegFile.content) : {};
   const peParsed = parametersMd ? parseParametersMetrics(parametersMd) : null;
   const quality = parseFrameworkQualityMetrics(parametersMd, detailFile?.content ?? null);
 
   let ttmPe = overrides.ttmPe ?? peParsed?.ttmPe ?? null;
+  if (ttmPe == null && cmpMeta?.trailingPe != null && cmpMeta.trailingPe > 0) {
+    ttmPe = cmpMeta.trailingPe;
+  }
+  if (ttmPe == null && cmp != null && cmpMeta?.trailingEps != null && cmpMeta.trailingEps > 0) {
+    ttmPe = Math.round((cmp / cmpMeta.trailingEps) * 10) / 10;
+  }
   if (ttmPe == null && cmp != null && peParsed?.normalizedEps) {
     ttmPe = Math.round((cmp / peParsed.normalizedEps) * 10) / 10;
   }
@@ -638,12 +649,16 @@ export async function runPegEvaluation(
     dataSource: pegFile
       ? `PEG_${ticker}.md + PARAMETERS`
       : parametersMd
-        ? 'PARAMETERS + framework parse'
+        ? parametersFromBundle
+          ? 'Bundled PARAMETERS (build) + framework parse'
+          : 'PARAMETERS + framework parse'
         : loc
           ? 'StockBook — add PARAMETERS or PEG file'
           : 'NSE resolve + live CMP (StockBook folder not on server)',
     pegFile: pegFile?.filename ?? null,
-    parametersFile: paramFile?.filename ?? null,
+    parametersFile:
+      paramFile?.filename ??
+      (parametersFromBundle ? `PARAMETERS_${ticker}.md (bundled)` : null),
     stockbookUrl: stockbookPath(sector, stockName, 'parameters'),
     ttmPe,
     epsGrowthPct,
