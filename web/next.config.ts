@@ -37,6 +37,8 @@ const nextConfig: NextConfig = {
     '/readme/documentation/[slug]': repoRuntimeTrace,
     '/readme/glossary': repoRuntimeTrace,
     '/journal': repoRuntimeTrace,
+    '/journal/news': repoRuntimeTrace,
+    '/journal/news/[year]/[month]/[day]': repoRuntimeTrace,
     '/glossary': repoRuntimeTrace,
     '/api/chat': repoRuntimeTrace,
     '/api/holdings': repoRuntimeTrace,

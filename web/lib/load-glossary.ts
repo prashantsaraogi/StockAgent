@@ -1,21 +1,10 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { readRepoMarkdown } from './content';
 import { GLOSSARY_PATH } from './documentation-index';
-
-const bundledGlossary = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  'bundled',
-  'GLOSSARY.md'
-);
+import { GLOSSARY_MARKDOWN } from './bundled/glossary.generated';
 
 export async function loadGlossaryMarkdown(): Promise<string | null> {
   const fromRepo = await readRepoMarkdown(GLOSSARY_PATH);
   if (fromRepo) return fromRepo;
-  try {
-    return await fs.readFile(bundledGlossary, 'utf8');
-  } catch {
-    return null;
-  }
+  if (GLOSSARY_MARKDOWN?.trim()) return GLOSSARY_MARKDOWN;
+  return null;
 }
