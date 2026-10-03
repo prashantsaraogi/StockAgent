@@ -106,13 +106,20 @@ export function parseParametersMetrics(md: string): Omit<
   const dateMatch = md.match(/\*\*CMP:\*\*\s*Rs\.?\s*[\d,]+(?:\.\d+)?\s*\(([\d-]+)\)/i);
   if (dateMatch) out.parametersDate = dateMatch[1];
 
-  const ttmRow = md.match(/\|\s*\*\*P\/E\*\*[\s\S]*?\|\s*\*\*([\d.]+)x\*\*/i);
-  if (ttmRow) out.ttmPe = parseNum(ttmRow[1]);
+  const peLine = md.match(/\|\s*\*\*P\/E\*\*[^\n]+\|/i)?.[0] ?? '';
+  const avgPeInRow = peLine.match(/\|\s*\*\*([\d.]+)x\*\*/i);
+  if (avgPeInRow) out.avg10yPe = parseNum(avgPeInRow[1]);
 
-  const avgPeMatch = md.match(
-    /\|\s*\*\*P\/E\*\*[\s\S]*?\|\s*[\d.]+\s*x\s*\|\s*[\d.]+\s*x\s*\|\s*\*\*([\d.]+)x\*\*/i
+  const todayPeInRow = peLine.match(
+    /\|\s*[\d.]+\s*x\s*\|\s*[\d.]+\s*x\s*\|\s*\*\*([\d.]+)x\*\*/i
   );
-  if (avgPeMatch) out.avg10yPe = parseNum(avgPeMatch[1]);
+  if (todayPeInRow) {
+    out.ttmPe = parseNum(todayPeInRow[1]);
+  } else {
+    const verdictPe = md.match(/P\/E\s*\*\*([\d.]+)x\*\*/i);
+    if (verdictPe) out.ttmPe = parseNum(verdictPe[1]);
+    else if (avgPeInRow) out.ttmPe = parseNum(avgPeInRow[1]);
+  }
 
   const fwdPeMatch = md.match(/\|\s*\*\*Forward P\/E\*\*[\s\S]*?\|\s*\*\*([\d.]+)x\*\*/i);
   if (fwdPeMatch) out.forwardPe = parseNum(fwdPeMatch[1]);
@@ -123,9 +130,16 @@ export function parseParametersMetrics(md: string): Omit<
   if (fairPeMatch) out.forwardFairPe = parseNum(fairPeMatch[1]);
 
   const normEpsMatch = md.match(
-    /\|\s*\*\*Normalized EPS \(FY\d+\)\*\*[\s\S]*?\|\s*Rs\s*[\d.]+\s*\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i
+    /\|\s*\*\*Normalized EPS[^\n]*\|\s*Rs\s*[\d.]+\s*\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i
   );
-  if (normEpsMatch) out.normalizedEps = parseNum(normEpsMatch[1]);
+  if (normEpsMatch) {
+    out.normalizedEps = parseNum(normEpsMatch[1]);
+  } else {
+    const year0Eps = md.match(
+      /Normalized EPS \(Year 0\)[^\n]*\|\s*Rs\s*[\d.]+\s*\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i
+    );
+    if (year0Eps) out.normalizedEps = parseNum(year0Eps[1]);
+  }
 
   const fairPriceMatch = md.match(
     /\|\s*\*\*5Y fair price \(base\)\*\*[\s\S]*?\|\s*Rs\s*[\d,]+\s*\|\s*Rs\s*[\d,]+\s*\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i
@@ -133,6 +147,32 @@ export function parseParametersMetrics(md: string): Omit<
   if (fairPriceMatch) out.framework5yFairPrice = parseNum(fairPriceMatch[1]);
 
   return out;
+}
+
+/** Fill missing TTM/forward P/E from live quote + normalized EPS @ CMP. */
+function enrichPeFromLiveQuote(
+  snapshot: PeSnapshot,
+  quote: { trailingPe?: number | null; trailingEps?: number | null } | null | undefined
+): void {
+  const cmp = snapshot.cmp;
+  if (cmp == null || cmp <= 0) return;
+
+  if (snapshot.ttmPe == null && quote?.trailingPe != null && quote.trailingPe > 0) {
+    snapshot.ttmPe = quote.trailingPe;
+  }
+  if (snapshot.ttmPe == null && quote?.trailingEps != null && quote.trailingEps > 0) {
+    snapshot.ttmPe = Math.round((cmp / quote.trailingEps) * 10) / 10;
+  }
+  if (snapshot.ttmPe == null && snapshot.normalizedEps != null && snapshot.normalizedEps > 0) {
+    snapshot.ttmPe = Math.round((cmp / snapshot.normalizedEps) * 10) / 10;
+  }
+  if (
+    snapshot.forwardPe == null &&
+    snapshot.normalizedEps != null &&
+    snapshot.normalizedEps > 0
+  ) {
+    snapshot.forwardPe = Math.round((cmp / snapshot.normalizedEps) * 10) / 10;
+  }
 }
 
 function formatInr(n: number): string {
@@ -296,11 +336,13 @@ export async function runStockCalculator(
     ...paramMetrics,
   };
 
+  enrichPeFromLiveQuote(snapshot, quote);
+
   let frameworkPe: number | null =
     input.peBasis === 'ttm' ? snapshot.ttmPe : snapshot.forwardPe;
 
-  if (frameworkPe == null && input.peBasis === 'forward' && snapshot.normalizedEps) {
-    frameworkPe = cmp / snapshot.normalizedEps;
+  if (frameworkPe == null && snapshot.normalizedEps) {
+    frameworkPe = Math.round((cmp / snapshot.normalizedEps) * 10) / 10;
   }
   if (frameworkPe == null && snapshot.ttmPe) {
     frameworkPe = snapshot.ttmPe;
@@ -310,7 +352,7 @@ export async function runStockCalculator(
 
   if (anchorPe == null) {
     throw new Error(
-      `${input.peBasis === 'ttm' ? 'TTM' : 'Forward'} P/E not available for ${resolved.ticker}. Enter a manual P/E override or check PARAMETERS file.`
+      `${input.peBasis === 'ttm' ? 'TTM' : 'Forward'} P/E not available for ${resolved.ticker}. Enable StockBook on Vercel, enter a manual P/E override, or retry when NSE quote includes EPS.`
     );
   }
 

@@ -16,6 +16,10 @@ export interface CmpQuote {
   source: CmpSource;
   /** ISO timestamp of the market quote */
   asOf: string;
+  /** TTM EPS from NSE quote-equity when available */
+  trailingEps?: number | null;
+  /** Trailing P/E from NSE when available (else derive from price / EPS) */
+  trailingPe?: number | null;
 }
 
 /** NSE symbol when portfolio ticker differs from NSE trading symbol. */
@@ -55,6 +59,60 @@ function cacheSet(quote: CmpQuote): void {
     quote,
     expiresAt: Date.now() + CACHE_TTL_MS,
   });
+}
+
+function pickPositiveNum(...values: unknown[]): number | null {
+  for (const v of values) {
+    if (typeof v === 'number' && Number.isFinite(v) && v > 0) return v;
+    if (typeof v === 'string') {
+      const n = parseFloat(v.replace(/,/g, ''));
+      if (Number.isFinite(n) && n > 0) return n;
+    }
+  }
+  return null;
+}
+
+/** Best-effort TTM EPS / P/E from NSE quote-equity JSON (shape varies). */
+export function extractNsePeMetrics(json: unknown): {
+  trailingEps: number | null;
+  trailingPe: number | null;
+} {
+  const root = json as Record<string, unknown> | null;
+  if (!root) return { trailingEps: null, trailingPe: null };
+
+  const securityInfo = root.securityInfo as Record<string, unknown> | undefined;
+  const keyMetrics = root.keyMetrics as Record<string, unknown> | undefined;
+  const metadata = root.metadata as Record<string, unknown> | undefined;
+
+  const trailingEps = pickPositiveNum(
+    securityInfo?.eps,
+    securityInfo?.earningPerShare,
+    securityInfo?.earningsPerShare,
+    keyMetrics?.epsTtm,
+    keyMetrics?.trailingEps,
+    metadata?.eps
+  );
+
+  let trailingPe = pickPositiveNum(
+    securityInfo?.pe,
+    securityInfo?.peRatio,
+    securityInfo?.priceToEarnings,
+    keyMetrics?.peRatio,
+    keyMetrics?.trailingPe,
+    keyMetrics?.pe
+  );
+
+  const price =
+    pickPositiveNum(
+      (root.priceInfo as Record<string, unknown> | undefined)?.lastPrice,
+      (root.priceInfo as Record<string, unknown> | undefined)?.close
+    ) ?? null;
+
+  if (trailingPe == null && price != null && trailingEps != null) {
+    trailingPe = Math.round((price / trailingEps) * 10) / 10;
+  }
+
+  return { trailingEps, trailingPe };
 }
 
 async function fetchNseCookies(): Promise<string> {
@@ -102,12 +160,16 @@ async function fetchNseDirect(nseSymbol: string): Promise<CmpQuote | null> {
       json?.priceInfo?.lastUpdateTime ??
       new Date().toISOString();
 
+    const peMetrics = extractNsePeMetrics(json);
+
     return {
       ticker: nseSymbol,
       nseSymbol,
       price,
       source: 'nse',
       asOf: typeof asOf === 'string' ? asOf : new Date().toISOString(),
+      trailingEps: peMetrics.trailingEps,
+      trailingPe: peMetrics.trailingPe,
     };
   } catch {
     return null;
