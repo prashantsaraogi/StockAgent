@@ -3229,6 +3229,21 @@ td.gain-neg {
   gap: 1rem;
 }
 
+.calc-full-one-line {
+  margin: 0.5rem 0 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.calc-full-framework-report {
+  padding: 1rem 1.25rem;
+}
+
+.calc-full-framework-report .markdown-body {
+  max-width: none;
+}
+
 .calc-full-module-tabs {
   margin-top: 0.75rem;
   flex-wrap: wrap;

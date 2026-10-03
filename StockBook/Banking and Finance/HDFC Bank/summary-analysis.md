@@ -1,7 +1,7 @@
 # HDFC Bank — Summary Analysis
 
 **Ticker:** HDFCBANK (NSE)  
-**Analysis date:** 23 Aug 2026  
+**Analysis date:** 3 Oct 2026 (CMP ~₹721 — web/Oct 2026; confirm NSE)  
 **Sector:** Banking and Finance
 
 ---
@@ -21,7 +21,7 @@
 
 ## Verdict (one line)
 
-**HOLD · continuous 5-10 sh/mo below avg**
+**HOLD legacy · PAUSE surplus adds (0% rank) · governance bucket until post-Bagchi + Q2 FY27 proof**
 
 ---
 

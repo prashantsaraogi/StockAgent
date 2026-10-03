@@ -10,8 +10,10 @@ import { EarningsQualityResults } from '@/components/EarningsQualityResults';
 import { MarginAnalysisResults } from '@/components/MarginAnalysisResults';
 import { BusinessQualityResults } from '@/components/BusinessQualityResults';
 import { RiskDecisionResults } from '@/components/RiskDecisionResults';
+import { MarkdownView } from '@/components/MarkdownView';
 
 export type FullResultTabId =
+  | 'framework'
   | 'overview'
   | 'cagr'
   | 'pe'
@@ -20,7 +22,7 @@ export type FullResultTabId =
   | 'business-quality'
   | 'risk';
 
-const FULL_TABS: { id: FullResultTabId; label: string }[] = [
+const MODULE_TABS: { id: FullResultTabId; label: string }[] = [
   { id: 'overview', label: 'Overview' },
   { id: 'cagr', label: 'CAGR' },
   { id: 'pe', label: 'PE' },
@@ -37,6 +39,8 @@ interface StockCalculatorFullResultsProps {
   savedAt?: string;
   /** Open a module tab from URL (?tab=cagr) on saved full analysis pages. */
   initialTab?: FullResultTabId;
+  /** Basic Analysis — default to Framework report tab when present */
+  preferFrameworkTab?: boolean;
 }
 
 function verdictToneClass(verdict: string): string {
@@ -51,9 +55,17 @@ export function StockCalculatorFullResults({
   childIds,
   savedAt,
   initialTab,
+  preferFrameworkTab,
 }: StockCalculatorFullResultsProps) {
-  const [activeTab, setActiveTab] = useState<FullResultTabId>(initialTab ?? 'overview');
+  const defaultTab: FullResultTabId =
+    initialTab ??
+    (preferFrameworkTab && analysis.frameworkReport?.markdown ? 'framework' : 'overview');
+  const [activeTab, setActiveTab] = useState<FullResultTabId>(defaultTab);
   const c = analysis.cagr;
+
+  const tabs: { id: FullResultTabId; label: string }[] = analysis.frameworkReport?.markdown
+    ? [{ id: 'framework', label: 'Framework report' }, ...MODULE_TABS]
+    : MODULE_TABS;
 
   const overviewModules: {
     label: string;
@@ -110,18 +122,22 @@ export function StockCalculatorFullResults({
     <div className="calc-full-results">
       <section className="card wide calc-full-header">
         <h2>
-          Full analysis — {analysis.stockName}{' '}
+          {analysis.basicAnalysis ? 'Basic analysis' : 'Full analysis'} — {analysis.stockName}{' '}
           <span className="muted">({analysis.ticker})</span>
         </h2>
+        {analysis.frameworkReport?.oneLineVerdict && (
+          <p className="calc-full-one-line">{analysis.frameworkReport.oneLineVerdict}</p>
+        )}
         <p className="muted small">
           {analysis.sector} · {analysis.inputs.expectedCagrPct}% CAGR · {analysis.inputs.years}Y ·{' '}
           {analysis.inputs.peBasis === 'forward' ? 'Forward' : 'TTM'} P/E
+          {analysis.frameworkReport?.reportMode === 'gemini' && ' · Gemini synthesis (Analysis section)'}
           {savedAt &&
             ` · ${new Date(savedAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })} IST`}
         </p>
 
         <nav className="sub-nav calc-tabs calc-full-module-tabs" aria-label="Analysis modules">
-          {FULL_TABS.map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
@@ -133,6 +149,12 @@ export function StockCalculatorFullResults({
           ))}
         </nav>
       </section>
+
+      {activeTab === 'framework' && analysis.frameworkReport?.markdown && (
+        <section className="card wide calc-full-framework-report">
+          <MarkdownView content={analysis.frameworkReport.markdown} headingAnchors />
+        </section>
+      )}
 
       {activeTab === 'overview' && (
         <section className="card wide calc-full-overview">

@@ -10,6 +10,10 @@ import { runEarningsQualityAnalysis, type EarningsQualityResult } from './earnin
 import { runMarginAnalysis, type MarginAnalysisResult } from './margin-analysis';
 import { runBusinessQualityAnalysis, type BusinessQualityResult } from './business-quality-moat';
 import { runRiskDecisionAnalysis, type RiskDecisionResult } from './risk-decision';
+import {
+  generateBasicFrameworkReport,
+  type BasicFrameworkReport,
+} from './basic-analysis-report';
 
 export interface StockCalculatorFullInputs {
   peBasis: PeBasis;
@@ -42,6 +46,10 @@ export interface StockCalculatorFullResult {
     businessQualityVerdict: string;
     riskVerdict: string;
   };
+  /** Set when run used Basic Analysis mode */
+  basicAnalysis?: boolean;
+  /** Chat-style framework narrative (Basic mode) */
+  frameworkReport?: BasicFrameworkReport | null;
 }
 
 function parsePurchaseDate(value: string | null | undefined): string | null {
@@ -126,12 +134,51 @@ export async function runFullStockCalculatorAnalysis(input: {
 
   const sector = cagr.sector;
   const stockName = cagr.stockName;
+  const basicAnalysis = input.basicAnalysis ?? false;
+
+  const frameworkReport = basicAnalysis
+    ? await generateBasicFrameworkReport(
+        {
+          ticker,
+          stockName,
+          sector,
+          analyzedAt: new Date().toISOString(),
+          inputs: {
+            peBasis: input.peBasis,
+            expectedCagrPct: input.expectedCagrPct,
+            years: input.years,
+            manualPeOverride: input.manualPeOverride ?? null,
+            investmentAmountInr: input.investmentAmountInr ?? null,
+            purchasePrice: input.purchasePrice ?? null,
+            purchaseDate: purchaseDate,
+          },
+          cagr,
+          peScorecard,
+          peParameters,
+          earningsQuality,
+          margin,
+          businessQuality,
+          riskDecision,
+          overview: {
+            cagrVerdict: cagr.frameworkVerdict ?? cagr.impliedVerdict,
+            peVerdict: peVerdictFromScorecard(peScorecard, peParameters),
+            earningsQualityVerdict: earningsQuality.overallVerdict,
+            marginVerdict: margin.overallVerdict,
+            businessQualityVerdict: businessQuality.verdict,
+            riskVerdict: riskDecision.investmentVerdict,
+          },
+        },
+        input.tenantId
+      )
+    : null;
 
   return {
     ticker,
     stockName,
     sector,
     analyzedAt: new Date().toISOString(),
+    basicAnalysis,
+    frameworkReport,
     inputs: {
       peBasis: input.peBasis,
       expectedCagrPct: input.expectedCagrPct,

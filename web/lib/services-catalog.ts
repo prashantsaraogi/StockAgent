@@ -652,7 +652,7 @@ Run Stock Analysis → PEG tab to verify scorecard + 100-pt total.`,
         categoryId: 'stock-calculator',
         title: 'Analyze stock — basic or advanced (6 modules)',
         description:
-          'Stock Analysis home: **Basic** = stock name only (default TTM P/E, 12% CAGR, 5Y). **Advanced** = set P/E basis + expected CAGR. Runs CAGR, P/E, earnings, margin, business quality, risk.',
+          'Stock Analysis home: **Basic** = stock name only → **Framework report** (narrative: PCCL, discipline, quotes, position) + 6 modules. **Advanced** = custom P/E + CAGR.',
         cadence: 'on-demand',
         actionType: 'link',
         href: '/stock-calculator',

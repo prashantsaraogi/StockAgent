@@ -334,6 +334,7 @@ export function StockCalculatorHub() {
           fullRecordId={recordId ?? undefined}
           childIds={childIds ?? undefined}
           savedAt={savedAt ?? undefined}
+          preferFrameworkTab={mode === 'basic'}
         />
       )}
     </div>

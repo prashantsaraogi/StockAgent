@@ -1,6 +1,6 @@
 # HDFC Bank — FAQ
 
-**Ticker:** HDFCBANK · **Updated:** 23 Aug 2026
+**Ticker:** HDFCBANK · **Updated:** 3 Oct 2026
 
 ---
 
@@ -34,4 +34,10 @@
 
 ---
 
-**Next refresh:** Q2 FY27 or user trade.
+## Q6. Oct 2026 — Bagchi CEO; still add?
+
+**HOLD** 1,125 shares. **0% fresh surplus** (governance bucket — `personal-discipline.md`). RBI approved **Anup Bagchi** as MD & CEO from **27 Oct 2026** (FACT — Oct 2026 filings/press). That **reduces succession uncertainty** but **does not clear** deposit/NIM proof or US litigation overhang. **Do not add** to fix avg ₹775; rank bank salary ₹ to **ICICI / Axis** first. Revisit adds after **Q2 FY27** NIM + LDR trend with new CEO.
+
+**Quotes lens (PAUSE surplus adds):** Buffett — *"Price is what you pay; value is what you get."* · Marks — *"You don't have to make money back the same way you lost it."* · Framework — *"In India, governance is not a footnote — it is part of valuation."*
+
+**Next refresh:** Post Bagchi takeover · Q2 FY27 results · RBI MSRDC outcome.

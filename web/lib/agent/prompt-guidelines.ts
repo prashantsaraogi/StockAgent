@@ -510,15 +510,15 @@ Cheap or expensive vs history? Forward IV premium? ADD case from PARAMETERS quic
         id: 'full-analysis-all-tabs',
         title: 'Stock Analysis — all 6 modules (basic or advanced)',
         description:
-          'Populate StockBook then run **Analyze** — basic (stock only) or advanced (TTM/forward P/E + CAGR).',
+          'Populate StockBook then run **Analyze** — Basic also shows **Framework report** (chat-style narrative).',
         prompt: `Prepare StockBook for {TICKER} then verify all Stock Analysis modules.
 
-1. Refresh PARAMETERS · MARGIN · EARNINGS_QUALITY · BUSINESS_QUALITY · RISK_DECISION files
-2. User runs **Stock Analysis → Analyze** — **Basic** (stock name only; default TTM P/E, 12% CAGR, 5Y) or **Advanced** (custom P/E basis + CAGR)
-3. Cross-check overview verdicts — flag conflicts (e.g. margin 🔴 but BQ 🟢)
+1. Refresh PARAMETERS · MARGIN · EARNINGS_QUALITY · BUSINESS_QUALITY · RISK_DECISION · summary/faq/detail (PCCL)
+2. User runs **Stock Analysis → Analyze** — **Basic** (stock name only; default TTM P/E, 12% CAGR, 5Y) opens **Framework report** tab (holdings + discipline + PCCL + quotes) plus 6 modules; **Advanced** = custom P/E + CAGR
+3. Cross-check Framework one-line vs module verdicts — flag conflicts (e.g. margin 🔴 but BQ 🟢)
 4. **PEG** tab separately for combined P/E + growth scorecard
 
-Modules: CAGR · PE (optional purchase for scorecard) · Earnings Quality · Margin · Business Quality · Risk.`,
+Modules: Framework report (Basic) · CAGR · PE · Earnings Quality · Margin · Business Quality · Risk.`,
         channel: 'both',
         framework: ['MARGIN-FRAMEWORK', 'EARNINGS-QUALITY-FRAMEWORK', 'PARAMETERS'],
         placeholders: ['{TICKER}'],

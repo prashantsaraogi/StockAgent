@@ -10,6 +10,7 @@ import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
 
 const VALID_TABS = new Set<FullResultTabId>([
+  'framework',
   'overview',
   'cagr',
   'pe',
@@ -65,6 +66,7 @@ export default async function FullAnalysisDetailPage({ params, searchParams }: P
         childIds={entry.childIds}
         savedAt={entry.createdAt}
         initialTab={initialTab}
+        preferFrameworkTab={entry.analysis.basicAnalysis ?? Boolean(entry.analysis.frameworkReport)}
       />
     </div>
   );
