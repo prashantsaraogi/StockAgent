@@ -221,6 +221,7 @@ export async function resolveStock(query: string): Promise<StockSearchResult | n
 
   const index = await buildStockbookTickerIndex();
   const upper = extractTickerFromQuery(q);
+  const tokens = tokenizeQuery(q);
 
   if (index.has(upper)) {
     const loc = index.get(upper)!;
@@ -229,6 +230,29 @@ export async function resolveStock(query: string): Promise<StockSearchResult | n
       'stockbook',
       true
     );
+  }
+
+  for (const loc of index.values()) {
+    if (!matchesStockbookEntry(loc, q, tokens)) continue;
+    return toResult(
+      { ticker: loc.ticker, company: loc.stock, sector: loc.sector },
+      'stockbook',
+      true
+    );
+  }
+
+  if (/^[A-Z][A-Z0-9&.-]{0,19}$/.test(upper)) {
+    const validated = await validateNseTicker(upper);
+    if (validated) {
+      const loc = index.get(validated.ticker);
+      return toResult(
+        loc
+          ? { ticker: loc.ticker, company: loc.stock, sector: loc.sector }
+          : validated,
+        loc ? 'stockbook' : 'nse',
+        Boolean(loc)
+      );
+    }
   }
 
   const aliasExact = searchSymbolAliases(q, 3).find(
@@ -255,7 +279,6 @@ export async function resolveStock(query: string): Promise<StockSearchResult | n
 
   const matches = await searchStocks(q, 8);
   const qLower = q.toLowerCase();
-  const tokens = tokenizeQuery(q);
   const exact = matches.find(
     (m) =>
       m.ticker.toLowerCase() === qLower ||

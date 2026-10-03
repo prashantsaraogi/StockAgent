@@ -8,7 +8,7 @@ import path from 'path';
 import { readStockTabContent } from './content';
 import { getRepoRoot } from './framework-paths';
 import { getStockbookByTicker } from './stockbook-index';
-import { resolveStock } from './stock-search';
+import { normalizeStockQuery, resolveStock } from './stock-search';
 import { fetchLiveNseCmp } from './nse-cmp';
 import { stockbookPath } from './navigation';
 import { parseParametersMetrics } from './stock-calculator-engine';
@@ -295,7 +295,10 @@ function opportunityLabel(pe: PegZone, peg: PegZone, growth: PegZone): string {
 export async function runPegEvaluation(
   input: RunPegEvaluationInput
 ): Promise<PegEvaluationResult | null> {
-  const resolved = await resolveStock(input.ticker.trim());
+  const tickerInput = normalizeStockQuery(input.ticker.trim());
+  if (!tickerInput) return null;
+
+  const resolved = await resolveStock(tickerInput);
   if (!resolved) return null;
 
   const loc = await getStockbookByTicker(resolved.ticker);

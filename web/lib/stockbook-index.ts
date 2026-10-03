@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { getRepoRoot } from './framework-paths';
 import { toSlug } from './navigation';
+import { STOCKBOOK_TICKER_INDEX } from './bundled/stockbook-index.generated';
 
 export interface StockbookLocation {
   sector: string;
@@ -22,11 +23,31 @@ async function exists(p: string): Promise<boolean> {
   }
 }
 
-/** Build ticker → StockBook folder map from summary-analysis.md files. */
+function rowToLocation(row: { sector: string; stock: string; ticker: string }): StockbookLocation {
+  const ticker = row.ticker.toUpperCase();
+  return {
+    sector: row.sector,
+    stock: row.stock,
+    sectorSlug: toSlug(row.sector),
+    stockSlug: toSlug(row.stock),
+    ticker,
+  };
+}
+
+function loadBundledTickerIndex(): Map<string, StockbookLocation> {
+  const index = new Map<string, StockbookLocation>();
+  for (const row of Object.values(STOCKBOOK_TICKER_INDEX)) {
+    const loc = rowToLocation(row);
+    index.set(loc.ticker, loc);
+  }
+  return index;
+}
+
+/** Build ticker → StockBook folder map from bundled index + on-disk summary-analysis.md. */
 export async function buildStockbookTickerIndex(): Promise<Map<string, StockbookLocation>> {
   if (cachedIndex) return cachedIndex;
 
-  const index = new Map<string, StockbookLocation>();
+  const index = loadBundledTickerIndex();
   const root = path.join(getRepoRoot(), 'StockBook');
 
   if (!(await exists(root))) {
@@ -49,7 +70,7 @@ export async function buildStockbookTickerIndex(): Promise<Map<string, Stockbook
 
       try {
         const md = await fs.readFile(summaryPath, 'utf8');
-        const match = md.match(/\*\*Ticker:\*\*\s*([A-Z0-9]+)/);
+        const match = md.match(/\*\*Ticker:\*\*\s*([A-Z0-9.&-]+)/i);
         if (!match) continue;
 
         const ticker = match[1].toUpperCase();
@@ -73,7 +94,7 @@ export async function buildStockbookTickerIndex(): Promise<Map<string, Stockbook
       await walk(path.join(root, s.name), s.name);
     }
   } catch {
-    /* hosted deploy without StockBook bundle — Ask Agent still runs on framework text */
+    /* hosted deploy without StockBook on disk — bundled index still applies */
   }
 
   cachedIndex = index;

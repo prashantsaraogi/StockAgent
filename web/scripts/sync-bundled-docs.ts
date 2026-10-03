@@ -43,6 +43,39 @@ async function walkDir(root: string, visit: (filePath: string, name: string) => 
   }
 }
 
+async function scanStockbookTickerIndex(): Promise<
+  Record<string, { sector: string; stock: string; ticker: string }>
+> {
+  const stockBook = path.join(repoRoot, 'StockBook');
+  const out: Record<string, { sector: string; stock: string; ticker: string }> = {};
+
+  await walkDir(stockBook, async (filePath, name) => {
+    const rel = path.relative(stockBook, filePath);
+    const parts = rel.split(path.sep);
+    if (parts.length < 3) return;
+    const sector = parts[0];
+    const stock = parts[1];
+
+    if (name === 'summary-analysis.md') {
+      const md = await readTextIfExists(filePath);
+      if (!md) return;
+      const match = md.match(/\*\*Ticker:\*\*\s*([A-Z0-9.&-]+)/i);
+      if (!match) return;
+      const ticker = match[1].toUpperCase();
+      out[ticker] = { sector, stock, ticker };
+      return;
+    }
+
+    const paramMatch = name.match(/^PARAMETERS_([A-Z0-9.&-]+)\.md$/i);
+    if (paramMatch) {
+      const ticker = paramMatch[1].toUpperCase();
+      if (!out[ticker]) out[ticker] = { sector, stock, ticker };
+    }
+  });
+
+  return out;
+}
+
 async function scanStockBookTickerFiles(
   pattern: RegExp,
   tickerFromName: (name: string) => string | null
@@ -142,8 +175,12 @@ async function main() {
   );
   ok += Object.keys(parametersByTicker).length + Object.keys(pegByTicker).length;
 
+  const stockbookIndex = await scanStockbookTickerIndex();
+  await writeGeneratedTs('stockbook-index.generated.ts', 'STOCKBOOK_TICKER_INDEX', stockbookIndex);
+  ok += Object.keys(stockbookIndex).length;
+
   console.log(
-    `[sync-bundled-docs] generated docs (${Object.keys(docBySlug).length}), glossary, wisdom, news (${Object.keys(newsByDate).length} days), PARAMETERS (${Object.keys(parametersByTicker).length}), PEG (${Object.keys(pegByTicker).length}); ${miss} missing source file(s)`
+    `[sync-bundled-docs] generated docs (${Object.keys(docBySlug).length}), glossary, wisdom, news (${Object.keys(newsByDate).length} days), PARAMETERS (${Object.keys(parametersByTicker).length}), PEG (${Object.keys(pegByTicker).length}), StockBook tickers (${Object.keys(stockbookIndex).length}); ${miss} missing source file(s)`
   );
   if (miss > 0) process.exitCode = 0;
 }
