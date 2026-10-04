@@ -29,7 +29,7 @@ export function AppShell({ email, tenantId, authMode, children }: AppShellProps)
           <BrandLogo />
           <div>
             <strong>Veersa Stock Agent</strong>
-            <span className="brand-sub">India Stock Investment Framework</span>
+            <span className="brand-sub">India equity · long-term investing</span>
           </div>
         </div>
         <div className="header-actions">

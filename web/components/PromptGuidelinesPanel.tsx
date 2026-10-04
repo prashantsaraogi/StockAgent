@@ -56,8 +56,8 @@ export function PromptGuidelinesPanel() {
     <div className="prompt-guidelines">
       <div className="prompt-guidelines-intro card wide">
         <p>
-          Copy-paste prompts the <strong>India Stock Investment Framework</strong> understands.
-          Ask Agent applies core rules first — not generic AI stock chat.
+          Copy-paste prompts for stock analysis, portfolio, and news workflows.
+          Ask Agent uses the same discipline as Stock Analysis — not generic stock chat.
         </p>
         <ul className="prompt-legend muted small">
           <li>
@@ -74,7 +74,7 @@ export function PromptGuidelinesPanel() {
         </ul>
         <p className="muted small">
           Replace <code>{'{TICKER}'}</code>, <code>{'{DATE}'}</code>, etc. before sending. Buy/add
-          prompts trigger full <strong>buy-decision-workflow</strong> + quotes lens.
+          prompts run full discipline checks and a quotes lens.
         </p>
       </div>
 
@@ -82,7 +82,7 @@ export function PromptGuidelinesPanel() {
         <input
           type="search"
           className="prompt-search"
-          placeholder="Search prompts, framework files…"
+          placeholder="Search prompts…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           aria-label="Search prompts"
@@ -137,13 +137,6 @@ export function PromptGuidelinesPanel() {
                     ))}
                   </p>
                 )}
-                <ul className="prompt-framework-tags">
-                  {p.framework.map((f) => (
-                    <li key={f}>
-                      <span className="tag">{f}</span>
-                    </li>
-                  ))}
-                </ul>
                 <pre className="prompt-text">{p.prompt}</pre>
                 <button
                   type="button"

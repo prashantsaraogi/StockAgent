@@ -88,7 +88,7 @@ function pickQuotesForVerdict(
       '> *"You don\'t have to make money back the same way you lost it."*  \n> — **Howard Marks**'
     );
     out.push(
-      '> *"Don\'t average down on a losing position unless the thesis has improved — not because the price fell."*  \n> — **Framework synthesis**'
+      '> *"Don\'t average down on a losing position unless the thesis has improved — not because the price fell."*  \n> — **Discipline note**'
     );
   } else if (gapTone === 'negative') {
     out.push(
@@ -198,17 +198,11 @@ function buildDeterministicMarkdown(input: {
     : '*No position in imported portfolio — analysis uses **fresh capital** lens.*';
 
   const disciplineBlock = discipline
-    ? `### Personal discipline (mandatory)
-
-| Field | Value |
-|-------|--------|
-| Surplus rank | **${discipline.surplusPct}%** |
-| Legacy | ${discipline.legacyAction} |
+    ? `| Surplus rank | **${discipline.surplusPct}%** |
+| Legacy holder | ${discipline.legacyAction} |
 | Fresh / surplus | ${discipline.surplusAction} |
-| Why | ${discipline.reason} |
-
-*Source: \`investor-wisdom/personal-discipline.md\` (web rules).*`
-    : '*Ticker not in pause / structural buckets — still run buy-decision-workflow before ADD.*';
+| Note | ${discipline.reason} |`
+    : '';
 
   const pcclBlock =
     pcclApplied != null
@@ -217,30 +211,21 @@ function buildDeterministicMarkdown(input: {
 | CMP (${cmpSource}) | ${cmp != null ? formatInr(cmp) : '—'} |
 | Premium to Applied PCCL | ${premiumPccl != null ? `${formatPct(premiumPccl)}` : '—'} |`
       : `| CMP | ${cmp != null ? formatInr(cmp) : '—'} |
-| PCCL | *Not parsed — open StockBook \`detail-analysis.md\` or refresh PARAMETERS* |
+| PCCL | *Not available — refresh stock parameters* |
 | TTM P/E | ${pe.ttmPe ?? '—'}× |
 | 10Y avg P/E | ${pe.avg10yPe ?? '—'}× |`;
 
-  return `# Framework report — ${analysis.stockName} (${analysis.ticker})
+  const summaryNote = ctx.summaryExcerpt ? clip(ctx.summaryExcerpt, 600) : '';
+  const disciplineTable = disciplineBlock
+    ? `\n| Personal rules |\n|---|\n${disciplineBlock.split('\n').slice(1).join('\n')}\n`
+    : '';
 
-**Sector:** ${analysis.sector} · **Date:** ${date}  
-**Mode:** Basic Analysis (6 modules + framework narrative)
+  return `# ${analysis.stockName} (${analysis.ticker}) — Investment view
+
+**Sector:** ${analysis.sector} · **Date checked:** ${date}  
+**CMP:** ${cmp != null ? formatInr(cmp) : '—'} (${cmpSource})
 
 > **One-line:** ${oneLine}
-
----
-
-## Framework lens
-
-Applied in this run (same precedence as Ask Agent):
-
-1. **StockBook read order** — summary → faq → approach → PARAMETERS (excerpts below when available)
-2. **Six calculator modules** — CAGR gap · P/E · earnings quality · margin · business quality · risk decision
-3. **Personal discipline** — pause registry & structural buckets override generic "SIP everywhere"
-4. **PCCL dual anchor** — StockBook pessimistic anchor; **Applied PCCL = max(Base, CMP)** on underwater legacy book
-5. **Evidence labels** — FACT (live CMP, module scores) vs ASSUMPTION (your ${analysis.inputs.expectedCagrPct}% CAGR) vs StockBook narrative
-
-**Binding:** \`stock-agent.mdc\` · \`buy-decision-workflow.md\` · \`personal-discipline.md\`
 
 ---
 
@@ -250,33 +235,20 @@ ${positionBlock}
 
 ---
 
-## Context used
+## Business quality vs risks
 
-| Layer | Status |
-|-------|--------|
-| StockBook summary | ${ctx.summaryExcerpt ? 'Loaded' : 'Missing / bundled unavailable'} |
-| StockBook approach | ${ctx.approachExcerpt ? 'Loaded' : 'Missing'} |
-| PARAMETERS | ${pe.parametersFile ?? getBundledParametersMd(analysis.ticker) ? 'Loaded' : 'Missing'} |
-| Live CMP | ${cmpSource} |
-| Portfolio holdings | ${holding ? 'Matched ticker' : 'Not held or not imported'} |
-| Risk decision file | ${risk.riskDecisionFile ?? 'Module synthesis'} |
+| Area | Reading |
+|------|---------|
+| Business quality | ${bq.verdict} (score ${bq.businessQualityScore10}/10) |
+| Earnings quality | ${analysis.earningsQuality.overallVerdict} |
+| Margin trend | ${analysis.margin.overallVerdict} |
+| Overall risk view | ${risk.investmentVerdict} |
 
-${ctx.summaryExcerpt ? `\n### Summary excerpt\n\n${ctx.summaryExcerpt}\n` : ''}
-${detailExcerpt ? `\n### Valuation / PCCL excerpt (detail)\n\n${detailExcerpt}\n` : ''}
+${risk.concerns.length ? `**Key concerns:** ${risk.concerns.slice(0, 3).join(' · ')}` : ''}
 
----
-
-## Business quality vs governance
-
-| Lens | Signal | Source |
-|------|--------|--------|
-| Business quality module | ${bq.verdict} | Stock Analysis tab |
-| Moat / quality score | ${bq.businessQualityScore10}/10 | BUSINESS_QUALITY file |
-| Earnings quality | ${analysis.earningsQuality.overallVerdict} | Earnings Quality tab |
-| Margin trend | ${analysis.margin.overallVerdict} | Margin tab |
-| Risk & decision | ${risk.investmentVerdict} | RISK_DECISION synthesis |
-
-**Governance / integrity:** Treat separately from franchise quality. ${risk.concerns.slice(0, 2).join(' · ') || 'See Risk tab for factor register.'}
+${summaryNote ? `${summaryNote}\n` : ''}
+${risk.thesis.whyOwn ? `**Why own:** ${clip(risk.thesis.whyOwn, 450)}` : ''}
+${risk.thesis.whyNotAggressive ? `\n**Why not add aggressively:** ${clip(risk.thesis.whyNotAggressive, 450)}` : ''}
 
 ---
 
@@ -284,74 +256,54 @@ ${detailExcerpt ? `\n### Valuation / PCCL excerpt (detail)\n\n${detailExcerpt}\n
 
 ${pcclBlock}
 
-**CAGR gap (your ${analysis.inputs.expectedCagrPct}% vs framework possible band):** ${c.cagrGap.cagrGapPp != null ? `${c.cagrGap.cagrGapPp} pp` : 'n/a'} — ${c.frameworkVerdict ?? c.impliedVerdict}
+**Growth vs your ${analysis.inputs.expectedCagrPct}% CAGR assumption:** ${c.cagrGap.cagrGapPp != null ? `${c.cagrGap.cagrGapPp} pp gap` : 'n/a'} — ${c.frameworkVerdict ?? c.impliedVerdict}
+
+${detailExcerpt ? `\n${detailExcerpt}\n` : ''}
 
 ---
 
-## Module verdicts (synthesis)
+## What to do
 
-| Module | Verdict |
-|--------|---------|
+| Capital | Action |
+|---------|--------|
+| Legacy holder | ${discipline ? discipline.legacyAction : holding ? '**HOLD** — no trim for valuation alone' : '—'} |
+| Fresh / surplus | ${discipline ? discipline.surplusAction : analysis.riskDecision.notScreamingBuy ? '**WAIT / WATCHLIST** — confirm PCCL and sector rank' : '**STAGED STARTER OK** — small size until proof'} |
+${disciplineTable}
+
+---
+
+## Scorecard
+
+| Check | Verdict |
+|-------|---------|
 | CAGR | ${analysis.overview.cagrVerdict} |
 | P/E | ${analysis.overview.peVerdict} |
-| Earnings Quality | ${analysis.overview.earningsQualityVerdict} |
+| Earnings | ${analysis.overview.earningsQualityVerdict} |
 | Margin | ${analysis.overview.marginVerdict} |
-| Business Quality | ${analysis.overview.businessQualityVerdict} |
-| Risk & Decision | ${analysis.overview.riskVerdict} |
+| Business quality | ${analysis.overview.businessQualityVerdict} |
+| Risk | ${analysis.overview.riskVerdict} |
 
 ---
 
-## Core-problem test
+## Why cheap / core problem
 
-${risk.narrativeSummary ? clip(risk.narrativeSummary, 900) : '*Run Ask Agent or refresh StockBook `detail-analysis.md` for explicit "why cheap" drivers.*'}
+${risk.narrativeSummary ? clip(risk.narrativeSummary, 900) : '*See Risk section in Stock Analysis for detail.*'}
 
-**Thesis breakers to watch:** ${risk.thesisBreakers.slice(0, 3).map((t) => t.text).join(' · ') || '—'}
-
----
-
-## Actions (framework)
-
-| Capital type | Action |
-|--------------|--------|
-| Legacy holder | ${discipline ? discipline.legacyAction : holding ? 'Default **HOLD** — long-term mandate (no TRIM for valuation alone)' : '—'} |
-| Fresh / salary surplus | ${discipline ? discipline.surplusAction : premiumPccl != null && premiumPccl > 0 ? 'Rank vs portfolio PCCL gaps — prefer better margin-of-safety names' : 'Staged starter only if catalyst + PCCL pass'} |
-
-${disciplineBlock}
+**Watch:** ${risk.thesisBreakers.slice(0, 3).map((t) => t.text).join(' · ') || '—'}
 
 ---
 
-## Analysis
-
-${risk.thesis.whyOwn ? `**Why own (thesis):** ${clip(risk.thesis.whyOwn, 500)}` : ''}
-
-${risk.thesis.whyNotAggressive ? `**Why not aggressive add:** ${clip(risk.thesis.whyNotAggressive, 500)}` : ''}
-
-Module-linked CAGR report excerpt: ${c.report ? '*See CAGR module tab for full projection tables.*' : '*CAGR narrative in module tab.*'}
-
-*Labels: CMP and module scores = **FACT** where sourced live; expected CAGR = **YOUR ASSUMPTION**; StockBook excerpts = **FACT** from saved files; forward paths = **HYPOTHESIS**.*
-
----
-
-## Verdict
-
-**${oneLine}**
-
-| Audience | Guidance |
-|----------|----------|
-| Existing holder | ${discipline?.legacyAction ?? 'HOLD · size-capped adds only if MoS + workflow pass'} |
-| Fresh capital | ${discipline?.surplusAction ?? (analysis.riskDecision.notScreamingBuy ? 'WAIT / WATCHLIST — confirm PCCL + sector rank' : 'STAGED STARTER OK — cap ≤2% book until proof')} |
-
-**Next review:** ${risk.thesis.nextReview || 'After quarterly results + material news'}
-
----
-
-## Quotes lens
+## Quotes
 
 ${quotes.join('\n\n')}
 
 ---
 
-*Generated by Stock Analysis · Basic mode. Not investment advice. For deeper live news / §22 price-decline, use Ask Agent or refresh StockBook in Cursor.*
+## Triggers
+
+**Next review:** ${risk.thesis.nextReview || 'After quarterly results and material news'}
+
+*Not investment advice.*
 `;
 }
 
@@ -409,14 +361,14 @@ export async function generateBasicFrameworkReport(
   let reportMode: BasicFrameworkReport['reportMode'] = 'framework-local';
 
   try {
-    const system = `You are the India Stock Investment Framework assistant. Refine ONLY the "## Analysis" section of a Basic Analysis report. Never change numbers, tables outside Analysis, or verdict. Use FACT/ASSUMPTION labels. No generic disclaimers.`;
-    const userPrompt = `Ticker ${analysis.ticker}. One-line verdict: ${oneLine}. Improve Analysis (3-5 short paragraphs): separate business quality vs governance, PCCL/surplus discipline, module conflicts. Return ONLY markdown paragraphs (no ## heading).`;
+    const system = `You are an India equity analyst writing for a long-term investor. Refine ONLY the "## Business quality vs risks" section. Never change numbers elsewhere or the one-line verdict. No file paths or methodology jargon.`;
+    const userPrompt = `Ticker ${analysis.ticker}. One-line: ${oneLine}. Rewrite Business quality vs risks (3-4 short paragraphs + keep the table). Plain language.`;
 
     const gemini = await generateGeminiText(system, userPrompt);
     if (gemini && gemini.trim().length > 120) {
       markdown = markdown.replace(
-        /## Analysis[\s\S]*?(?=## Verdict)/,
-        `## Analysis\n\n${gemini.trim()}\n\n`
+        /## Business quality vs risks[\s\S]*?(?=## Valuation)/,
+        `## Business quality vs risks\n\n${gemini.trim()}\n\n`
       );
       reportMode = 'gemini';
     }

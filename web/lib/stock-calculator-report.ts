@@ -61,12 +61,12 @@ function deriveFrameworkVerdict(
   const maxRisk = Math.max(internalRisk.score, externalRisk.score);
   if (maxRisk >= 3) return 'INVESTIGATE — L3 risk on internal/external register';
   if (cagrGap.gapTone === 'negative' && cagrGap.cagrGapPp != null && cagrGap.cagrGapPp < -4) {
-    return 'WAIT — expected CAGR materially above framework possible band';
+    return 'WAIT — expected CAGR materially above supported growth band';
   }
-  if (cagrGap.gapTone === 'negative') return 'WATCHLIST — CAGR expectation stretched vs framework';
-  if (cagrGap.gapTone === 'neutral') return 'WATCHLIST — aligned with framework possible CAGR band';
+  if (cagrGap.gapTone === 'negative') return 'WATCHLIST — CAGR expectation stretched vs supported band';
+  if (cagrGap.gapTone === 'neutral') return 'WATCHLIST — aligned with supported CAGR band';
   if (maxRisk >= 2) return 'STAGED STARTER OK — what-if only; L2 risk caps size';
-  return 'WATCHLIST — framework room exists; confirm with PCCL + buy-decision-workflow before deploy';
+  return 'WATCHLIST — valuation room exists; confirm PCCL and discipline before deploy';
 }
 
 function pickQuotes(cagrGap: CagrGapAnalysis): string[] {

@@ -303,7 +303,7 @@ How does it affect current value @ CMP, SIP pace, or PCCL? Structural vs tempora
       {
         id: 'morning-a',
         title: 'Morning run — Variant A (early IST)',
-        description: 'Cursor full morning framework — news + scripts + surplus brief.',
+        description: 'Cursor full morning run — news + scripts + surplus brief.',
         prompt: `Run my India Stock Investment Agent MORNING FRAMEWORK — Variant A (early morning).
 
 Follow: .cursor/prompts/MORNING-FRAMEWORK-SEQUENCE.md
@@ -418,10 +418,10 @@ No sell-to-rotate.`,
         id: 'ask-agent-stock-one-word',
         title: 'Ask Agent — one-word stock analysis',
         description:
-          'Web `/chat`: type `{TICKER}` or “Analyze ITC” — investor-facing report (no Framework lens UI).',
+          'Web `/chat`: type `{TICKER}` or “Analyze ITC” — full investor-facing report.',
         prompt: `Web Ask Agent — user typed: {TICKER}
 
-Same output as Stock Analysis → Basic Framework report: one-line, position, PCCL, discipline, quotes. Framework internal only.`,
+Same output as Stock Analysis → Basic Investment view: one-line, position, PCCL, discipline, quotes.`,
         channel: 'web',
         framework: ['buy-decision-workflow', 'personal-discipline', 'PCCL'],
         placeholders: ['{TICKER}'],
@@ -462,7 +462,7 @@ Web Portfolio page recomputes Lists 1–3 from registry + lots + live CMP automa
       {
         id: 'analyze-stock',
         title: 'Full stock analysis',
-        description: 'Orchestrated framework — exclusion guards first.',
+        description: 'Full disciplined analysis — exclusion guards first.',
         prompt: `Full framework analysis for {TICKER} at CMP.
 
 Read StockBook: summary → faq → suggested-approach → detail → PARAMETERS → risk files.
@@ -522,7 +522,7 @@ Cheap or expensive vs history? Forward IV premium? ADD case from PARAMETERS quic
         id: 'full-analysis-all-tabs',
         title: 'Stock Analysis — all 6 modules (basic or advanced)',
         description:
-          'Populate StockBook then run **Analyze** — Basic also shows **Framework report** (chat-style narrative).',
+          'Populate StockBook then run **Analyze** — Basic also shows **Investment view** (chat-style narrative).',
         prompt: `Prepare StockBook for {TICKER} then verify all Stock Analysis modules.
 
 1. Refresh PARAMETERS · MARGIN · EARNINGS_QUALITY · BUSINESS_QUALITY · RISK_DECISION · summary/faq/detail (PCCL)
@@ -595,7 +595,7 @@ StockBook/PE-EVALUATION-FRAMEWORK.md Part D.`,
       },
       {
         id: 'margin-full',
-        title: 'Margin Analysis — full framework (Part A–D)',
+        title: 'Margin Analysis — full module (Part A–D)',
         description:
           '5Y margin path · vs 10Y history · drivers/pass-through · quarterly compression flags.',
         prompt: `{TICKER} — full Margin Analysis per MARGIN-FRAMEWORK.md.

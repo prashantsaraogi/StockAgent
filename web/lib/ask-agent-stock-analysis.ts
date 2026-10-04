@@ -3,7 +3,7 @@
  */
 
 import { runFullStockCalculatorAnalysis } from './stock-calculator-full';
-import { toInvestorFacingReport } from './investor-report-format';
+import { sanitizeUserFacingAnswer } from './investor-report-format';
 import type { AgentQueryResult } from './agent/framework-agent';
 import type { StockSearchResult } from './stock-search';
 
@@ -22,7 +22,7 @@ export async function runAskAgentStockAnalysis(
 
   if (!full?.frameworkReport?.markdown) return null;
 
-  const answer = toInvestorFacingReport(full.frameworkReport.markdown);
+  const answer = sanitizeUserFacingAnswer(full.frameworkReport.markdown);
   const mode: AgentQueryResult['mode'] =
     full.frameworkReport.reportMode === 'gemini' ? 'gemini' : 'framework-local';
 

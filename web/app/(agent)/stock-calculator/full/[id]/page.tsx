@@ -10,7 +10,7 @@ import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
 
 const VALID_TABS = new Set<FullResultTabId>([
-  'framework',
+  'report',
   'overview',
   'cagr',
   'pe',
@@ -28,8 +28,11 @@ interface Props {
 export default async function FullAnalysisDetailPage({ params, searchParams }: Props) {
   const { id } = await params;
   const { tab } = await searchParams;
+  const tabNorm = tab === 'framework' ? 'report' : tab;
   const initialTab =
-    tab && VALID_TABS.has(tab as FullResultTabId) ? (tab as FullResultTabId) : undefined;
+    tabNorm && VALID_TABS.has(tabNorm as FullResultTabId)
+      ? (tabNorm as FullResultTabId)
+      : undefined;
   const session = await requireSession();
   const entry = await getFullAnalysisRecord(
     session.tenantId,

@@ -1,7 +1,5 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
-import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
-import { MarkdownView } from '@/components/MarkdownView';
 import { RiskDecisionPanel } from '@/components/RiskDecisionPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
@@ -9,12 +7,6 @@ import {
   groupRiskDecisionByDate,
   listRiskDecisionRecords,
 } from '@/lib/risk-decision-history';
-
-function clipFrameworkIntro(md: string): string {
-  const lines = md.split('\n');
-  const end = lines.findIndex((l, i) => i > 15 && /^## Section A/.test(l));
-  return (end > 0 ? lines.slice(0, end) : lines.slice(0, 45)).join('\n').trim();
-}
 
 function formatTime(iso: string): string {
   try {
@@ -30,10 +22,6 @@ function formatTime(iso: string): string {
 
 export default async function RiskDecisionPage() {
   const session = await requireSession();
-  const frameworkMd =
-    (await loadFrameworkMarkdown('StockBook/RISK-DECISION-FRAMEWORK.md')) ??
-    '# Risk & Decision\n\nFramework not found.';
-
   const entries = await listRiskDecisionRecords(
     session.tenantId,
     session.userId,
@@ -58,11 +46,6 @@ export default async function RiskDecisionPage() {
           Score /100 + verdict.
         </p>
       </div>
-
-      <section className="card wide sector-framework-ref">
-        <h2>Framework reference</h2>
-        <MarkdownView content={clipFrameworkIntro(frameworkMd)} />
-      </section>
 
       <RiskDecisionPanel />
 

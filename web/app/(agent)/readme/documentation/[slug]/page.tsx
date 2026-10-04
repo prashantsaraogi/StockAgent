@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import {
   extractDocHeadings,
   getDocBySlug,
+  isDocPublishedOnWeb,
   listAllDocs,
   listDocCategories,
 } from '@/lib/documentation-index';
@@ -22,7 +23,7 @@ export function generateStaticParams() {
 export default async function DocumentationDetailPage({ params }: Props) {
   const { slug } = await params;
   const doc = getDocBySlug(slug);
-  if (!doc) notFound();
+  if (!doc || !isDocPublishedOnWeb(doc)) notFound();
 
   const content = await loadDocMarkdown(slug);
   if (!content) {
@@ -77,7 +78,6 @@ export default async function DocumentationDetailPage({ params }: Props) {
           </aside>
 
           <section className="content-panel prose-panel doc-detail-content">
-            <p className="file-badge">{doc.path}</p>
             <MarkdownView content={content} headingAnchors />
           </section>
         </div>

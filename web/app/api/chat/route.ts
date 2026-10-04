@@ -7,6 +7,7 @@ import { runFrameworkQuery } from '@/lib/agent/framework-agent';
 import { runNewsFrameworkQuery, shouldRunNewsAgent, type NewsQueryResult } from '@/lib/agent/news-agent';
 import { routeAskAgentQuery } from '@/lib/ask-agent-query-router';
 import { runAskAgentStockAnalysis } from '@/lib/ask-agent-stock-analysis';
+import { sanitizeUserFacingAnswer } from '@/lib/investor-report-format';
 
 export const maxDuration = 120;
 
@@ -55,7 +56,8 @@ export async function POST(request: Request) {
       result = await runFrameworkQuery(query, agentContext);
     }
 
-    const { answer, mode, model } = result;
+    const { mode, model } = result;
+    const answer = sanitizeUserFacingAnswer(result.answer);
 
     const chatSessionId =
       typeof sessionId === 'string' && sessionId.length > 0 ? sessionId : randomUUID();

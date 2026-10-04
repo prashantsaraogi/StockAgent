@@ -18,7 +18,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <div className="login-brand">
           <BrandLogo size="lg" />
           <h1>Veersa Stock Agent</h1>
-          <p>Sign in — framework, StockBook, news, and Ask Agent.</p>
+          <p>Sign in — portfolio, StockBook, news, and Ask Agent.</p>
           {supabaseEnabled && <span className="auth-badge">Supabase · POC login</span>}
         </div>
         <LoginForm

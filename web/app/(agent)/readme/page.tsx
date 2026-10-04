@@ -7,8 +7,7 @@ export default function ReadMeOverviewPage() {
       <header className="page-header">
         <h1>ReadMe</h1>
         <p className="muted">
-          Framework reference for the India Stock Investment Agent — glossary terms and
-          documentation index.
+          Help center — glossary, app guides, and documentation index.
         </p>
         <ReadMeSubNav />
       </header>
@@ -17,7 +16,7 @@ export default function ReadMeOverviewPage() {
         <section className="card">
           <h3>Glossary</h3>
           <p className="muted small">
-            PCCL, MoS, YoC, catalyst bands, verdict vocabulary, and framework terms from{' '}
+            PCCL, MoS, YoC, catalyst bands, and verdict vocabulary from{' '}
             <code>GLOSSARY.md</code>.
           </p>
           <Link href="/readme/glossary" className="btn-primary card-btn">
@@ -28,7 +27,7 @@ export default function ReadMeOverviewPage() {
         <section className="card">
           <h3>Documentation</h3>
           <p className="muted small">
-            Getting started, web app routes, Supabase setup, and investment framework workflows —
+            Getting started, web app routes, Supabase setup, and analysis workflows —
             browsable by index with in-page table of contents.
           </p>
           <Link href="/readme/documentation" className="btn-primary card-btn">
@@ -59,7 +58,7 @@ export default function ReadMeOverviewPage() {
             </thead>
             <tbody>
               <tr>
-                <td>Framework terms</td>
+                <td>Glossary terms</td>
                 <td>
                   <Link href="/readme/glossary">Glossary</Link>
                 </td>

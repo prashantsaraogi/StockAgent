@@ -4,7 +4,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Veersa Stock Agent',
-  description: 'Veersa Stock Agent — India Stock Investment Framework web application',
+  description: 'Veersa Stock Agent — portfolio, stock analysis, and Ask Agent',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

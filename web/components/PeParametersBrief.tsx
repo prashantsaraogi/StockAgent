@@ -74,7 +74,7 @@ export function PeParametersBrief({ data, hint }: PeParametersBriefProps) {
           <span className="muted small">Premium {fmtPct(data.premiumTo10yPct)}</span>
         </div>
         <div className="pe-eval-metric">
-          <span className="pe-eval-label">5Y fair (framework)</span>
+          <span className="pe-eval-label">5Y fair value</span>
           <strong>{fmtInr(data.framework5yFairPrice)}</strong>
         </div>
       </div>

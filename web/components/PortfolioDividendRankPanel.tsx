@@ -37,7 +37,7 @@ export function PortfolioDividendRankPanel({ data }: Props) {
         <DividendRankTable
           tableId="yoc"
           title="Top 10 — Yield on Cost (YoC)"
-          subtitle="Best income % on your deployed capital — framework primary lens for dividend names"
+          subtitle="Best income % on your deployed capital — primary lens for dividend names"
           rows={data.topByYoc}
           variant="yoc"
         />

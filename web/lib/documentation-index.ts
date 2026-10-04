@@ -69,7 +69,7 @@ const DOC_ENTRIES: DocEntry[] = [
   {
     slug: 'parallel-development',
     title: 'Parallel development (Cursor + Web)',
-    description: 'Dual-track design — shared framework, tenant isolation, write rules.',
+    description: 'Dual-track design — shared analysis engine, tenant isolation, write rules.',
     path: 'docs/PARALLEL-DEVELOPMENT.md',
     category: 'getting-started',
     order: 2,
@@ -235,6 +235,17 @@ const DOC_ENTRIES: DocEntry[] = [
   },
 ];
 
+/** Methodology / agent rules — not listed on the public web ReadMe index. */
+const WEB_HIDDEN_DOC_CATEGORIES = new Set<string>(['framework']);
+
+const WEB_HIDDEN_DOC_SLUGS = new Set<string>(['ask-agent-rules']);
+
+export function isDocPublishedOnWeb(doc: DocEntry): boolean {
+  if (WEB_HIDDEN_DOC_CATEGORIES.has(doc.category)) return false;
+  if (WEB_HIDDEN_DOC_SLUGS.has(doc.slug)) return false;
+  return true;
+}
+
 const CATEGORY_META: Record<string, { label: string; description: string; order: number }> = {
   'getting-started': {
     label: 'Getting started',
@@ -266,6 +277,7 @@ export function getDocSlugForRepoPath(repoPath: string): string | undefined {
 export function listDocCategories(): DocCategory[] {
   const byCategory = new Map<string, DocEntry[]>();
   for (const doc of DOC_ENTRIES) {
+    if (!isDocPublishedOnWeb(doc)) continue;
     const list = byCategory.get(doc.category) ?? [];
     list.push(doc);
     byCategory.set(doc.category, list);
@@ -285,7 +297,7 @@ export function listDocCategories(): DocCategory[] {
 }
 
 export function listAllDocs(): DocEntry[] {
-  return [...DOC_ENTRIES].sort((a, b) => a.order - b.order);
+  return [...DOC_ENTRIES].filter(isDocPublishedOnWeb).sort((a, b) => a.order - b.order);
 }
 
 export const GLOSSARY_PATH = 'GLOSSARY.md';

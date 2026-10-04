@@ -1,18 +1,9 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
-import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
-import { MarkdownView } from '@/components/MarkdownView';
 import { PegEvaluationPanel } from '@/components/PegEvaluationPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
 import { groupPegByDate, listPegRecords } from '@/lib/peg-history';
-
-function clipFrameworkIntro(md: string): string {
-  const lines = md.split('\n');
-  const end = lines.findIndex((l, i) => i > 12 && /^## Analysis sequence/.test(l));
-  const slice = end > 0 ? lines.slice(0, end) : lines.slice(0, 45);
-  return slice.join('\n').trim();
-}
 
 function formatTime(iso: string): string {
   try {
@@ -28,10 +19,6 @@ function formatTime(iso: string): string {
 
 export default async function PegEvaluationPage() {
   const session = await requireSession();
-  const frameworkMd =
-    (await loadFrameworkMarkdown('StockBook/PEG-FRAMEWORK.md')) ??
-    '# PEG Evaluation\n\nFramework file not found in repo.';
-
   const entries = await listPegRecords(session.tenantId, session.userId, session.authMode);
   const timeline = groupPegByDate(entries);
 
@@ -53,14 +40,6 @@ export default async function PegEvaluationPage() {
           Hero-style combo check · max P/E at target PEG.
         </p>
       </div>
-
-      <section className="card wide sector-framework-ref">
-        <h2>Framework reference</h2>
-        <p className="muted small">
-          From <code>StockBook/PEG-FRAMEWORK.md</code>
-        </p>
-        <MarkdownView content={clipFrameworkIntro(frameworkMd)} />
-      </section>
 
       <PegEvaluationPanel />
 

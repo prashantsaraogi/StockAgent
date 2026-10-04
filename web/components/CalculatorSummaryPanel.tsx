@@ -14,6 +14,11 @@ import {
   type CalculatorTabId,
 } from '@/lib/stock-calculator-tabs';
 import { riskLevelClass } from '@/lib/stock-calculator-framework';
+import {
+  sanitizeStockbookMarkdownForWeb,
+  sanitizeUserFacingAnswer,
+  sanitizeVerdictLabel,
+} from '@/lib/investor-report-format';
 
 export interface CalculatorScenarioRow {
   label: string;
@@ -69,7 +74,7 @@ function MetricTable({
 }) {
   const visible = rows.filter((r) => r.value && r.value !== '—');
   if (visible.length === 0) {
-    return <p className="muted small">No framework data — check StockBook PARAMETERS file.</p>;
+    return <p className="muted small">No valuation data — refresh stock parameters.</p>;
   }
   return (
     <div className="table-wrap">
@@ -143,7 +148,7 @@ function ValuationTab({
             hint: 'Your earnings CAGR assumption',
           },
           {
-            label: 'Framework 5Y fair (base)',
+            label: '5Y fair value (base case)',
             value:
               snapshot.framework5yFairPrice != null
                 ? fmtInr(snapshot.framework5yFairPrice)
@@ -294,7 +299,7 @@ function ForwardGrowthTab({
           <div className="calc-cagr-box">
             <span className="calc-cagr-label">Possible CAGR</span>
             <strong>{fmtPct(cagrGap.possibleCagrPct)}</strong>
-            <span className="muted small">Framework conservative</span>
+            <span className="muted small">Conservative case</span>
           </div>
           <div className="calc-cagr-gap-arrow" aria-hidden>
             <span className="calc-gap-pp">
@@ -325,7 +330,7 @@ function ForwardGrowthTab({
           { label: 'Volume CAGR (forward)', value: fwd.volumeCagr },
           { label: 'Acceptable 5Y return?', value: fwd.forwardVerdict },
           {
-            label: 'Framework base EPS CAGR',
+            label: 'Base EPS CAGR (model)',
             value:
               cagrGap.frameworkBaseEpsCagrPct != null
                 ? fmtPct(cagrGap.frameworkBaseEpsCagrPct)
@@ -439,7 +444,7 @@ function ProfitabilityTab({ quality }: Pick<CalculatorSummaryProps, 'quality'>) 
         rows={[
           { label: 'Buffett ROE gate (≥15%)', value: roePass },
           {
-            label: 'Base EPS CAGR (framework)',
+            label: 'Base EPS CAGR (model)',
             value: quality.baseEpsCagrRange ?? (quality.baseEpsCagrPct != null ? fmtPct(quality.baseEpsCagrPct) : null),
           },
           {
@@ -471,7 +476,7 @@ function EntryApproachTab({
     <>
       {frameworkVerdict && (
         <p className="calc-framework-verdict">
-          <strong>Calculator verdict:</strong> {frameworkVerdict}
+          <strong>Calculator verdict:</strong> {sanitizeVerdictLabel(frameworkVerdict)}
         </p>
       )}
       <MetricTable
@@ -493,7 +498,7 @@ function EntryApproachTab({
         <div className="calc-approach-excerpt">
           <h3 className="calc-scenario-title">StockBook suggested approach</h3>
           <div className="calc-report-prose">
-            <MarkdownView content={entry.approachExcerpt} />
+            <MarkdownView content={sanitizeStockbookMarkdownForWeb(entry.approachExcerpt)} />
           </div>
         </div>
       )}
@@ -511,13 +516,13 @@ export function CalculatorSummaryPanel(props: CalculatorSummaryProps) {
           <h2>Analysis — {props.stockName}</h2>
           {props.reportMode && (
             <span className={`tag ${props.reportMode === 'gemini' ? 'verdict' : ''}`}>
-              {props.reportMode === 'gemini' ? 'Framework + Gemini' : 'Framework core'}
+              {props.reportMode === 'gemini' ? 'Enhanced narrative' : 'Core model'}
             </span>
           )}
         </div>
         {props.frameworkVerdict && (
           <p className="calc-framework-verdict">
-            <strong>Framework verdict:</strong> {props.frameworkVerdict}
+            <strong>Verdict:</strong> {sanitizeVerdictLabel(props.frameworkVerdict)}
           </p>
         )}
       </div>
@@ -553,13 +558,9 @@ export function CalculatorSummaryPanel(props: CalculatorSummaryProps) {
 
       {props.report && (
         <details className="calc-full-report">
-          <summary>Full framework report (markdown)</summary>
-          <p className="muted small calc-report-note">
-            Structured per Ask Agent rules — Framework lens · Context · Analysis · Verdict ·
-            Quotes. Not generic AI stock chat.
-          </p>
+          <summary>Full written report</summary>
           <div className="calc-report-prose">
-            <MarkdownView content={props.report} />
+            <MarkdownView content={sanitizeUserFacingAnswer(props.report ?? '')} />
           </div>
         </details>
       )}

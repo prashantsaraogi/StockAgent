@@ -1,7 +1,5 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
-import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
-import { MarkdownView } from '@/components/MarkdownView';
 import { EarningsQualityPanel } from '@/components/EarningsQualityPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
@@ -9,13 +7,6 @@ import {
   groupEarningsQualityByDate,
   listEarningsQualityRecords,
 } from '@/lib/earnings-quality-history';
-
-function clipFrameworkIntro(md: string): string {
-  const lines = md.split('\n');
-  const end = lines.findIndex((l, i) => i > 15 && /^## Four sections/.test(l));
-  const slice = end > 0 ? lines.slice(0, end) : lines.slice(0, 40);
-  return slice.join('\n').trim();
-}
 
 function formatTime(iso: string): string {
   try {
@@ -32,10 +23,6 @@ function formatTime(iso: string): string {
 
 export default async function EarningsQualityPage() {
   const session = await requireSession();
-  const frameworkMd =
-    (await loadFrameworkMarkdown('StockBook/EARNINGS-QUALITY-FRAMEWORK.md')) ??
-    '# Earnings Quality\n\nFramework file not found in repo.';
-
   const entries = await listEarningsQualityRecords(
     session.tenantId,
     session.userId,
@@ -62,14 +49,6 @@ export default async function EarningsQualityPage() {
           <strong>D Quarterly trend</strong> (8 quarters + auto ↑ → ↓).
         </p>
       </div>
-
-      <section className="card wide sector-framework-ref">
-        <h2>Framework reference</h2>
-        <p className="muted small">
-          From <code>StockBook/EARNINGS-QUALITY-FRAMEWORK.md</code>
-        </p>
-        <MarkdownView content={clipFrameworkIntro(frameworkMd)} />
-      </section>
 
       <EarningsQualityPanel />
 

@@ -1,7 +1,5 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
-import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
-import { MarkdownView } from '@/components/MarkdownView';
 import { PeEvaluationPanel } from '@/components/PeEvaluationPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
@@ -9,13 +7,6 @@ import {
   groupPeEvaluationByDate,
   listPeEvaluationRecords,
 } from '@/lib/pe-evaluation-history';
-
-function clipFrameworkIntro(md: string, stopHeading: RegExp): string {
-  const lines = md.split('\n');
-  const end = lines.findIndex((l, i) => i > 20 && stopHeading.test(l));
-  const slice = end > 0 ? lines.slice(0, end) : lines.slice(0, 55);
-  return slice.join('\n').trim();
-}
 
 function formatTime(iso: string): string {
   try {
@@ -34,11 +25,8 @@ function fmtPe(n: number | null): string {
   return `${n.toFixed(1)}×`;
 }
 
-export default async function PeEvaluationFrameworkPage() {
+export default async function PeEvaluationPage() {
   const session = await requireSession();
-  const scorecardMd =
-    (await loadFrameworkMarkdown('StockBook/PE-EVALUATION-FRAMEWORK.md')) ??
-    '# PE Evaluation Framework\n\nFramework file not found in repo.';
 
   const entries = await listPeEvaluationRecords(
     session.tenantId,
@@ -52,36 +40,27 @@ export default async function PeEvaluationFrameworkPage() {
       <header className="page-header">
         <h1>{STOCK_ANALYSIS_TITLE}</h1>
         <p className="muted">
-          Stock Valuation Scorecard — private to <strong>{session.email}</strong>.
-          Inputs: stock + purchase price + purchase date. Each run saved to your history.
+          P/E scorecard — private to <strong>{session.email}</strong>. Inputs: stock + purchase
+          price + purchase date. Each run saved to your history.
         </p>
         <StockCalculatorSubNav />
       </header>
 
       <div className="journal-section-intro card wide">
-        <h2 className="journal-section-title">PE Evaluation Framework</h2>
+        <h2 className="journal-section-title">P/E evaluation</h2>
         <p className="muted small">
           <strong>Part A</strong> — was purchase P/E cheap or expensive ·{' '}
           <strong>Part B</strong> — EPS growth + P/E compression ·{' '}
-          <strong>Part C</strong> — 8-point scorecard at today&apos;s CMP (ignore anchor).
+          <strong>Part C</strong> — 8-point scorecard at today&apos;s CMP.
         </p>
       </div>
-
-      <section className="card wide sector-framework-ref">
-        <h2>Framework reference</h2>
-        <p className="muted small">
-          From <code>StockBook/PE-EVALUATION-FRAMEWORK.md</code> · cross-ref{' '}
-          <code>PARAMETERS-FRAMEWORK.md</code>
-        </p>
-        <MarkdownView content={clipFrameworkIntro(scorecardMd, /^## Part A/)} />
-      </section>
 
       <PeEvaluationPanel />
 
       {entries.length === 0 ? (
         <section className="card wide">
           <p className="muted">
-            No PE scorecard runs yet. Enter a stock above — history appears here by date.
+            No P/E scorecard runs yet. Enter a stock above — history appears here by date.
           </p>
         </section>
       ) : (

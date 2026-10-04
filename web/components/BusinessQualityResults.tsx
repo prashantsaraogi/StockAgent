@@ -123,7 +123,7 @@ export function BusinessQualityResults({ data, recordId, savedAt }: BusinessQual
             <div className="pe-eval-metric">
               <span className="pe-eval-label">Pillars scored</span>
               <strong>{data.pillars.filter((p) => p.score10 != null).length}/7</strong>
-              <span className="muted small">Seven-factor framework</span>
+              <span className="muted small">Seven-factor scorecard</span>
             </div>
             <div className="pe-eval-metric">
               <span className="pe-eval-label">Green factors</span>

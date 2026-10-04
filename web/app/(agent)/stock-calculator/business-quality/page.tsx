@@ -1,7 +1,5 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
-import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
-import { MarkdownView } from '@/components/MarkdownView';
 import { BusinessQualityPanel } from '@/components/BusinessQualityPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
@@ -9,13 +7,6 @@ import {
   groupBusinessQualityByDate,
   listBusinessQualityRecords,
 } from '@/lib/business-quality-history';
-
-function clipFrameworkIntro(md: string): string {
-  const lines = md.split('\n');
-  const end = lines.findIndex((l, i) => i > 15 && /^## Seven pillars/.test(l));
-  const slice = end > 0 ? lines.slice(0, end) : lines.slice(0, 45);
-  return slice.join('\n').trim();
-}
 
 function formatTime(iso: string): string {
   try {
@@ -31,10 +22,6 @@ function formatTime(iso: string): string {
 
 export default async function BusinessQualityPage() {
   const session = await requireSession();
-  const frameworkMd =
-    (await loadFrameworkMarkdown('StockBook/BUSINESS-QUALITY-MOAT-FRAMEWORK.md')) ??
-    '# Business Quality & Moat\n\nFramework file not found.';
-
   const entries = await listBusinessQualityRecords(
     session.tenantId,
     session.userId,
@@ -60,14 +47,6 @@ export default async function BusinessQualityPage() {
           pricing power · industry runway · capital efficiency · management · reinvestment.
         </p>
       </div>
-
-      <section className="card wide sector-framework-ref">
-        <h2>Framework reference</h2>
-        <p className="muted small">
-          From <code>StockBook/BUSINESS-QUALITY-MOAT-FRAMEWORK.md</code>
-        </p>
-        <MarkdownView content={clipFrameworkIntro(frameworkMd)} />
-      </section>
 
       <BusinessQualityPanel />
 

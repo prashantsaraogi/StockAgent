@@ -11,10 +11,10 @@ import { MarginAnalysisResults } from '@/components/MarginAnalysisResults';
 import { BusinessQualityResults } from '@/components/BusinessQualityResults';
 import { RiskDecisionResults } from '@/components/RiskDecisionResults';
 import { MarkdownView } from '@/components/MarkdownView';
-import { toInvestorFacingReport } from '@/lib/investor-report-format';
+import { sanitizeUserFacingAnswer, sanitizeVerdictLabel } from '@/lib/investor-report-format';
 
 export type FullResultTabId =
-  | 'framework'
+  | 'report'
   | 'overview'
   | 'cagr'
   | 'pe'
@@ -60,12 +60,12 @@ export function StockCalculatorFullResults({
 }: StockCalculatorFullResultsProps) {
   const defaultTab: FullResultTabId =
     initialTab ??
-    (preferFrameworkTab && analysis.frameworkReport?.markdown ? 'framework' : 'overview');
+    (preferFrameworkTab && analysis.frameworkReport?.markdown ? 'report' : 'overview');
   const [activeTab, setActiveTab] = useState<FullResultTabId>(defaultTab);
   const c = analysis.cagr;
 
   const tabs: { id: FullResultTabId; label: string }[] = analysis.frameworkReport?.markdown
-    ? [{ id: 'framework', label: 'Framework report' }, ...MODULE_TABS]
+    ? [{ id: 'report', label: 'Investment view' }, ...MODULE_TABS]
     : MODULE_TABS;
 
   const overviewModules: {
@@ -127,12 +127,13 @@ export function StockCalculatorFullResults({
           <span className="muted">({analysis.ticker})</span>
         </h2>
         {analysis.frameworkReport?.oneLineVerdict && (
-          <p className="calc-full-one-line">{analysis.frameworkReport.oneLineVerdict}</p>
+          <p className="calc-full-one-line">
+            {sanitizeVerdictLabel(analysis.frameworkReport.oneLineVerdict)}
+          </p>
         )}
         <p className="muted small">
           {analysis.sector} · {analysis.inputs.expectedCagrPct}% CAGR · {analysis.inputs.years}Y ·{' '}
           {analysis.inputs.peBasis === 'forward' ? 'Forward' : 'TTM'} P/E
-          {analysis.frameworkReport?.reportMode === 'gemini' && ' · Gemini synthesis (Analysis section)'}
           {savedAt &&
             ` · ${new Date(savedAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })} IST`}
         </p>
@@ -151,10 +152,10 @@ export function StockCalculatorFullResults({
         </nav>
       </section>
 
-      {activeTab === 'framework' && analysis.frameworkReport?.markdown && (
+      {activeTab === 'report' && analysis.frameworkReport?.markdown && (
         <section className="card wide calc-full-framework-report">
           <MarkdownView
-            content={toInvestorFacingReport(analysis.frameworkReport.markdown)}
+            content={sanitizeUserFacingAnswer(analysis.frameworkReport.markdown)}
             headingAnchors
           />
         </section>

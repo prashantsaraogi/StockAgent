@@ -7,6 +7,7 @@ import { MarkdownView } from '@/components/MarkdownView';
 import { ProsePanel } from '@/components/ProsePanel';
 import { marketCapBucketLabel } from '@/lib/market-cap';
 import { stockbookPath } from '@/lib/navigation';
+import { sanitizeUserFacingAnswer } from '@/lib/investor-report-format';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -49,21 +50,19 @@ export default async function JournalAnalysisDetailPage({ params }: Props) {
         <h2>Your question</h2>
         <MarkdownView content={entry.query} />
 
-        <h2 className="mt-section">Framework answer</h2>
-        <MarkdownView content={entry.answer} />
+        <h2 className="mt-section">Answer</h2>
+        <MarkdownView content={sanitizeUserFacingAnswer(entry.answer)} />
       </ProsePanel>
 
       {entry.stockName && entry.sector && (
         <section className="card">
-          <h3>Framework reference (read-only)</h3>
-          <p className="muted small">
-            Shared StockBook research files — not your personal log.
-          </p>
+          <h3>Stock research files</h3>
+          <p className="muted small">Saved analysis for this company in StockBook.</p>
           <Link
             href={stockbookPath(entry.sector, entry.stockName, 'summary')}
             className="card-link"
           >
-            Open {entry.stockName} framework files →
+            Open {entry.stockName} in StockBook →
           </Link>
         </section>
       )}

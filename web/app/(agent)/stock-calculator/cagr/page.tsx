@@ -35,7 +35,7 @@ export default async function CagrEvaluationPage() {
       <header className="page-header">
         <h1>{STOCK_ANALYSIS_TITLE}</h1>
         <p className="muted">
-          Framework-backed what-if tools — private to <strong>{session.email}</strong>.{' '}
+          CAGR what-if tools — private to <strong>{session.email}</strong>.{' '}
           <strong>Not linked</strong> to <Link href="/portfolio">Portfolio</Link> holdings.
         </p>
         <StockCalculatorSubNav />
@@ -44,7 +44,7 @@ export default async function CagrEvaluationPage() {
       <div className="journal-section-intro card wide">
         <h2 className="journal-section-title">CAGR Evaluation</h2>
         <p className="muted small">
-          Project exit value from expected CAGR, anchor P/E, and framework quality / risk haircuts.
+          Project exit value from expected CAGR, anchor P/E, and quality / risk adjustments.
           For all six modules at once, use{' '}
           <Link href="/stock-calculator">Analyze</Link> (basic or advanced). History: year → month → date (IST).
         </p>

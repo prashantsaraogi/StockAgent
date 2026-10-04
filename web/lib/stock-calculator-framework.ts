@@ -328,10 +328,10 @@ export function computeCagrGapAnalysis(input: {
       gapVerdict = `Room to spare — framework supports up to ~${possibleCagrPct.toFixed(1)}% vs your ${expectedCagrPct}% expectation (+${cagrGapPp.toFixed(1)} pp headroom).`;
       gapTone = 'positive';
     } else if (cagrGapPp >= -2) {
-      gapVerdict = `Aligned — your ${expectedCagrPct}% expectation is near framework possible ~${possibleCagrPct.toFixed(1)}% (${cagrGapPp >= 0 ? '+' : ''}${cagrGapPp.toFixed(1)} pp).`;
+      gapVerdict = `Aligned — your ${expectedCagrPct}% expectation is near supported ~${possibleCagrPct.toFixed(1)}% (${cagrGapPp >= 0 ? '+' : ''}${cagrGapPp.toFixed(1)} pp).`;
       gapTone = 'neutral';
     } else {
-      gapVerdict = `Stretched expectation — your ${expectedCagrPct}% exceeds framework possible ~${possibleCagrPct.toFixed(1)}% by ${Math.abs(cagrGapPp).toFixed(1)} pp (stress haircut up to ${stressHaircut.toFixed(1)} pp).`;
+      gapVerdict = `Stretched expectation — your ${expectedCagrPct}% exceeds supported ~${possibleCagrPct.toFixed(1)}% by ${Math.abs(cagrGapPp).toFixed(1)} pp (stress haircut up to ${stressHaircut.toFixed(1)} pp).`;
       gapTone = 'negative';
     }
   }

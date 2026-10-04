@@ -7,6 +7,7 @@ import {
 } from '@/lib/sector-score-parser';
 import { ProseContent } from '@/components/ProsePanel';
 import { SectorScorePanel } from '@/components/SectorScorePanel';
+import { sanitizeStockbookMarkdownForWeb } from '@/lib/investor-report-format';
 
 interface Props {
   searchParams: Promise<{ file?: string }>;
@@ -39,7 +40,10 @@ export default async function IndustryViewPage({ searchParams }: Props) {
         <SectorScorePanel sectorLabel={title} filePath={file} score={score} />
       )}
 
-      <ProseContent content={content} badge={file} title={score ? 'Full outlook' : undefined} />
+      <ProseContent
+        content={sanitizeStockbookMarkdownForWeb(content)}
+        title={score ? 'Full outlook' : undefined}
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { requireSession } from '@/lib/auth';
 import { getCalculatorRecord } from '@/lib/stock-calculator-history';
 import { CalculatorSummaryPanel } from '@/components/CalculatorSummaryPanel';
+import { sanitizeVerdictLabel } from '@/lib/investor-report-format';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 
 interface Props {
@@ -48,9 +49,11 @@ export default async function CagrEvaluationDetailPage({ params }: Props) {
           <span className="tag">CMP ₹{entry.cmp.toLocaleString('en-IN')}</span>
           <span className="tag">{entry.anchorPe.toFixed(1)}× anchor P/E</span>
           {entry.frameworkVerdict && (
-            <span className="tag verdict">{entry.frameworkVerdict.split('—')[0].trim()}</span>
+            <span className="tag verdict">
+              {sanitizeVerdictLabel(entry.frameworkVerdict.split('—')[0].trim())}
+            </span>
           )}
-          {entry.reportMode === 'gemini' && <span className="tag">Framework + Gemini</span>}
+          {entry.reportMode === 'gemini' && <span className="tag">Enhanced narrative</span>}
           {entry.manualPeOverride != null && (
             <span className="tag warn">Manual {entry.manualPeOverride}×</span>
           )}
@@ -89,7 +92,7 @@ export default async function CagrEvaluationDetailPage({ params }: Props) {
       )}
 
       <p className="footer-note muted small">
-        Private to {session.email} · ID <code>{entry.id.slice(0, 8)}…</code> · Framework-first
+        Private to {session.email} · ID <code>{entry.id.slice(0, 8)}…</code>
         report (not generic AI)
       </p>
     </div>

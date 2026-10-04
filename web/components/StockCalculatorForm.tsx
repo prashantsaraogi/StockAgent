@@ -128,7 +128,7 @@ export function StockCalculatorForm() {
         <h2>New calculation</h2>
         <p className="muted small">
           Standalone what-if — pulls ROE, leverage, EBITDA, cash flow, and risk registers from
-          StockBook framework. Not linked to Portfolio.
+          Standalone what-if — not linked to Portfolio.
         </p>
 
         <form onSubmit={submit} className="holding-form calculator-form">
@@ -187,7 +187,7 @@ export function StockCalculatorForm() {
                 onChange={(e) => setExpectedCagr(e.target.value)}
                 required
               />
-              <span className="field-hint muted small">Compared vs framework possible CAGR</span>
+              <span className="field-hint muted small">Compared vs model-supported CAGR</span>
             </div>
 
             <div className="form-row">

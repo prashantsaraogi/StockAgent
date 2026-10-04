@@ -30,7 +30,7 @@ export default async function HomePage() {
         </section>
         <section className="card">
           <h3>Ask Agent</h3>
-          <p className="muted small">Framework-backed analysis.</p>
+          <p className="muted small">Stock analysis and journal.</p>
           <Link href="/chat" className="card-link">
             Start chat →
           </Link>

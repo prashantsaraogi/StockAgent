@@ -11,7 +11,7 @@ import {
   matchStockQuestionArchetype,
   stockQuestionPlaybookForAgent,
 } from '@/lib/stock-question-types';
-import { toInvestorFacingReport } from '@/lib/investor-report-format';
+import { sanitizeUserFacingAnswer } from '@/lib/investor-report-format';
 
 export interface AgentQueryContext {
   tenantId: string;
@@ -313,7 +313,7 @@ Run Stock Analysis → **Basic** or retry Ask Agent with Gemini configured for P
 
 ---
 
-*Framework applied in background. Your question: ${query}*
+*Your question: ${query}*
 `;
 }
 
@@ -392,22 +392,24 @@ export async function runFrameworkQuery(
   try {
     const geminiAnswer = await callGemini(system, userPrompt);
     if (geminiAnswer) {
-      answer = toInvestorFacingReport(geminiAnswer);
+      answer = sanitizeUserFacingAnswer(geminiAnswer);
       mode = 'gemini';
       model = process.env.GEMINI_MODEL ?? 'gemini-3.6-flash';
     } else {
-      answer = localFrameworkAnswer(query, {
-        holdings,
-        stockCtx,
-        isBuyQuery,
-        quoteSnippet,
-        ticker: context.ticker,
-        stockName: context.stockName,
-      });
+      answer = sanitizeUserFacingAnswer(
+        localFrameworkAnswer(query, {
+          holdings,
+          stockCtx,
+          isBuyQuery,
+          quoteSnippet,
+          ticker: context.ticker,
+          stockName: context.stockName,
+        })
+      );
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'LLM error';
-    answer =
+    answer = sanitizeUserFacingAnswer(
       localFrameworkAnswer(query, {
         holdings,
         stockCtx,
@@ -415,7 +417,8 @@ export async function runFrameworkQuery(
         quoteSnippet,
         ticker: context.ticker,
         stockName: context.stockName,
-      }) + `\n\n> **Note:** ${msg}`;
+      }) + `\n\n> **Note:** ${msg}`
+    );
   }
 
   await writeAgentInbox(context.tenantId, query, answer);

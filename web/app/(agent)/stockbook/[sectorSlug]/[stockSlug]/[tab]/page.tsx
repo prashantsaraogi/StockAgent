@@ -6,6 +6,10 @@ import { StockSubNav } from '@/components/StockSubNav';
 import { MarkdownView, HtmlReportView } from '@/components/MarkdownView';
 import { ProsePanel } from '@/components/ProsePanel';
 import { ChatPanel } from '@/components/ChatPanel';
+import {
+  sanitizeStockbookHtmlForWeb,
+  sanitizeStockbookMarkdownForWeb,
+} from '@/lib/investor-report-format';
 import type { StockbookTabId } from '@/lib/navigation';
 import { STOCKBOOK_TABS } from '@/lib/navigation';
 
@@ -41,12 +45,12 @@ export default async function StockDetailPage({ params }: Props) {
         <ProsePanel className="stock-content">
           {file ? (
             file.type === 'html' ? (
-              <HtmlReportView html={file.content} title={file.filename} />
+              <HtmlReportView
+                html={sanitizeStockbookHtmlForWeb(file.content)}
+                title="Investor report"
+              />
             ) : (
-              <>
-                <p className="file-badge">{file.filename}</p>
-                <MarkdownView content={file.content} />
-              </>
+              <MarkdownView content={sanitizeStockbookMarkdownForWeb(file.content)} />
             )
           ) : (
             <div className="empty-state">

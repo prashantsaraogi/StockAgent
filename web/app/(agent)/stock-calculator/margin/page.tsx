@@ -1,18 +1,9 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
-import { loadFrameworkMarkdown } from '@/lib/load-framework-markdown';
-import { MarkdownView } from '@/components/MarkdownView';
 import { MarginAnalysisPanel } from '@/components/MarginAnalysisPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
 import { groupMarginByDate, listMarginRecords } from '@/lib/margin-history';
-
-function clipFrameworkIntro(md: string): string {
-  const lines = md.split('\n');
-  const end = lines.findIndex((l, i) => i > 15 && /^## Four parts/.test(l));
-  const slice = end > 0 ? lines.slice(0, end) : lines.slice(0, 40);
-  return slice.join('\n').trim();
-}
 
 function formatTime(iso: string): string {
   try {
@@ -28,10 +19,6 @@ function formatTime(iso: string): string {
 
 export default async function MarginAnalysisPage() {
   const session = await requireSession();
-  const frameworkMd =
-    (await loadFrameworkMarkdown('StockBook/MARGIN-FRAMEWORK.md')) ??
-    '# Margin Analysis\n\nFramework file not found in repo.';
-
   const entries = await listMarginRecords(session.tenantId, session.userId, session.authMode);
   const timeline = groupMarginByDate(entries);
 
@@ -53,14 +40,6 @@ export default async function MarginAnalysisPage() {
           <strong>C Drivers &amp; pass-through</strong> · <strong>D Quarterly trend</strong>.
         </p>
       </div>
-
-      <section className="card wide sector-framework-ref">
-        <h2>Framework reference</h2>
-        <p className="muted small">
-          From <code>StockBook/MARGIN-FRAMEWORK.md</code>
-        </p>
-        <MarkdownView content={clipFrameworkIntro(frameworkMd)} />
-      </section>
 
       <MarginAnalysisPanel />
 

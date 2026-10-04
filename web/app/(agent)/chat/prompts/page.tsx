@@ -7,7 +7,7 @@ export default function PromptGuidelinesPage() {
       <header className="page-header">
         <h1>Prompt Guidelines</h1>
         <p className="muted">
-          Copy-paste prompts the framework understands — buy/add, PCCL, news, risk, portfolio, and
+          Copy-paste prompts for buy/add, PCCL, news, risk, portfolio, and
           morning runs.
         </p>
         <ChatSubNav />

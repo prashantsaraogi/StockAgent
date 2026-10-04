@@ -28,7 +28,7 @@ export default async function PeEvaluationDetailPage({ params }: Props) {
   return (
     <div className="page page-prose">
       <Link href="/stock-calculator/pe" className="back-link">
-        ← PE Evaluation Framework
+        ← P/E evaluation
       </Link>
 
       <header className="page-header">

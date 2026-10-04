@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { MarkdownView } from './MarkdownView';
 import { createSessionId } from '@/lib/session-id';
 import { STOCK_QUICK_QUESTIONS } from '@/lib/stock-question-types';
+import { sanitizeUserFacingAnswer } from '@/lib/investor-report-format';
 import {
   clearStockChatThread,
   loadStockChatThread,
@@ -178,8 +179,7 @@ export function ChatPanel({
           <div className="chat-empty">
             <p>
               Type a <strong>stock name</strong> (even one word, e.g. <strong>ITC</strong>) for a full
-              investment view — position, valuation, and what to do. Framework rules run in the
-              background.
+              investment view — position, valuation, and what to do.
             </p>
             <ul>
               <li>Uses your holdings, StockBook, and live CMP where available</li>
@@ -208,8 +208,7 @@ export function ChatPanel({
               </div>
             )}
             <p className="chat-empty-link">
-              <a href="/chat/prompts">Prompt Guidelines →</a> ·{' '}
-              <a href="/readme/documentation/stock-question-framework">Stock question framework</a>
+              <a href="/chat/prompts">Prompt library →</a>
             </p>
           </div>
         )}
@@ -217,7 +216,11 @@ export function ChatPanel({
           <div key={i} className={`chat-bubble ${msg.role}`}>
             {msg.role === 'agent' ? (
               <>
-                <MarkdownView content={msg.text} />
+                <MarkdownView
+                  content={
+                    msg.role === 'agent' ? sanitizeUserFacingAnswer(msg.text) : msg.text
+                  }
+                />
                 {msg.meta?.analysisType === 'stock-full' && (
                   <p className="muted small chat-meta">Full stock analysis · modules + StockBook</p>
                 )}

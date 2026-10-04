@@ -1,5 +1,5 @@
 /**
- * Agent Services catalog — refresh jobs, daily maintenance, and framework prompts.
+ * Agent Services catalog — refresh jobs, daily maintenance, and analysis prompts.
  * One-click API actions vs copy-paste prompts for Cursor / Ask Agent.
  */
 
@@ -262,7 +262,7 @@ Read today's summary.md · add material tickers · cross-ref portfolio holdings 
       {
         id: 'morning-a',
         categoryId: 'news-daily',
-        title: 'Morning framework — Variant A (early IST)',
+        title: 'Morning run — Variant A (early IST)',
         description: 'Full morning sequence: news + scripts + surplus brief (Cursor).',
         cadence: 'daily',
         actionType: 'prompt',
@@ -283,7 +283,7 @@ No TRIM/SELL. Persist to files — not chat only.`,
       {
         id: 'morning-b',
         categoryId: 'news-daily',
-        title: 'Morning framework — Variant B (post-close)',
+        title: 'Morning run — Variant B (post-close)',
         description: 'Full calendar-day news pass — Bucket C post-close priority.',
         cadence: 'daily',
         actionType: 'prompt',
@@ -471,7 +471,7 @@ Compare latest month + 3–6 month trend. Label FACT vs UNVERIFIED.`,
         channel: 'both',
         href: '/portfolio',
         hrefLabel: 'Portfolio',
-        prompt: `I have ₹{AMOUNT} salary surplus this month — where should it go per framework rank?
+        prompt: `I have ₹{AMOUNT} salary surplus this month — where should it go per surplus rank?
 
 Read quadrant-map · latest News · PCCL gaps · pause registry. Top 3 names with % split.
 No sell-to-rotate.`,
@@ -652,7 +652,7 @@ Run Stock Analysis → PEG tab to verify scorecard + 100-pt total.`,
         categoryId: 'stock-calculator',
         title: 'Ask Agent — stock by name',
         description:
-          'Type a stock name on `/chat` (even one word). Full investor report; same engine as Basic Analysis — framework hidden.',
+          'Type a stock name on `/chat` (even one word). Full investor report — same output as Stock Analysis Basic mode.',
         cadence: 'on-demand',
         actionType: 'link',
         href: '/chat',
@@ -664,7 +664,7 @@ Run Stock Analysis → PEG tab to verify scorecard + 100-pt total.`,
         categoryId: 'stock-calculator',
         title: 'Analyze stock — basic or advanced (6 modules)',
         description:
-          'Stock Analysis home: **Basic** = stock name only → **Framework report** (narrative: PCCL, discipline, quotes, position) + 6 modules. **Advanced** = custom P/E + CAGR.',
+          'Stock Analysis home: **Basic** = stock name only → **Investment view** (PCCL, discipline, quotes, position) + 6 modules. **Advanced** = custom P/E + CAGR.',
         cadence: 'on-demand',
         actionType: 'link',
         href: '/stock-calculator',

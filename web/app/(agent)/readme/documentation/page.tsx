@@ -11,7 +11,7 @@ export default function DocumentationIndexPage() {
       <header className="page-header">
         <h1>Documentation</h1>
         <p className="muted">
-          Index of framework and web app docs — <strong>{totalDocs}</strong> articles with
+          Help and reference docs — <strong>{totalDocs}</strong> articles with
           in-page table of contents on each detail page.
         </p>
         <ReadMeSubNav />
