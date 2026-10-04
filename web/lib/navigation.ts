@@ -3,6 +3,30 @@
  * Login → My Agent (authenticated shell)
  */
 
+/** Grouped hub — journal, services, wisdom, help, prompts */
+export const RESOURCES_HUB_TITLE = 'Resources & Playbook';
+export const RESOURCES_HUB_INTRO =
+  'Daily journal, automated services, investor wisdom, help docs, and copy-paste agent prompts — in one place.';
+
+export const RESOURCES_NAV = [
+  { href: '/resources', label: 'Overview', exact: true as const },
+  { href: '/journal/news', label: 'Journal', matchPrefix: '/journal' },
+  { href: '/services', label: 'Services', matchPrefix: '/services' },
+  { href: '/wisdom', label: 'Wisdom', matchPrefix: '/wisdom' },
+  { href: '/readme', label: 'ReadMe', matchPrefix: '/readme' },
+  { href: '/chat/prompts', label: 'Prompt Guidelines', matchPrefix: '/chat/prompts' },
+] as const;
+
+export function isResourcesSectionPath(pathname: string): boolean {
+  if (pathname === '/resources') return true;
+  return RESOURCES_NAV.some(
+    (item) =>
+      'matchPrefix' in item &&
+      item.matchPrefix &&
+      pathname.startsWith(item.matchPrefix)
+  );
+}
+
 /** Journal sub-tabs — daily news archive + Ask Agent history */
 export const JOURNAL_NAV = [
   { href: '/journal/news', label: 'Daily News' },
@@ -31,13 +55,9 @@ export const MAIN_NAV = [
   { href: '/home', label: 'Dashboard', icon: '⌂' },
   { href: '/portfolio', label: 'Portfolio', icon: '◧' },
   { href: '/stock-calculator', label: STOCK_ANALYSIS_TITLE, icon: '⊕' },
-  { href: '/journal', label: 'Journal', icon: '▤' },
   { href: '/industry-analysis', label: 'Industry Growth', icon: '◫' },
-  { href: '/services', label: 'Services', icon: '⚙' },
-  { href: '/wisdom', label: 'Wisdom', icon: '“' },
-  { href: '/readme', label: 'ReadMe', icon: 'ℹ' },
+  { href: '/resources', label: RESOURCES_HUB_TITLE, icon: '▦' },
   { href: '/chat', label: 'Ask Agent', icon: '◉' },
-  { href: '/chat/prompts', label: 'Prompt Guidelines', icon: '▣' },
 ] as const;
 
 /** StockBook file tabs — matches StockBook/AGENT-RULES.md read order + report */

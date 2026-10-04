@@ -1,5 +1,5 @@
+import Link from 'next/link';
 import { ChatPanel } from '@/components/ChatPanel';
-import { ChatSubNav } from '@/components/ChatSubNav';
 import { ProsePanel } from '@/components/ProsePanel';
 
 export default function ChatPage() {
@@ -9,9 +9,10 @@ export default function ChatPage() {
         <h1>Ask Agent</h1>
         <p className="muted">
           Type a stock name or a question — you get a clear investment view; discipline and PCCL run
-          behind the scenes.
+          behind the scenes.{' '}
+          <Link href="/chat/prompts">Prompt Guidelines</Link> live under{' '}
+          <Link href="/resources">Resources &amp; Playbook</Link>.
         </p>
-        <ChatSubNav />
       </header>
       <ProsePanel className="chat-panel-wrap">
         <ChatPanel />

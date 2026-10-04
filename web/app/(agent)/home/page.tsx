@@ -36,10 +36,10 @@ export default async function HomePage() {
           </Link>
         </section>
         <section className="card">
-          <h3>Journal</h3>
-          <p className="muted small">Daily news and Ask Agent history.</p>
-          <Link href="/journal/analysis" className="card-link">
-            Open Journal →
+          <h3>Resources &amp; Playbook</h3>
+          <p className="muted small">Journal, services, wisdom, help, and prompts.</p>
+          <Link href="/resources" className="card-link">
+            Open hub →
           </Link>
         </section>
       </div>

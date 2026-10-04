@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { BrandLogo } from '@/components/BrandLogo';
-import { MAIN_NAV } from '@/lib/navigation';
+import { isResourcesSectionPath, MAIN_NAV } from '@/lib/navigation';
 
 interface AppShellProps {
   email: string;
@@ -48,10 +48,8 @@ export function AppShell({ email, tenantId, authMode, children }: AppShellProps)
           let active = pathname === item.href;
           if (!active && item.href === '/chat') {
             active = pathname === '/chat';
-          } else if (!active && item.href === '/readme') {
-            active = pathname.startsWith('/readme');
-          } else if (!active && item.href === '/journal') {
-            active = pathname.startsWith('/journal');
+          } else if (!active && item.href === '/resources') {
+            active = isResourcesSectionPath(pathname);
           } else if (!active && item.href === '/stock-calculator') {
             active = pathname.startsWith('/stock-calculator');
           } else if (!active && item.href !== '/home') {

@@ -1277,6 +1277,17 @@ button.stock-quick-q:disabled {
   margin-top: 0.75rem;
 }
 
+.resources-hub-bar {
+  padding: 0.5rem 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-elevated, var(--bg));
+}
+
+.resources-sub-nav {
+  flex-wrap: wrap;
+  margin: 0;
+}
+
 .journal-sub-nav {
   margin-top: 0.75rem;
 }

@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
     '/chat': repoRuntimeTrace,
     '/home': repoRuntimeTrace,
     '/portfolio': repoRuntimeTrace,
+    '/resources': repoRuntimeTrace,
     '/wisdom': repoRuntimeTrace,
     '/readme': repoRuntimeTrace,
     '/readme/documentation': repoRuntimeTrace,

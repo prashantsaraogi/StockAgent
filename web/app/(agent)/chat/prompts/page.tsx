@@ -1,4 +1,4 @@
-import { ChatSubNav } from '@/components/ChatSubNav';
+import Link from 'next/link';
 import { PromptGuidelinesPanel } from '@/components/PromptGuidelinesPanel';
 
 export default function PromptGuidelinesPage() {
@@ -7,10 +7,9 @@ export default function PromptGuidelinesPage() {
       <header className="page-header">
         <h1>Prompt Guidelines</h1>
         <p className="muted">
-          Copy-paste prompts for buy/add, PCCL, news, risk, portfolio, and
-          morning runs.
+          Copy-paste prompts for buy/add, PCCL, news, risk, portfolio, and morning runs.{' '}
+          <Link href="/chat">← Ask Agent</Link>
         </p>
-        <ChatSubNav />
       </header>
       <PromptGuidelinesPanel />
     </div>
