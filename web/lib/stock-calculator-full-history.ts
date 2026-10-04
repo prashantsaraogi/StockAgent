@@ -388,9 +388,6 @@ export async function getFullAnalysisRecord(
   userId?: string,
   authMode?: 'supabase' | 'cookie-dev'
 ): Promise<StockCalculatorFullRecord | null> {
-  const local = (await readIndex(tenantId)).entries.find((e) => e.id === id);
-  if (local) return local;
-
   if (authMode === 'supabase' && userId) {
     const remote = await fetchOneFromSupabase(userId, id);
     if (remote) {
@@ -398,6 +395,10 @@ export async function getFullAnalysisRecord(
       return remote;
     }
   }
+
+  const local = (await readIndex(tenantId)).entries.find((e) => e.id === id);
+  if (local) return local;
+
   return null;
 }
 

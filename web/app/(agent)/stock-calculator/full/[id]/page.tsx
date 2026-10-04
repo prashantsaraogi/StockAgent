@@ -1,14 +1,6 @@
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { requireSession } from '@/lib/auth';
-import { getFullAnalysisRecord } from '@/lib/stock-calculator-full-history';
-import {
-  StockCalculatorFullResults,
-  type FullResultTabId,
-} from '@/components/StockCalculatorFullResults';
-import { StockAnalysisRefreshBar } from '@/components/StockAnalysisRefreshBar';
-import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
-import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
+import { FullAnalysisDetailLoader } from '@/components/FullAnalysisDetailLoader';
+import type { FullResultTabId } from '@/components/StockCalculatorFullResults';
 
 const VALID_TABS = new Set<FullResultTabId>([
   'report',
@@ -27,6 +19,7 @@ interface Props {
 }
 
 export default async function FullAnalysisDetailPage({ params, searchParams }: Props) {
+  await requireSession();
   const { id } = await params;
   const { tab } = await searchParams;
   const tabNorm = tab === 'framework' ? 'report' : tab;
@@ -34,53 +27,6 @@ export default async function FullAnalysisDetailPage({ params, searchParams }: P
     tabNorm && VALID_TABS.has(tabNorm as FullResultTabId)
       ? (tabNorm as FullResultTabId)
       : undefined;
-  const session = await requireSession();
-  const entry = await getFullAnalysisRecord(
-    session.tenantId,
-    id,
-    session.userId,
-    session.authMode
-  );
-  if (!entry) notFound();
 
-  const when = new Date(entry.createdAt).toLocaleString('en-IN', {
-    dateStyle: 'full',
-    timeStyle: 'short',
-  });
-
-  return (
-    <div className="page">
-      <Link href="/stock-calculator" className="back-link">
-        ← {STOCK_ANALYSIS_TITLE}
-      </Link>
-
-      <header className="page-header">
-        <h1>
-          {entry.stockName} ({entry.ticker})
-        </h1>
-        <p className="muted">
-          Full analysis · {when} · {entry.sector}
-        </p>
-        <StockCalculatorSubNav />
-      </header>
-
-      <StockAnalysisRefreshBar
-        recordId={entry.id}
-        ticker={entry.ticker}
-        stockName={entry.stockName}
-        inputs={entry.analysis.inputs}
-        basicAnalysis={entry.analysis.basicAnalysis ?? false}
-        savedAt={entry.createdAt}
-      />
-
-      <StockCalculatorFullResults
-        analysis={entry.analysis}
-        fullRecordId={entry.id}
-        childIds={entry.childIds}
-        savedAt={entry.createdAt}
-        initialTab={initialTab}
-        preferFrameworkTab={entry.analysis.basicAnalysis ?? Boolean(entry.analysis.frameworkReport)}
-      />
-    </div>
-  );
+  return <FullAnalysisDetailLoader recordId={id} initialTab={initialTab} />;
 }

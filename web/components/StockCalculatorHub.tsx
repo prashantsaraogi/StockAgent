@@ -8,6 +8,7 @@ import type { FullAnalysisChildIds } from '@/lib/stock-calculator-full-history';
 import { StockCalculatorFullResults } from '@/components/StockCalculatorFullResults';
 import { StockSearchSuggestions } from '@/components/StockSearchSuggestions';
 import type { StockSearchResult } from '@/lib/stock-search';
+import { writeFullAnalysisSessionCache } from '@/lib/stock-full-analysis-session-cache';
 
 const DEFAULT_CAGR = '12';
 const DEFAULT_YEARS = '5';
@@ -124,7 +125,17 @@ export function StockCalculatorHub() {
       }
 
       const id = data.record?.id as string | undefined;
-      if (id && data.detailPath) {
+      if (id && data.detailPath && data.analysis) {
+        writeFullAnalysisSessionCache({
+          id,
+          createdAt: data.record.createdAt,
+          ticker: data.analysis.ticker,
+          stockName: data.analysis.stockName,
+          sector: data.analysis.sector,
+          childIds: data.record.childIds,
+          analysis: data.analysis,
+          historyPersisted: data.historyPersisted,
+        });
         router.push(data.detailPath as string);
         return;
       }

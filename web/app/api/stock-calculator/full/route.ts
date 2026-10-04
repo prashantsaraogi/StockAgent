@@ -1,8 +1,47 @@
 import { NextResponse } from 'next/server';
 import { getSession, portfolioLotContext } from '@/lib/auth';
 import { runFullStockCalculatorAnalysis } from '@/lib/stock-calculator-full';
-import { saveFullAnalysisRecord } from '@/lib/stock-calculator-full-history';
+import {
+  getFullAnalysisRecord,
+  saveFullAnalysisRecord,
+} from '@/lib/stock-calculator-full-history';
 import type { PeBasis } from '@/lib/stock-calculator-engine';
+
+/** Load one saved full analysis (server history). */
+export async function GET(request: Request) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const recordId = new URL(request.url).searchParams.get('recordId')?.trim();
+  if (!recordId) {
+    return NextResponse.json({ ok: false, error: 'recordId required' }, { status: 400 });
+  }
+
+  const entry = await getFullAnalysisRecord(
+    session.tenantId,
+    recordId,
+    session.userId,
+    session.authMode
+  );
+  if (!entry) {
+    return NextResponse.json({ ok: false, error: 'Not found' }, { status: 404 });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    entry: {
+      id: entry.id,
+      createdAt: entry.createdAt,
+      ticker: entry.ticker,
+      stockName: entry.stockName,
+      sector: entry.sector,
+      childIds: entry.childIds,
+      analysis: entry.analysis,
+    },
+  });
+}
 
 function optionalPositiveNumber(value: unknown): number | null {
   if (value == null || value === '') return null;

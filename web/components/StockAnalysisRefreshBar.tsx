@@ -1,8 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import type { StockCalculatorFullInputs } from '@/lib/stock-calculator-full';
+import { writeFullAnalysisSessionCache } from '@/lib/stock-full-analysis-session-cache';
 
 interface StockAnalysisRefreshBarProps {
   recordId: string;
@@ -24,7 +24,6 @@ export function StockAnalysisRefreshBar({
   purchasePrice,
   purchaseDate,
 }: StockAnalysisRefreshBarProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -60,7 +59,19 @@ export function StockAnalysisRefreshBar({
         setError(data.error ?? 'Refresh failed');
         return;
       }
-      router.refresh();
+      if (data.record?.id && data.analysis) {
+        writeFullAnalysisSessionCache({
+          id: data.record.id,
+          createdAt: data.record.createdAt,
+          ticker: data.analysis.ticker,
+          stockName: data.analysis.stockName,
+          sector: data.analysis.sector,
+          childIds: data.record.childIds,
+          analysis: data.analysis,
+          historyPersisted: data.historyPersisted,
+        });
+      }
+      window.location.reload();
     } catch {
       setError('Network error — try again.');
     } finally {
