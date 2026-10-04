@@ -25,6 +25,8 @@ const TONE_LABEL: Record<ScorecardTone, string> = {
 export interface ScorecardRow {
   check: string;
   tone: ScorecardTone;
+  /** Observable number or metric backing the verdict (not opinion alone). */
+  currentValue: string;
   headline: string;
   bullets: string[];
 }
@@ -58,7 +60,11 @@ export function classifyScorecardTone(verdict: string, check?: string): Scorecar
 }
 
 function stripEmojiPrefix(s: string): string {
-  return s.replace(/^[🟢🟡🟠🔴]\s*/, '').trim();
+  return s.replace(/^[\s\uFFFD🟢🟡🟠🔴]+/, '').trim();
+}
+
+function formatPct1(n: number): string {
+  return `${n.toFixed(1)}%`;
 }
 
 function buildCagrRow(analysis: StockCalculatorFullResult): ScorecardRow {
@@ -86,7 +92,12 @@ function buildCagrRow(analysis: StockCalculatorFullResult): ScorecardRow {
   }
   if (bullets.length === 0) bullets.push(headline);
 
-  return { check: 'CAGR', tone, headline, bullets: bullets.slice(0, 3) };
+  const currentValue =
+    gap.possibleCagrPct != null
+      ? `Supported ~**${formatPct1(gap.possibleCagrPct)}** · your **${analysis.inputs.expectedCagrPct}%** · gap **${formatCagrGapPp(gap.cagrGapPp)}**`
+      : `Hurdle **${analysis.inputs.expectedCagrPct}%** · ${analysis.inputs.years}Y`;
+
+  return { check: 'CAGR', tone, currentValue, headline, bullets: bullets.slice(0, 3) };
 }
 
 function buildPeRow(analysis: StockCalculatorFullResult): ScorecardRow {
@@ -115,7 +126,16 @@ function buildPeRow(analysis: StockCalculatorFullResult): ScorecardRow {
   }
   if (bullets.length === 0) bullets.push(headline);
 
-  return { check: 'P/E', tone, headline, bullets: bullets.slice(0, 3) };
+  let currentValue = '—';
+  if (pe.ttmPe != null) {
+    currentValue =
+      pe.avg10yPe != null
+        ? `TTM **${pe.ttmPe.toFixed(1)}×** · 10Y avg **${pe.avg10yPe.toFixed(1)}×**`
+        : `TTM **${pe.ttmPe.toFixed(1)}×**`;
+    if (pe.cmp != null) currentValue += ` · CMP **₹${Math.round(pe.cmp).toLocaleString('en-IN')}**`;
+  }
+
+  return { check: 'P/E', tone, currentValue, headline, bullets: bullets.slice(0, 3) };
 }
 
 function buildEarningsRow(analysis: StockCalculatorFullResult): ScorecardRow {
@@ -131,7 +151,26 @@ function buildEarningsRow(analysis: StockCalculatorFullResult): ScorecardRow {
   if (headline.toLowerCase().includes('mixed')) {
     bullets.push('Translation from revenue to **reported EPS** is uneven — wait for two clean quarters if adding.');
   }
-  return { check: 'Earnings', tone, headline, bullets: bullets.slice(0, 3) };
+
+  let currentValue = '—';
+  const qs = eq.quarterly ?? [];
+  const latestQ = qs[qs.length - 1];
+  const yoyQ = qs.length >= 5 ? qs[qs.length - 5] : null;
+  if (latestQ?.quarter && latestQ.pat != null && yoyQ?.pat != null && yoyQ.pat !== 0) {
+    const patYoY = ((latestQ.pat - yoyQ.pat) / Math.abs(yoyQ.pat)) * 100;
+    if (latestQ.revenue != null && yoyQ.revenue != null && yoyQ.revenue !== 0) {
+      const revYoY = ((latestQ.revenue - yoyQ.revenue) / Math.abs(yoyQ.revenue)) * 100;
+      currentValue = `${latestQ.quarter}: rev **${revYoY >= 0 ? '+' : ''}${revYoY.toFixed(0)}%** · PAT **${patYoY >= 0 ? '+' : ''}${patYoY.toFixed(0)}%** YoY`;
+    } else {
+      currentValue = `${latestQ.quarter}: PAT **${patYoY >= 0 ? '+' : ''}${patYoY.toFixed(0)}%** YoY`;
+    }
+  } else if (eq.warnings.length) {
+    currentValue = `**${eq.warnings.length}** quality flag(s) in file`;
+  } else if (eq.growth?.[0]?.value) {
+    currentValue = `${eq.growth[0].label}: **${eq.growth[0].value}**`;
+  }
+
+  return { check: 'Earnings', tone, currentValue, headline, bullets: bullets.slice(0, 3) };
 }
 
 function buildMarginRow(analysis: StockCalculatorFullResult): ScorecardRow {
@@ -143,7 +182,24 @@ function buildMarginRow(analysis: StockCalculatorFullResult): ScorecardRow {
   if (headline.toLowerCase().includes('mixed')) {
     bullets.push('Direction unclear — margin recovery must show in **numbers**, not guidance alone.');
   }
-  return { check: 'Margin', tone, headline, bullets: bullets.slice(0, 3) };
+
+  const m = analysis.margin;
+  const ebitdaRow = m.partB?.rows?.find((r) => /ebitda/i.test(r.metric));
+  let currentValue = '—';
+  if (ebitdaRow?.todayPct != null) {
+    currentValue = `EBITDA margin **${formatPct1(ebitdaRow.todayPct)}**`;
+    if (ebitdaRow.avg10yPct != null) {
+      currentValue += ` · 10Y avg **${formatPct1(ebitdaRow.avg10yPct)}**`;
+    }
+    if (ebitdaRow.deltaPp != null) {
+      const d = ebitdaRow.deltaPp;
+      currentValue += ` (**${d >= 0 ? '+' : ''}${d.toFixed(1)} pp** vs avg)`;
+    }
+  } else if (m.partD?.changePp != null) {
+    currentValue = `Latest quarter margin Δ **${m.partD.changePp >= 0 ? '+' : ''}${m.partD.changePp.toFixed(1)} pp**`;
+  }
+
+  return { check: 'Margin', tone, currentValue, headline, bullets: bullets.slice(0, 3) };
 }
 
 function buildBusinessQualityRow(analysis: StockCalculatorFullResult): ScorecardRow {
@@ -162,7 +218,8 @@ function buildBusinessQualityRow(analysis: StockCalculatorFullResult): Scorecard
   } else if (score >= 7) {
     bullets.push('Quality tier supports **long-term hold** lens — still subject to valuation and PCCL.');
   }
-  return { check: 'Business quality', tone, headline, bullets: bullets.slice(0, 3) };
+  const currentValue = `Franchise score **${score}/10**`;
+  return { check: 'Business quality', tone, currentValue, headline, bullets: bullets.slice(0, 3) };
 }
 
 function buildRiskRow(
@@ -183,7 +240,9 @@ function buildRiskRow(
     bullets.push(analysis.riskDecision.concerns.slice(0, 2).join(' · '));
   }
   bullets.push(`Quantitative risk score **${analysis.riskDecision.quantitativeScore100}/100**.`);
-  return { check: 'Risk', tone, headline, bullets: bullets.slice(0, 3) };
+  const t = analysis.riskDecision.thesis;
+  const currentValue = `Score **${analysis.riskDecision.quantitativeScore100}/100** · ${t.valuationLabel} · ${t.riskLabel}`;
+  return { check: 'Risk', tone, currentValue, headline, bullets: bullets.slice(0, 3) };
 }
 
 export function buildInvestorScorecardRows(
@@ -209,13 +268,13 @@ export function buildInvestorScorecardMarkdown(
   const rows = buildInvestorScorecardRows(analysis, riskHeadline, discipline);
 
   const tableLines = rows.map(
-    (r) => `| ${TONE_LABEL[r.tone]} | **${r.check}** | ${r.headline} |`
+    (r) => `| ${TONE_LABEL[r.tone]} | **${r.check}** | ${r.currentValue} | ${r.headline} |`
   );
 
   return `## Scorecard
 
-| | Check | Verdict |
-|:-:|-------|---------|
+| | Check | Current value | Verdict |
+|:-:|-------|---------------|---------|
 ${tableLines.join('\n')}
 
 [What the scorecard colours mean →](/readme/glossary#ask-agent-scorecard-colours)

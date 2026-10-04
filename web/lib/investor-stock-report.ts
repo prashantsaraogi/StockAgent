@@ -258,11 +258,7 @@ export function buildInvestorStockReportMarkdown(parts: InvestorReportParts): st
 `
         : '';
 
-  const declineBlock = declineSection
-    ? `\n---\n\n${declineSection.replace(/^## Q\d+\.[^\n]*\n?/i, '## Why the stock fell\n\n')}\n`
-    : risk.narrativeSummary
-      ? `\n---\n\n## Why cheap / core problem\n\n${clip(risk.narrativeSummary, 900)}\n\n**Watch:** ${risk.thesisBreakers.slice(0, 3).map((t) => t.text).join(' · ') || '—'}\n`
-      : '';
+  const declineBlock = formatEvidenceSectionBlock(declineSection, risk);
 
   const quotes = pickInvestorQuotes(holding != null, discipline != null, c.cagrGap.gapTone);
 
@@ -272,6 +268,10 @@ export function buildInvestorStockReportMarkdown(parts: InvestorReportParts): st
 **CMP:** ${cmp != null ? formatInr(cmp) : '—'} (${cmpSource})
 
 > **One-line:** ${oneLine}
+
+---
+
+${scorecardBlock}
 
 ---
 
@@ -298,6 +298,8 @@ ${risk.thesis.whyNotAggressive ? `\n**Why not add aggressively:** ${clip(risk.th
 
 ${extractCoreProblemBlurb(faq)}
 
+${declineBlock}
+
 ---
 
 ## Valuation & PCCL
@@ -320,12 +322,6 @@ ${disciplineNote}
 
 ---
 
-${scorecardBlock}
-
-${declineBlock}
-
----
-
 ## Quotes
 
 ${quotes.join('\n\n')}
@@ -338,6 +334,25 @@ ${quotes.join('\n\n')}
 
 *Not investment advice.*
 `;
+}
+
+function formatEvidenceSectionBlock(
+  declineSection: string | null,
+  risk: StockCalculatorFullResult['riskDecision']
+): string {
+  if (declineSection) {
+    const body = declineSection.replace(/^## Q\d+\.[^\n]*\n?/i, '').trim();
+    const heading = /\| Strength \| Evidence \|/i.test(body)
+      ? '## Strengths & evidence'
+      : /why did the stock fall|price decline/i.test(declineSection)
+        ? '## Why the stock fell'
+        : '## Thesis evidence';
+    return `\n---\n\n${heading}\n\n${body}\n`;
+  }
+  if (risk.narrativeSummary) {
+    return `\n---\n\n## Why cheap / core problem\n\n${clip(risk.narrativeSummary, 900)}\n\n**Watch:** ${risk.thesisBreakers.slice(0, 3).map((t) => t.text).join(' · ') || '—'}\n`;
+  }
+  return '';
 }
 
 function enrichBusinessQualityReading(
