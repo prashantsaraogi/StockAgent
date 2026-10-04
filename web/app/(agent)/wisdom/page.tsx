@@ -1,4 +1,5 @@
 import { ProseContent } from '@/components/ProsePanel';
+import { sanitizeWisdomMarkdownForWeb } from '@/lib/investor-report-format';
 import { loadWisdomQuotes } from '@/lib/load-wisdom-quotes';
 
 export default async function WisdomPage() {
@@ -9,14 +10,14 @@ export default async function WisdomPage() {
       <header className="page-header">
         <h1>Wisdom</h1>
         <p className="muted">
-          Personal quote lens — cited on PAUSE, WAIT, HOLD cash, and BUY decisions.
+          Timeless quotes for patience, valuation, quality, and when to wait vs act.
         </p>
       </header>
 
       {loaded ? (
-        <ProseContent content={loaded.content} badge={loaded.badge} />
+        <ProseContent content={sanitizeWisdomMarkdownForWeb(loaded.content)} />
       ) : (
-        <p className="muted">Load investor-wisdom/quotes.md to populate.</p>
+        <p className="muted">Quote library is not available on this host yet.</p>
       )}
     </div>
   );

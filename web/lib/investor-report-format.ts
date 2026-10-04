@@ -97,3 +97,25 @@ export function sanitizeStockbookMarkdownForWeb(markdown: string): string {
 export function sanitizeStockbookHtmlForWeb(html: string): string {
   return stripStockbookInternalRefs(stripFrameworkJargon(html));
 }
+
+/**
+ * Wisdom / quotes library on the web — quotes and themes only; agent meta hidden at render time.
+ */
+export function sanitizeWisdomMarkdownForWeb(markdown: string): string {
+  let out = sanitizeStockbookMarkdownForWeb(markdown);
+  out = out.replace(/^# Investor Wisdom — Quotes Library/m, '# Wisdom — Quotes');
+  out = out.replace(/\*\*Project:\*\*[^\n]*\n/g, '');
+  out = out.replace(/\*\*Created:\*\*[^\n]*\n/g, '');
+  out = out.replace(/\*\*Purpose:\*\*[^\n]*\n/g, '');
+  out = out.replace(/\*\*Agent rule:\*\*[^\n]*\n/g, '');
+  out = out.replace(/^## How the agent uses this file\r?\n/m, '## When these themes help\n');
+  out = out.replace(/\*\*Format in chat:\*\*[^\n]*\n/g, '');
+  out = out.replace(/^## Maintenance[\s\S]*$/m, '');
+  out = out.replace(/\*\*Related:\*\*[^\n]*\n/g, '');
+  out = out.replace(/`buy-decision-workflow\.md`/gi, '');
+  out = out.replace(/Quotes lens/gi, 'Quotes');
+  out = out.replace(/User doctrine \/ My-agent framework/gi, 'Personal discipline');
+  out = out.replace(/\(India Stock Investment Agent\)/gi, '');
+  out = out.replace(/\n{3,}/g, '\n\n');
+  return out.trim();
+}
