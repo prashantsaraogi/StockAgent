@@ -52,12 +52,16 @@ export async function POST(request: Request) {
       const stockResult = await runAskAgentStockAnalysis(
         session.tenantId,
         route.stock,
-        portfolioLotContext(session)
+        lotCtx
       );
-      result =
-        stockResult ??
-        (await runFrameworkQuery(query, agentContext));
-      if (!stockResult) analysisType = 'general';
+      if (stockResult) {
+        result = stockResult;
+      } else {
+        result = {
+          answer: `Could not build a full report for **${route.stock.ticker}**. Try **Stock Analysis → Basic** or check server logs. General Q&A fallback is disabled for one-word stock queries.`,
+          mode: 'framework-local' as const,
+        };
+      }
     } else {
       result = await runFrameworkQuery(query, agentContext);
     }
