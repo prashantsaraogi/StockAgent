@@ -5,6 +5,10 @@ import { createAnalysisJob, saveChatExchange } from '@/lib/db/records';
 import { saveAnalysisRecord } from '@/lib/analysis-history';
 import { runFrameworkQuery } from '@/lib/agent/framework-agent';
 import { runNewsFrameworkQuery, shouldRunNewsAgent, type NewsQueryResult } from '@/lib/agent/news-agent';
+import { routeAskAgentQuery } from '@/lib/ask-agent-query-router';
+import { runAskAgentStockAnalysis } from '@/lib/ask-agent-stock-analysis';
+
+export const maxDuration = 120;
 
 /** Ask Agent — framework-backed Q&A; answer saved to Analysis Log. */
 export async function POST(request: Request) {
@@ -20,18 +24,36 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'Message required' }, { status: 400 });
     }
 
+    const route = await routeAskAgentQuery(query, { ticker, sector, stockName });
+
+    const resolvedTicker = route.stock?.ticker ?? ticker;
+    const resolvedStockName = route.stock?.company ?? stockName;
+    const resolvedSector = route.stock?.sector ?? sector;
+
     const agentContext = {
       tenantId: session.tenantId,
       email: session.email,
-      ticker,
-      sector,
-      stockName,
+      ticker: resolvedTicker,
+      sector: resolvedSector,
+      stockName: resolvedStockName,
     };
 
-    const isNews = shouldRunNewsAgent(query);
-    const result: NewsQueryResult | Awaited<ReturnType<typeof runFrameworkQuery>> = isNews
-      ? await runNewsFrameworkQuery(query, agentContext)
-      : await runFrameworkQuery(query, agentContext);
+    let analysisType: 'stock-full' | 'news' | 'general' = 'general';
+    let result: NewsQueryResult | Awaited<ReturnType<typeof runFrameworkQuery>>;
+
+    if (route.kind === 'news' || shouldRunNewsAgent(query)) {
+      analysisType = 'news';
+      result = await runNewsFrameworkQuery(query, agentContext);
+    } else if (route.kind === 'stock-analysis' && route.stock) {
+      analysisType = 'stock-full';
+      const stockResult = await runAskAgentStockAnalysis(session.tenantId, route.stock);
+      result =
+        stockResult ??
+        (await runFrameworkQuery(query, agentContext));
+      if (!stockResult) analysisType = 'general';
+    } else {
+      result = await runFrameworkQuery(query, agentContext);
+    }
 
     const { answer, mode, model } = result;
 
@@ -46,9 +68,9 @@ export async function POST(request: Request) {
       answer,
       agentMode: mode,
       sessionId: chatSessionId,
-      ticker,
-      sector,
-      stockName,
+      ticker: resolvedTicker,
+      sector: resolvedSector,
+      stockName: resolvedStockName,
     });
 
     const supabase = await import('@/lib/supabase/server').then((m) =>
@@ -60,17 +82,17 @@ export async function POST(request: Request) {
         sessionId: chatSessionId,
         userMessage: query,
         agentMessage: answer,
-        ticker: analysisRecord.ticker ?? ticker,
-        sector: analysisRecord.sector ?? sector,
-        stockName: analysisRecord.stockName ?? stockName,
+        ticker: analysisRecord.ticker ?? resolvedTicker,
+        sector: analysisRecord.sector ?? resolvedSector,
+        stockName: analysisRecord.stockName ?? resolvedStockName,
       });
 
       await createAnalysisJob(supabase, {
         userId: session.userId,
         query,
-        ticker: analysisRecord.ticker ?? ticker,
-        sector: analysisRecord.sector ?? sector,
-        stockName: analysisRecord.stockName ?? stockName,
+        ticker: analysisRecord.ticker ?? resolvedTicker,
+        sector: analysisRecord.sector ?? resolvedSector,
+        stockName: analysisRecord.stockName ?? resolvedStockName,
       });
     }
 
@@ -80,11 +102,13 @@ export async function POST(request: Request) {
       meta: {
         mode,
         model,
+        analysisType,
+        resolvedTicker: analysisRecord.ticker ?? resolvedTicker ?? null,
         tenantId: session.tenantId,
         analysisId: analysisRecord.id,
         analysisPath: `/journal/analysis/${analysisRecord.id}`,
         inboxPath: `data/users/${session.tenantId}/agent-inbox/last-query.md`,
-        ...(isNews
+        ...(analysisType === 'news'
           ? {
               newsWritten: true,
               newsDate: (result as NewsQueryResult).newsDate,

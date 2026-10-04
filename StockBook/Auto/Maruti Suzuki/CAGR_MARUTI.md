@@ -1,7 +1,7 @@
 # Maruti Suzuki - Holding CAGR
 
 **Ticker:** MARUTI (NSE)  
-**CMP:** **Rs 11,386** | **CMP date:** 2026-10-03 | **Source:** Yahoo Finance NSE (.NS) - proxy for NSE last price  
+**CMP:** **Rs 11,386** | **CMP date:** 2026-10-04 | **Source:** Yahoo Finance NSE (.NS) - proxy for NSE last price  
 **Last calculated:** 2026-09-08
 
 Cross-ref: `CAGR-FRAMEWORK.md` | `.cursor/portfolio/holdings.md` | `summary-analysis.md`

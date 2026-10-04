@@ -64,6 +64,7 @@ async function writeIndex(tenantId: string, data: AnalysisIndexFile): Promise<vo
 
 export function extractVerdict(answer: string): string | null {
   const patterns = [
+    />\s*\*\*One-line:\*\*\s*(.+)$/im,
     /\*\*(HOLD|PAUSE ADDS|WAIT|WATCHLIST|INVESTIGATE|ACCUMULATE SIP|STAGED STARTER OK|STAGED STARTER|HIGH ALERT[^*]*)\*\*/i,
     /## Verdict\s*\n+\*\*([^*]+)\*\*/i,
   ];

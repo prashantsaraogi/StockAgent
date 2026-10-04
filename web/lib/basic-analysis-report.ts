@@ -426,3 +426,5 @@ export async function generateBasicFrameworkReport(
 
   return { markdown, oneLineVerdict: oneLine, reportMode };
 }
+
+export { toInvestorFacingReport } from './investor-report-format';

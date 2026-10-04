@@ -4,15 +4,15 @@
     "daily-market-pack": {
       "action": "daily-market-pack",
       "trigger": "cli",
-      "startedAt": "2026-10-03T03:21:28.366Z",
-      "finishedAt": "2026-10-03T03:21:28.929Z",
+      "startedAt": "2026-10-04T02:36:46.534Z",
+      "finishedAt": "2026-10-04T02:36:49.256Z",
       "ok": false,
       "summary": "2/3 steps OK",
       "steps": [
         {
           "action": "refresh-portfolio-cmp",
           "ok": true,
-          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-03",
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-04",
           "details": {
             "failed": [],
             "updated": 3
@@ -27,15 +27,48 @@
         {
           "action": "news-today",
           "ok": true,
-          "summary": "News summary written for 2026-10-03",
+          "summary": "News summary written for 2026-10-04",
           "details": {
-            "newsWebPath": "/journal/news/2026/10/03"
+            "newsWebPath": "/journal/news/2026/10/04"
           }
         }
       ]
     }
   },
   "history": [
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-10-04T02:36:46.534Z",
+      "finishedAt": "2026-10-04T02:36:49.256Z",
+      "ok": false,
+      "summary": "2/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-04",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": false,
+          "summary": "",
+          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-10-04",
+          "details": {
+            "newsWebPath": "/journal/news/2026/10/04"
+          }
+        }
+      ]
+    },
     {
       "action": "daily-market-pack",
       "trigger": "cli",

@@ -648,6 +648,18 @@ Note infra FCF lens for EPC names (L&T) vs consumer (Hero, ITC).
 Run Stock Analysis → PEG tab to verify scorecard + 100-pt total.`,
       },
       {
+        id: 'ask-agent-stock',
+        categoryId: 'stock-calculator',
+        title: 'Ask Agent — stock by name',
+        description:
+          'Type a stock name on `/chat` (even one word). Full investor report; same engine as Basic Analysis — framework hidden.',
+        cadence: 'on-demand',
+        actionType: 'link',
+        href: '/chat',
+        hrefLabel: 'Ask Agent',
+        channel: 'web',
+      },
+      {
         id: 'stock-calculator-full',
         categoryId: 'stock-calculator',
         title: 'Analyze stock — basic or advanced (6 modules)',

@@ -43,29 +43,15 @@ Do **not**:
 
 ---
 
-## Required output structure (markdown)
+## User-visible output (mandatory — framework stays internal)
 
-Every answer must include these sections (omit only if truly N/A):
+Run the pipeline in §Mandatory response pipeline **before writing**. Do **not** expose steps, file names, or “Framework lens / Context used” headings to the user.
 
-```markdown
-## Framework lens
-[Which rules/workflows applied — numbered steps from buy-decision-workflow or AGENT-RULES]
+Follow **`user-output-template.md`** — investment view with **One-line**, **Your position**, **Business quality vs risks**, **Valuation & PCCL**, **What to do**, **Quotes**, **Triggers**.
 
-## Context used
-[Portfolio row · StockBook verdict excerpt if any · FACT vs ASSUMPTION labels]
+For **buy/add** queries: still run buy-decision-workflow internally; user sees ≥3 quotes under **Quotes**, not a workflow checklist.
 
-## Analysis
-[Framework-constrained reasoning — not generic market commentary]
-
-## Verdict
-**[HOLD | PAUSE ADDS | WAIT | STAGED STARTER | ACCUMULATE SIP | WATCHLIST | INVESTIGATE]**
-[One-line rationale tied to framework, not sentiment]
-
-## Quotes lens
-[≥1 quote from quotes.md on PAUSE/WAIT/BUY/HOLD when deployment or patience is relevant]
-```
-
-For **buy/add** queries: run full buy-decision-workflow; quotes lens is **mandatory** (≥3 quotes on PAUSE/WAIT/BUY).
+For **bare ticker / one-word stock** (e.g. `ITC`, `Analyze HDFC Bank`): treat as **full stock analysis** — same depth as Stock Analysis → Basic (modules + StockBook + discipline in background).
 
 For **news / daily summary** queries (e.g. “add news for 7 September”, “run news for today”): delegate to **News agent** — write `News/YYYY-MM/YYYY-MM-DD/summary.md` per `News/AGENT-RULES.md` + `News/SEARCH-WORKFLOW.md`; confirm file path and link to `/journal/news/Y/M/D` in the reply.
 

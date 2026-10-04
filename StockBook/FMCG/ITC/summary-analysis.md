@@ -1,8 +1,8 @@
 # ITC — Summary Analysis
 
 **Ticker:** ITC (NSE)  
-**Analysis date:** 23 Aug 2026  
-**Sector:** FMCG
+**Analysis date:** 4 Oct 2026  
+**Sector:** FMCG (cigarettes + FMCG-others; hotels demerged → ITCHOTELS)
 
 ---
 
@@ -10,36 +10,35 @@
 
 | Metric | Value |
 |--------|------:|
-| Quantity | 3000 shares |
+| Quantity | 3,000 shares |
 | Avg cost | ₹357.94 |
-| Cost basis | ₹1,073,820 |
-| CMP (approx.) | ₹269 |
-| Current value | ₹807,000 |
-| Return | -24.8% |
+| Cost basis | ₹10,73,820 |
+| CMP (4 Oct 2026) | **~₹256** (PARAMETERS / NSE) |
+| Current value | **~₹7,68,000** |
+| Return | **~-28%** |
+| Related | **1,185 ITCHOTELS** @ ₹223.38 (demerger 1:10, Jan 2025) |
 
 ---
 
 ## Verdict (one line)
 
-**HOLD · YoC on capital · tier 5 SIP**
+**HOLD legacy · PAUSE all surplus adds (0% rank) · YoC ~4% on cost — do not average down**
+
+*Overrides Aug 2026 “tier 5 accelerate” text — see `personal-discipline.md` Bucket C + pause registry + 8% YoC gate.*
 
 ---
 
-## Valuation tier @ CMP (₹269)
+## Valuation @ CMP (~₹256)
 
 | Metric | Value |
 |--------|------:|
-| PCCL anchor (pessimistic) | ₹300-340 |
-| Premium to PCCL (low) | -10% |
-| **Tier (1-5)** | **5 — Best cost to add** |
-| **Current value @ CMP** | **Low** |
-| **Framework read (past + forward)** | Below PCCL and cost -25%. Dividend/YoC compounder; forward prob ~65% · accelerate band. |
-| **SIP stance** | Accelerate — largest monthly tranche |
-| **Monthly pace** | **105-150 sh/mo** |
-| **Blended avg ceiling** | **₹376** |
-| Surplus slice | 10% |
-
-*Continuous SIP doctrine — PCCL protects pace and book, not entry timing. See `suggested-approach.md`.*
+| Rational PCCL anchor (StockBook) | ₹300–340 (mid **₹320**) |
+| **Applied PCCL** (loss book) | **₹256** (= CMP floor) |
+| Premium to Applied PCCL | **0%** |
+| Premium to Rational PCCL (~₹320) | **~-20%** (below pessimistic anchor) |
+| PARAMETERS IV (@22× TTM proxy) | ~₹348 — **MoS vs IV ~+26%** (ASSUMPTION on EPS) |
+| TTM P/E @ CMP | **~16×** vs 10Y avg **~26×** (PARAMETERS Part 1) |
+| **YoC (FY25 div ₹14.35 / cost)** | **~4.0%** — **below 8% add gate** |
 
 ---
 
@@ -47,11 +46,10 @@
 
 | Action | Detail |
 |--------|--------|
-| **HOLD** | All 3000 shares (wealth mandate) |
-| **Continuous SIP** | **105-150 sh/mo** @ tier **5** |
-| **Blended cap** | Pause pace upgrade if book avg nears **₹376** |
-| **Accelerate** | If price enters tier **5** (at/below PCCL) |
-| **Surplus rank** | **HOLD** · 10% of monthly investable |
+| **HOLD** | All 3,000 ITC + legacy ITCHOTELS per long-term mandate |
+| **Surplus / SIP** | **0%** — no 105–150 sh/mo; deploy to higher-ranked FMCG / non-pause names |
+| **Fresh capital** | **WAIT / WATCHLIST** — cheap vs history ≠ override tax/regulatory + discipline |
+| **Do not** | Add to “fix” avg cost · chase 52-week low without thesis upgrade |
 
 ---
 
@@ -60,40 +58,22 @@
 
 | Lens | File | Updated | Snapshot | Verdict tie-in |
 |------|------|---------|----------|--------------|
-| News | [`News/TICKER-INDEX.md`](../../../News/TICKER-INDEX.md) | - | No row in TICKER-INDEX | See macro digest |
-| Parameters (10Y + 5Y) | [`PARAMETERS_ITC.md`](PARAMETERS_ITC.md) | 2026-08-29 | See PARAMETERS file | Refresh Part 1+2 |
-| Broker targets | [`BROKER_ITC.md`](BROKER_ITC.md) | 2026-08-29 | Consensus only - refresh fetch | Secondary to PCCL |
-| Holding CAGR | [`CAGR_ITC.md`](CAGR_ITC.md) | 2026-08-28 | Book CAGR -18.57% | Legacy book context |
-| Quotes | [`faq.md`](faq.md) | 2026-08-23 | Not run (no buy/add logged) | On buy/add only |
-| PCCL / dual-axis | [`suggested-approach.md`](suggested-approach.md) | 2026-08-30 | See valuation tier above | Sets SIP pace |
+| News | `News/TICKER-INDEX.md` | 2026-08-29 | FMCG selling −ve | Sentiment headwind |
+| Parameters | `PARAMETERS_ITC.md` | 2026-10-04 | CMP ₹255.9; P/E cheap vs 10Y | Trailing cheap; forward confirmatory |
+| Personal discipline | `personal-discipline.md` | 2026-08-28 | Bucket C + pause registry | **0% surplus** |
+| Q2 FY26 | ITC press release | 2025-10-30 | PAT +4.1%; cig +6.8% | Operations **resilient** — FACT |
+| Price | Live context | 2026-10-01 | 52-wk low ~₹256 | §22 driver table in `faq.md` |
 
-*Full registry:* [`StockBook/ANALYSIS-LENSES-FRAMEWORK.md`](../../../ANALYSIS-LENSES-FRAMEWORK.md) - Sync: `StockBook/_sync-analysis-lenses.ps1` (2026-08-30)
 <!-- LENSES-SUMMARY:END -->
 
-## StockBook files & lenses
+## StockBook files
 
 | File | Purpose |
 |------|---------|
-| `summary-analysis.md` | Verdict + integrated lens snapshot |
-| `suggested-approach.md` | Lens-driven SIP plan |
+| `summary-analysis.md` | Verdict + lens snapshot |
+| `suggested-approach.md` | SIP plan — **refresh to PAUSE** |
 | `detail-analysis.md` | Full framework |
 | `faq.md` | Q&A + Quotes lens |
-| `PARAMETERS_ITC.md` | 10Y rear-view + 5Y forward |
-| `BROKER_ITC.md` | Street targets by broker |
-| `CAGR_ITC.md` | Holding return per lot |
+| `PARAMETERS_ITC.md` | 10Y + 5Y forward |
 
-**Refresh:** After news run, parameters/broker batch, or verdict change - run lens sync.
-
-## StockBook files & lenses
-
-| File | Purpose |
-|------|---------|
-| `summary-analysis.md` | Verdict + integrated lens snapshot |
-| `suggested-approach.md` | Lens-driven SIP plan |
-| `detail-analysis.md` | Full framework |
-| `faq.md` | Q&A + Quotes lens |
-| `PARAMETERS_ITC.md` | 10Y rear-view + 5Y forward |
-| `BROKER_ITC.md` | Street targets by broker |
-| `CAGR_ITC.md` | Holding return per lot |
-
-**Refresh:** After news run, parameters/broker batch, or verdict change â€” run lens sync.
+**Refresh:** After Q3 FY26 results or material tax/GST headline.

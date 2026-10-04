@@ -1,6 +1,6 @@
 # Max Healthcare - Broker Target Prices
 
-**Ticker:** MAXHEALTH (NSE) | **CMP:** Rs 940.95 (2026-10-03) | **CMP date:** 2026-10-03  
+**Ticker:** MAXHEALTH (NSE) | **CMP:** Rs 940.95 (2026-10-04) | **CMP date:** 2026-10-04  
 **Trendlyne consensus:** Rs 1252 (upside 23.43%) | 6 analysts  
 **As of:** 2026-08-29 | **Horizon:** ~12-month broker targets (typical)
 

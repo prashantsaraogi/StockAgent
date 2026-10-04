@@ -11,6 +11,7 @@ import {
   matchStockQuestionArchetype,
   stockQuestionPlaybookForAgent,
 } from '@/lib/stock-question-types';
+import { toInvestorFacingReport } from '@/lib/investor-report-format';
 
 export interface AgentQueryContext {
   tenantId: string;
@@ -184,13 +185,13 @@ Framework root: ${ctx.repoRoot}
 
 ---
 
-# Execution contract
+# Execution contract (internal — do not repeat in user reply)
 
-1. **Never** skip the Framework lens section in your answer.
-2. **Never** give generic "buy/sell" advice without PCCL/workflow/mandate checks.
-3. Use verdict vocabulary from ASK-AGENT-RULES only.
-4. Label facts vs MANAGEMENT CLAIM vs HYPOTHESIS vs UNVERIFIED.
-5. For buy/add: run buy-decision-workflow steps 1–9; quotes lens mandatory (≥3 quotes).
+1. Run buy-decision-workflow, discipline, PCCL, mandate checks **before** writing.
+2. **Never** show "Framework lens", "Context used", file paths, or step lists to the user.
+3. User-facing format: **user-output-template.md** only.
+4. Use verdict vocabulary from ASK-AGENT-RULES in One-line / What to do.
+5. Label missing data UNVERIFIED in prose — no invented CMP or dates.
 6. Default for existing holdings: **HOLD** — no trim/sell for valuation per long-term mandate.`;
 }
 
@@ -199,35 +200,37 @@ function buildUserPrompt(
   holdings: string,
   stockCtx: string,
   isBuyQuery: boolean,
-  stockPlaybook: string
+  stockPlaybook: string,
+  ticker?: string,
+  stockName?: string
 ): string {
-  return `${holdings}
+  const scope =
+    ticker || stockName
+      ? `Stock in scope: **${stockName ?? ticker}** (${ticker ?? 'ticker n/a'})`
+      : 'No single stock pinned — infer from question if needed.';
 
-${stockCtx ? `## StockBook for this query (Layer 2 — binding for this user)\n${stockCtx}\n` : ''}
-${stockPlaybook}
+  return `[INTERNAL DATA — do not dump verbatim; synthesize for the user]
+
+### Portfolio
+${holdings}
+
+${stockCtx ? `### StockBook\n${stockCtx}\n` : ''}
+${stockPlaybook ? `### Archetype hints (internal)\n${stockPlaybook}\n` : ''}
+
+${scope}
 
 ## User question
 ${query}
 
 ---
 
-## Instructions (mandatory)
+Write the **user-visible** answer only (see USER OUTPUT TEMPLATE in system instructions).
 
-Answer **only after** applying the core framework (Layer 1) and user context (Layer 2).
+${stockPlaybook ? 'Include results / P/E sync / driver tables **inside** Business quality or Valuation sections — not as FAQ write-back.' : ''}
 
-Use this **exact section structure** in markdown:
+${isBuyQuery ? 'Buy/add query: run full workflow internally; ≥3 quotes under **Quotes**.' : 'Include ≥1 quote when patience or deployment is relevant.'}
 
-## Framework lens
-## Context used
-## Analysis
-## Verdict
-## Quotes lens
-
-${stockPlaybook ? 'For this stock question archetype, include the extra subsections defined in STOCK-QUESTION-FRAMEWORK.md under **Analysis** (e.g. Results snapshot, One-off table, Growth vs P/E sync). End with **### FAQ write-back (suggested)** for faq.md.' : ''}
-
-${isBuyQuery ? 'This is a **buy/add** query — run full buy-decision-workflow (Steps 1–9). Include ≥3 quotes in Quotes lens.' : 'Include ≥1 quote when patience, deployment, or discipline is relevant.'}
-
-Do not give a generic AI stock opinion. If StockBook or pause registry blocks adds, state **PAUSE ADDS** clearly.`;
+If pause registry or discipline blocks adds, say **PAUSE ADDS** or **0% surplus** clearly in **What to do**. Never mention .mdc files or workflow step numbers.`;
 }
 
 async function callGemini(system: string, userPrompt: string): Promise<string | null> {
@@ -264,71 +267,53 @@ function localFrameworkAnswer(
     stockCtx: string;
     isBuyQuery: boolean;
     quoteSnippet: string;
-    tenantId: string;
+    ticker?: string;
+    stockName?: string;
   }
 ): string {
-  const { holdings, stockCtx, isBuyQuery, quoteSnippet, tenantId } = ctx;
-  const workflowSteps = isBuyQuery
-    ? `1. Personal discipline pre-flight (pause registry, avg-cost trap)
-2. Exclusion guards + fraud/legal screen
-3. Structural-threat & pause registry
-4. Sector comparative rank
-5. PCCL dual anchor + tiers
-6. Core-problem test + catalyst probability
-7. Fresh vs existing holder lens
-8. Quotes lens (mandatory)
-9. Verdict: staged starter vs wait vs pause`
-    : `1. AGENT-RULES read order (summary → faq → approach)
-2. Core-problem test + valuation vs PCCL
-3. Long-term mandate (default HOLD on existing)
-4. Quotes lens where relevant`;
+  const { holdings, stockCtx, isBuyQuery, quoteSnippet, ticker, stockName } = ctx;
+  const title =
+    ticker || stockName
+      ? `# ${stockName ?? ticker} (${ticker ?? '—'}) — Investment view`
+      : '# Ask Agent — Investment view';
+  const date = new Date().toISOString().slice(0, 10);
 
-  return `## Framework lens
+  const held = /^\s*-\s+\w+/.test(holdings) && ticker && holdings.toUpperCase().includes(ticker);
 
-**Mode:** Local framework executor (add Gemini key for richer synthesis — framework rules unchanged)
+  return `${title}
 
-Applied: \`ASK-AGENT-RULES.md\` · \`buy-decision-workflow.md\` · \`personal-discipline.md\`
+**Date checked:** ${date}  
+**CMP:** UNVERIFIED — add \`GOOGLE_GENERATIVE_AI_API_KEY\` for live synthesis
 
-${workflowSteps}
+> **One-line:** ${isBuyQuery ? 'WAIT / PAUSE ADDS — confirm PCCL and discipline before any add' : 'HOLD — review StockBook and position before acting'}
 
 ---
 
-## Context used
+## Your position
 
-**Tenant:** \`data/users/${tenantId}/\`
+${held ? holdings.split('\n').find((l) => l.includes(ticker!)) ?? holdings : '*No matching row in imported holdings, or name a ticker (e.g. ITC) for a full report.*'}
 
-### Portfolio
-${holdings}
+## Business quality vs risks
 
-${stockCtx ? `### StockBook\n${clip(stockCtx, 4000)}` : '*No ticker-specific StockBook loaded — name the stock for deeper context.*'}
+${stockCtx ? clip(stockCtx, 1200) : 'Name a stock (even one word, e.g. **ITC**) for a full analysis with modules and live CMP.'}
 
----
+## Valuation & PCCL
 
-## Analysis
+Run Stock Analysis → **Basic** or retry Ask Agent with Gemini configured for PCCL, premium, and YoC math.
 
-**Your question:** ${query}
+## What to do
 
-${isBuyQuery
-    ? 'Before any ADD: run full buy-decision-workflow. Verify PCCL tier, personal discipline buckets (IT/AI → 0% surplus, HDFC Bank governance, ITC tax/regulatory), and surplus rank — **not CMP alone**. Never average down to fix avg cost.'
-    : 'Separate **business quality** from **valuation at CMP**. Read existing StockBook verdict before contradicting. Default **HOLD** on legacy positions per long-term investor mandate.'}
+| Capital | Action |
+| Legacy | **HOLD** per long-term mandate unless existential exit |
+| Fresh / surplus | **WAIT** until workflow + rank clear — no avg-down to fix cost |
 
----
-
-## Verdict
-
-**${isBuyQuery ? 'WAIT / PAUSE ADDS — pending full PCCL + workflow' : 'HOLD — framework review'}**
-
-Complete PCCL, catalyst band, and quotes table after adding \`GOOGLE_GENERATIVE_AI_API_KEY\` (Gemini still runs **under** this framework — it does not replace it).
-
----
-
-## Quotes lens
+## Quotes
 
 > ${quoteSnippet}
 
 ---
 
-*Query saved to \`agent-inbox/last-query.md\`. Framework precedence: Core rules → Your holdings/StockBook → General knowledge.*
+*Framework applied in background. Your question: ${query}*
 `;
 }
 
@@ -337,6 +322,10 @@ export async function runFrameworkQuery(
   context: AgentQueryContext
 ): Promise<AgentQueryResult> {
   const shared = getSharedFrameworkPaths();
+  const userOutputTemplate = await fs
+    .readFile(path.join(process.cwd(), 'lib/agent/user-output-template.md'), 'utf8')
+    .catch(() => 'Use investor-facing sections only — no Framework lens heading.');
+
   const [
     askAgentRules,
     stockAgentRules,
@@ -372,19 +361,29 @@ export async function runFrameworkQuery(
     quotes.split('\n').find((l) => l.startsWith('> *'))?.replace(/^>\s*/, '') ??
     'Patience and discipline anchor every decision.';
 
-  const system = buildSystemPrompt({
-    askAgentRules,
-    stockAgentRules,
-    agentRules,
-    buyWorkflow,
-    discipline,
-    longTermMandate,
-    quotes,
-    stockQuestionFramework,
-    repoRoot: shared.repoRoot,
-  });
+  const system =
+    buildSystemPrompt({
+      askAgentRules,
+      stockAgentRules,
+      agentRules,
+      buyWorkflow,
+      discipline,
+      longTermMandate,
+      quotes,
+      stockQuestionFramework,
+      repoRoot: shared.repoRoot,
+    }) +
+    `\n\n# USER OUTPUT TEMPLATE (binding for visible reply)\n${clip(userOutputTemplate, 4000)}`;
 
-  const userPrompt = buildUserPrompt(query, holdings, stockCtx, isBuyQuery, stockPlaybook);
+  const userPrompt = buildUserPrompt(
+    query,
+    holdings,
+    stockCtx,
+    isBuyQuery,
+    stockPlaybook,
+    context.ticker,
+    context.stockName
+  );
 
   let answer: string;
   let mode: AgentQueryResult['mode'] = 'framework-local';
@@ -393,7 +392,7 @@ export async function runFrameworkQuery(
   try {
     const geminiAnswer = await callGemini(system, userPrompt);
     if (geminiAnswer) {
-      answer = geminiAnswer;
+      answer = toInvestorFacingReport(geminiAnswer);
       mode = 'gemini';
       model = process.env.GEMINI_MODEL ?? 'gemini-3.6-flash';
     } else {
@@ -402,7 +401,8 @@ export async function runFrameworkQuery(
         stockCtx,
         isBuyQuery,
         quoteSnippet,
-        tenantId: context.tenantId,
+        ticker: context.ticker,
+        stockName: context.stockName,
       });
     }
   } catch (err) {
@@ -413,8 +413,9 @@ export async function runFrameworkQuery(
         stockCtx,
         isBuyQuery,
         quoteSnippet,
-        tenantId: context.tenantId,
-      }) + `\n\n> **LLM note:** ${msg}`;
+        ticker: context.ticker,
+        stockName: context.stockName,
+      }) + `\n\n> **Note:** ${msg}`;
   }
 
   await writeAgentInbox(context.tenantId, query, answer);

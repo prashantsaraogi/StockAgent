@@ -8,7 +8,8 @@ export default function ChatPage() {
       <header className="page-header">
         <h1>Ask Agent</h1>
         <p className="muted">
-          Natural-language queries map to the investment framework — answers on this page.
+          Type a stock name or a question — you get a clear investment view; discipline and PCCL run
+          behind the scenes.
         </p>
         <ChatSubNav />
       </header>

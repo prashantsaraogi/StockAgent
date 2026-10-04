@@ -11,6 +11,7 @@ import { MarginAnalysisResults } from '@/components/MarginAnalysisResults';
 import { BusinessQualityResults } from '@/components/BusinessQualityResults';
 import { RiskDecisionResults } from '@/components/RiskDecisionResults';
 import { MarkdownView } from '@/components/MarkdownView';
+import { toInvestorFacingReport } from '@/lib/investor-report-format';
 
 export type FullResultTabId =
   | 'framework'
@@ -152,7 +153,10 @@ export function StockCalculatorFullResults({
 
       {activeTab === 'framework' && analysis.frameworkReport?.markdown && (
         <section className="card wide calc-full-framework-report">
-          <MarkdownView content={analysis.frameworkReport.markdown} headingAnchors />
+          <MarkdownView
+            content={toInvestorFacingReport(analysis.frameworkReport.markdown)}
+            headingAnchors
+          />
         </section>
       )}
 

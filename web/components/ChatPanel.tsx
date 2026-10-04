@@ -21,7 +21,7 @@ interface ChatPanelProps {
 }
 
 export function ChatPanel({
-  placeholder = 'Ask about a stock, PCCL, sector rank, or buy decision…',
+  placeholder = 'Type a stock name (e.g. ITC) or ask a question…',
   showStockQuestions,
   context,
 }: ChatPanelProps) {
@@ -32,6 +32,7 @@ export function ChatPanel({
   const [messages, setMessages] = useState<StockChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingHint, setLoadingHint] = useState('');
   const [hydrating, setHydrating] = useState(Boolean(threadKey));
   const sessionIdRef = useRef('web-session-pending');
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -109,6 +110,8 @@ export function ChatPanel({
     setMessages(withUser);
     saveThread(withUser);
     setLoading(true);
+    const shortQuery = trimmed.split(/\s+/).length <= 4;
+    setLoadingHint(shortQuery ? `Running stock analysis for “${trimmed}”…` : 'Thinking…');
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -116,6 +119,9 @@ export function ChatPanel({
         body: JSON.stringify({ message: trimmed, sessionId: sessionIdRef.current, ...context }),
       });
       const data = await res.json();
+      if (data.meta?.analysisType === 'stock-full' && data.meta?.resolvedTicker) {
+        setLoadingHint('');
+      }
       const withAgent: StockChatMessage[] = [
         ...withUser,
         {
@@ -171,15 +177,16 @@ export function ChatPanel({
         {!hydrating && messages.length === 0 && (
           <div className="chat-empty">
             <p>
-              Answers run through your <strong>core investment framework first</strong> — not generic AI.
+              Type a <strong>stock name</strong> (even one word, e.g. <strong>ITC</strong>) for a full
+              investment view — position, valuation, and what to do. Framework rules run in the
+              background.
             </p>
             <ul>
-              <li>Precedence: AGENT-RULES → buy-decision-workflow → your holdings & StockBook</li>
-              <li>Every reply saved to your <strong>Analysis Log</strong> (sector → cap → history)</li>
+              <li>Uses your holdings, StockBook, and live CMP where available</li>
+              <li>Every reply saved to <strong>Analysis Log</strong></li>
               {threadKey && (
-                <li>Questions on this stock <strong>stay here</strong> when you switch tabs or leave and return</li>
+                <li>Conversation for this stock <strong>stays here</strong> when you return</li>
               )}
-              <li>Buy/add → full buy-decision-workflow + PCCL + quotes lens</li>
             </ul>
             {showQuick && (
               <div className="stock-quick-questions">
@@ -211,15 +218,8 @@ export function ChatPanel({
             {msg.role === 'agent' ? (
               <>
                 <MarkdownView content={msg.text} />
-                {msg.meta?.mode === 'gemini' && (
-                  <p className="muted small chat-meta">
-                    Framework-first · Gemini synthesis (rules override generic AI)
-                  </p>
-                )}
-                {msg.meta?.mode === 'framework-local' && (
-                  <p className="muted small chat-meta">
-                    Framework-first · local executor · add GOOGLE_GENERATIVE_AI_API_KEY for richer synthesis
-                  </p>
+                {msg.meta?.analysisType === 'stock-full' && (
+                  <p className="muted small chat-meta">Full stock analysis · modules + StockBook</p>
                 )}
                 {msg.meta?.analysisPath && (
                   <p className="muted small chat-meta">
@@ -232,7 +232,11 @@ export function ChatPanel({
             )}
           </div>
         ))}
-        {loading && <div className="chat-bubble agent loading">Applying core framework…</div>}
+        {loading && (
+          <div className="chat-bubble agent loading">
+            {loadingHint || 'Analyzing…'}
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
       <div className="chat-input-row">

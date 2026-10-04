@@ -415,6 +415,18 @@ No sell-to-rotate.`,
         placeholders: ['{AMOUNT}'],
       },
       {
+        id: 'ask-agent-stock-one-word',
+        title: 'Ask Agent — one-word stock analysis',
+        description:
+          'Web `/chat`: type `{TICKER}` or “Analyze ITC” — investor-facing report (no Framework lens UI).',
+        prompt: `Web Ask Agent — user typed: {TICKER}
+
+Same output as Stock Analysis → Basic Framework report: one-line, position, PCCL, discipline, quotes. Framework internal only.`,
+        channel: 'web',
+        framework: ['buy-decision-workflow', 'personal-discipline', 'PCCL'],
+        placeholders: ['{TICKER}'],
+      },
+      {
         id: 'portfolio-review',
         title: 'Portfolio reality check',
         description: 'Large holdings — capital productive? thesis valid?',

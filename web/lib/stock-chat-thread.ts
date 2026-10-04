@@ -8,6 +8,7 @@ export interface StockChatMessage {
   text: string;
   meta?: {
     mode?: string;
+    analysisType?: string;
     inboxPath?: string;
     analysisId?: string;
     analysisPath?: string;
