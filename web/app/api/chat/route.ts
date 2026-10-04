@@ -67,7 +67,11 @@ export async function POST(request: Request) {
     }
 
     const { mode, model } = result;
-    const answer = sanitizeUserFacingAnswer(result.answer);
+    let answer = sanitizeUserFacingAnswer(result.answer);
+    if (route.fuzzyStockMatch && route.stock) {
+      const from = route.stockPhrase ?? query;
+      answer = `> **Matched:** **${route.stock.company} (${route.stock.ticker})** — closest match for “${from}”.\n\n${answer}`;
+    }
 
     const chatSessionId =
       typeof sessionId === 'string' && sessionId.length > 0 ? sessionId : randomUUID();
@@ -116,6 +120,8 @@ export async function POST(request: Request) {
         model,
         analysisType,
         resolvedTicker: analysisRecord.ticker ?? resolvedTicker ?? null,
+        fuzzyStockMatch: route.fuzzyStockMatch ?? false,
+        resolvedStockName: resolvedStockName ?? null,
         tenantId: session.tenantId,
         analysisId: analysisRecord.id,
         analysisPath: analysisPersisted

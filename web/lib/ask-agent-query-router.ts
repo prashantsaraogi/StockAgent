@@ -2,7 +2,7 @@
  * Ask Agent — infer stock from short / one-word messages and route to analysis vs general Q&A.
  */
 
-import { resolveStock, type StockSearchResult } from './stock-search';
+import { resolveStock, resolveStockClosest, type StockSearchResult } from './stock-search';
 import { shouldRunNewsAgent } from './agent/news-agent';
 
 const LEADING_FILLER =
@@ -55,6 +55,8 @@ export interface AskAgentRoute {
   stock: StockSearchResult | null;
   /** Text used for resolveStock */
   stockPhrase: string | null;
+  /** True when symbol was chosen by closest-name match */
+  fuzzyStockMatch?: boolean;
 }
 
 /** Strip filler so "Analysis ITC Stock?" → "ITC", "ITC" → "ITC". */
@@ -112,15 +114,43 @@ export async function routeAskAgentQuery(
     return { kind: 'general', stock: null, stockPhrase: null };
   }
 
-  const resolved = await resolveStock(phrase);
+  let resolved = await resolveStock(phrase);
+  let fuzzyStockMatch = Boolean(resolved?.fuzzyMatch);
+
+  if (!resolved) {
+    resolved = await resolveStockClosest(phrase);
+    fuzzyStockMatch = Boolean(resolved);
+  }
+
+  if (!resolved) {
+    const tokens = phrase.split(/\s+/).filter((t) => t.length >= 3);
+    for (const tok of tokens) {
+      resolved = (await resolveStock(tok)) ?? (await resolveStockClosest(tok));
+      if (resolved) {
+        fuzzyStockMatch = Boolean(resolved.fuzzyMatch ?? true);
+        break;
+      }
+    }
+  }
+
   if (!resolved) {
     return { kind: 'general', stock: null, stockPhrase: phrase };
   }
 
   if (looksLikeStockAnalysisIntent(message, phrase)) {
-    return { kind: 'stock-analysis', stock: resolved, stockPhrase: phrase };
+    return {
+      kind: 'stock-analysis',
+      stock: resolved,
+      stockPhrase: resolved.resolvedFrom ?? phrase,
+      fuzzyStockMatch,
+    };
   }
 
   // Resolved symbol but open-ended question — still attach stock for context
-  return { kind: 'general', stock: resolved, stockPhrase: phrase };
+  return {
+    kind: 'general',
+    stock: resolved,
+    stockPhrase: resolved.resolvedFrom ?? phrase,
+    fuzzyStockMatch,
+  };
 }

@@ -13,6 +13,25 @@ export interface NseSymbolAlias {
 
 export const NSE_SYMBOL_ALIASES: NseSymbolAlias[] = [
   {
+    ticker: 'M&M',
+    company: 'Mahindra and Mahindra',
+    sector: 'Auto',
+    aliases: [
+      'mahindra',
+      'mahindra auto',
+      'mahindra and mahindra',
+      'm&m',
+      'm and m',
+      'mm',
+    ],
+  },
+  {
+    ticker: 'MARUTI',
+    company: 'Maruti Suzuki',
+    sector: 'Auto',
+    aliases: ['maruti', 'maruti suzuki', 'suzuki maruti', 'msil'],
+  },
+  {
     ticker: 'NUVAMA',
     company: 'Nuvama Wealth Management Limited',
     sector: 'Asset Management',

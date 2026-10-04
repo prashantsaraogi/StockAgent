@@ -212,22 +212,12 @@ export function buildInvestorScorecardMarkdown(
     (r) => `| ${TONE_LABEL[r.tone]} | **${r.check}** | ${r.headline} |`
   );
 
-  const takeawayLines = rows.flatMap((r) => {
-    const dot = TONE_LABEL[r.tone];
-    const pts = r.bullets.map((b) => `  - ${b}`).join('\n');
-    return [`- ${dot} **${r.check}**`, pts];
-  });
-
   return `## Scorecard
-
-*Legend:* 🟢 Good · 🟠 OK · 🟡 Mixed · 🔴 Weak · ⛔ Critical
 
 | | Check | Verdict |
 |:-:|-------|---------|
 ${tableLines.join('\n')}
 
-**What this means**
-
-${takeawayLines.join('\n')}
+[What the scorecard colours mean →](/readme/glossary#ask-agent-scorecard-colours)
 `;
 }

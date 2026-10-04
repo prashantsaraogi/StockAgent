@@ -123,7 +123,7 @@ export function deriveInvestorOneLine(
   }
 
   if (!holding && premiumPccl != null && premiumPccl < -5) {
-    if (!analysis.riskDecision.notScreamingBuy && analysis.riskDecision.verdictTone !== 'avoid') {
+    if (!analysis.riskDecision.notScreamingBuy) {
       return 'STEADY SIP / STAGED STARTER OK — below Rational PCCL; size-capped (tier 4–5), not lump sum';
     }
     return 'WATCHLIST — cheap vs pessimistic anchor; confirm core problem before starter size';

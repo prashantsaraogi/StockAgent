@@ -30,6 +30,22 @@
 
 ---
 
+## Ask Agent scorecard colours
+
+Used in **Ask Agent** and **Stock Analysis → Investment view** scorecards (traffic-light column only).
+
+| Dot | Meaning | Typical use |
+|-----|---------|-------------|
+| 🟢 | **Good** | Attractive vs framework — aligned growth, cheap vs history, strong quality |
+| 🟠 | **OK** | Watchlist / wait / aligned but not a buy signal — confirm PCCL and sector rank |
+| 🟡 | **Mixed** | Monitor — incomplete data, average franchise, earnings or margin unclear |
+| 🔴 | **Weak** | Caution — avoid tone, investigate, or poor risk/reward for fresh capital |
+| ⛔ | **Critical** | Hard alert — avoid fresh capital, structural or exclusion-level risk |
+
+The scorecard table shows **one-line verdicts** per check (CAGR, P/E, earnings, margin, business quality, risk). It does not repeat full module reports — use **Stock Analysis** tabs for detail.
+
+---
+
 ## 2. Two-axis framework — SIP tier (A) vs Current value @ CMP (B)
 
 **Do not collapse into one label.** Your **old avg cost** does not set tier — **CMP vs PCCL** does (Axis A). **"Is CMP good to buy today?"** is Axis B (P/E, industry, macro).

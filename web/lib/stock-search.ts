@@ -17,6 +17,10 @@ export interface StockSearchResult {
   source: StockSearchSource;
   /** True when StockBook folder exists for this ticker */
   inStockBook: boolean;
+  /** Closest-name match (not exact ticker/company hit) */
+  fuzzyMatch?: boolean;
+  /** Phrase that produced this resolution */
+  resolvedFrom?: string;
 }
 
 function toResult(
@@ -38,6 +42,165 @@ function normalizeSearchText(value: string): string {
 
 function tokenizeQuery(query: string): string[] {
   return normalizeSearchText(query).split(/\s+/).filter(Boolean);
+}
+
+function levenshtein(a: string, b: string): number {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  const row = new Array<number>(b.length + 1);
+  for (let j = 0; j <= b.length; j++) row[j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    let prev = i - 1;
+    row[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      const next = Math.min(row[j] + 1, row[j - 1] + 1, prev + cost);
+      prev = row[j];
+      row[j] = next;
+    }
+  }
+  return row[b.length];
+}
+
+/** 0–100 similarity for fuzzy company / ticker pick. */
+function similarityScore(query: string, target: string): number {
+  const q = normalizeSearchText(query);
+  const t = normalizeSearchText(target);
+  if (!q || !t) return 0;
+  if (q === t) return 100;
+  if (t.includes(q)) return 92;
+  if (q.includes(t) && t.length >= 3) return 88;
+
+  const qTokens = q.split(/\s+/).filter((x) => x.length >= 2);
+  const tTokens = t.split(/\s+/).filter(Boolean);
+  if (qTokens.length > 0 && tTokens.length > 0) {
+    let sum = 0;
+    for (const qt of qTokens) {
+      let best = 0;
+      for (const tt of tTokens) {
+        if (qt === tt) best = Math.max(best, 1);
+        else if (tt.startsWith(qt) || qt.startsWith(tt)) best = Math.max(best, 0.88);
+        else if (tt.includes(qt) || qt.includes(tt)) best = Math.max(best, 0.75);
+        else {
+          const maxLen = Math.max(qt.length, tt.length);
+          const sim = 1 - levenshtein(qt, tt) / maxLen;
+          best = Math.max(best, sim);
+        }
+      }
+      sum += best;
+    }
+    const tokenScore = (sum / qTokens.length) * 82;
+    const fullLev = 1 - levenshtein(q, t) / Math.max(q.length, t.length);
+    return Math.max(tokenScore, fullLev * 72);
+  }
+
+  const fullLev = 1 - levenshtein(q, t) / Math.max(q.length, t.length);
+  return fullLev * 70;
+}
+
+const FUZZY_MIN_SCORE = 44;
+
+/** Nudge fuzzy pick when user names a sector (e.g. "mahindra auto" → Auto, not Kotak Bank). */
+function sectorHintAdjust(query: string, sector: string, company: string): number {
+  const n = normalizeSearchText(query);
+  const sec = normalizeSearchText(sector);
+  const co = normalizeSearchText(company);
+
+  const wantsAuto = /\bauto\b|\bmotor|\bmotors|\bvehicle|\bcar\b|\bcv\b/.test(n);
+  const wantsBank = /\bbank|\bnbfc|\bfinance\b/.test(n);
+  const wantsPharma = /\bpharma|\bdrug|\blab|\breddy|\bsun\b/.test(n);
+
+  if (wantsAuto) {
+    if (sec.includes('auto')) return 14;
+    if (co.startsWith('tech ') && n.includes('mahindra')) return -22;
+    if (co.includes('bank') || sec.includes('bank') || sec.includes('financial')) return -28;
+  }
+  if (wantsBank && (sec.includes('bank') || co.includes('bank'))) return 14;
+  if (wantsPharma && (sec.includes('pharma') || sec.includes('health'))) return 10;
+  return 0;
+}
+
+/**
+ * Pick closest StockBook (+ alias) name when exact resolve fails.
+ * Uses query tokens and full phrase against company name and ticker.
+ */
+export async function resolveStockClosest(
+  query: string,
+  opts?: { minScore?: number }
+): Promise<StockSearchResult | null> {
+  const q = normalizeStockQuery(query).trim();
+  if (q.length < 2) return null;
+
+  const minScore = opts?.minScore ?? FUZZY_MIN_SCORE;
+  const index = await buildStockbookTickerIndex();
+  const phrases = [q, ...tokenizeQuery(q).filter((t) => t.length >= 3)];
+
+  type FuzzyCandidate = { result: StockSearchResult; score: number };
+  const candidates: FuzzyCandidate[] = [];
+
+  function consider(
+    item: { ticker: string; company: string; sector: string },
+    source: StockSearchSource,
+    inStockBook: boolean,
+    from: string
+  ) {
+    for (const phrase of phrases) {
+      let score = Math.max(
+        similarityScore(phrase, item.ticker),
+        similarityScore(phrase, item.company)
+      );
+      score += sectorHintAdjust(q, item.sector, item.company);
+      if (score < minScore) continue;
+      candidates.push({
+        result: {
+          ...toResult({ ...item, ticker: item.ticker.toUpperCase() }, source, inStockBook),
+          fuzzyMatch: true,
+          resolvedFrom: from,
+        },
+        score,
+      });
+    }
+  }
+
+  for (const loc of index.values()) {
+    consider(
+      { ticker: loc.ticker, company: loc.stock, sector: loc.sector },
+      'stockbook',
+      true,
+      q
+    );
+  }
+
+  for (const alias of searchSymbolAliases(q, 20)) {
+    consider(
+      { ticker: alias.ticker, company: alias.company, sector: alias.sector },
+      'alias',
+      index.has(alias.ticker),
+      q
+    );
+    for (const a of alias.aliases) {
+      if (a.length >= 3) {
+        consider(
+          { ticker: alias.ticker, company: alias.company, sector: alias.sector },
+          'alias',
+          index.has(alias.ticker),
+          a
+        );
+      }
+    }
+  }
+
+  if (candidates.length === 0) {
+    const nse = await searchNseSymbols(q, 8);
+    for (const hit of nse) {
+      consider(hit, 'nse', index.has(hit.ticker), q);
+    }
+  }
+
+  if (candidates.length === 0) return null;
+  candidates.sort((a, b) => b.score - a.score);
+  return candidates[0].result;
 }
 
 function matchesAllTokens(text: string, tokens: string[]): boolean {
@@ -295,7 +458,13 @@ export async function resolveStock(query: string): Promise<StockSearchResult | n
 
   if (matches.length > 0) return matches[0];
 
-  return resolveFromNse(q);
+  const fromNse = await resolveFromNse(q);
+  if (fromNse) return fromNse;
+
+  const fuzzy = await resolveStockClosest(q);
+  if (fuzzy) return fuzzy;
+
+  return null;
 }
 
 /** Re-export for callers that need external-only search. */
