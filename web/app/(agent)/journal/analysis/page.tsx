@@ -18,7 +18,10 @@ function formatTime(iso: string): string {
 
 export default async function JournalAnalysisPage() {
   const session = await requireSession();
-  const entries = await listAnalysisRecords(session.tenantId);
+  const entries = await listAnalysisRecords(session.tenantId, {
+    userId: session.userId,
+    authMode: session.authMode,
+  });
   const timeline = groupAnalysisByDate(entries);
 
   return (

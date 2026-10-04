@@ -68,13 +68,13 @@ export async function ensureUserDataDir(tenantId: string): Promise<void> {
 
   try {
     const paths = getUserPaths(tenantId);
-    if (await fileExists(paths.holdingsFile)) {
-      return;
-    }
-
     await safeMkdir(paths.portfolioDir);
     await safeMkdir(paths.stockbookDir);
     await safeMkdir(path.join(paths.portfolioDir, '../analysis-log'));
+
+    if (await fileExists(paths.holdingsFile)) {
+      return;
+    }
     await safeMkdir(path.join(paths.portfolioDir, '../stock-calculator'));
     await safeMkdir(path.dirname(paths.newsTickerIndex));
 

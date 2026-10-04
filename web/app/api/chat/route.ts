@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     const chatSessionId =
       typeof sessionId === 'string' && sessionId.length > 0 ? sessionId : randomUUID();
 
-    const analysisRecord = await saveAnalysisRecord({
+    const { record: analysisRecord, persisted: analysisPersisted } = await saveAnalysisRecord({
       tenantId: session.tenantId,
       userId: session.userId,
       authMode: session.authMode,
@@ -118,7 +118,10 @@ export async function POST(request: Request) {
         resolvedTicker: analysisRecord.ticker ?? resolvedTicker ?? null,
         tenantId: session.tenantId,
         analysisId: analysisRecord.id,
-        analysisPath: `/journal/analysis/${analysisRecord.id}`,
+        analysisPath: analysisPersisted
+          ? `/journal/analysis/${analysisRecord.id}`
+          : undefined,
+        analysisPersisted,
         inboxPath: `data/users/${session.tenantId}/agent-inbox/last-query.md`,
         ...(analysisType === 'news'
           ? {

@@ -5,6 +5,7 @@
 import type { HoldingRow } from './holdings';
 import type { StockCalculatorFullResult } from './stock-calculator-full';
 import type { DisciplineRule } from './investor-discipline-web';
+import { buildInvestorScorecardMarkdown } from './investor-scorecard';
 
 export function extractFaqSection(faq: string | null, headingPrefix: string): string | null {
   if (!faq) return null;
@@ -218,6 +219,8 @@ export function buildInvestorStockReportMarkdown(parts: InvestorReportParts): st
       ? 'WATCHLIST / WAIT (0% fresh surplus)'
       : analysis.overview.riskVerdict;
 
+  const scorecardBlock = buildInvestorScorecardMarkdown(analysis, scorecardRisk, discipline);
+
   const freshAction = discipline
     ? !holding
       ? discipline.freshSurplusAction ?? discipline.surplusAction
@@ -308,16 +311,7 @@ ${disciplineNote}
 
 ---
 
-## Scorecard
-
-| Check | Verdict |
-|-------|---------|
-| CAGR | ${analysis.overview.cagrVerdict} |
-| P/E | ${analysis.overview.peVerdict} |
-| Earnings | ${analysis.overview.earningsQualityVerdict} |
-| Margin | ${analysis.overview.marginVerdict} |
-| Business quality | ${analysis.overview.businessQualityVerdict} |
-| Risk | ${scorecardRisk} |
+${scorecardBlock}
 
 ${declineBlock}
 

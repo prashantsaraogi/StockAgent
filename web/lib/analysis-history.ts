@@ -17,6 +17,107 @@ import {
 } from './date-history-group';
 import type { StockChatMessage } from './stock-chat-thread';
 import { isServerlessReadOnlyFs, safeWriteFile } from './serverless-fs';
+import type { AuthMode } from './auth';
+
+export interface AnalysisLogReadContext {
+  userId?: string;
+  authMode?: AuthMode;
+}
+
+export interface SavedAnalysisResult {
+  record: AnalysisRecord;
+  /** False on serverless cookie-dev (no disk) or failed write */
+  persisted: boolean;
+}
+
+type AnalysisHistoryRow = {
+  id: string;
+  created_at: string;
+  query: string;
+  answer: string;
+  ticker: string | null;
+  stock_name: string | null;
+  sector: string;
+  market_cap_bucket: MarketCapBucket;
+  market_cap_cr: number | null;
+  verdict: string | null;
+  agent_mode: string | null;
+  session_id: string | null;
+};
+
+function rowToRecord(row: AnalysisHistoryRow): AnalysisRecord {
+  return {
+    id: row.id,
+    createdAt: row.created_at,
+    query: row.query,
+    answer: row.answer,
+    ticker: row.ticker,
+    stockName: row.stock_name,
+    sector: row.sector,
+    marketCapBucket: row.market_cap_bucket,
+    marketCapCr: row.market_cap_cr,
+    verdict: row.verdict,
+    agentMode: row.agent_mode,
+    sessionId: row.session_id,
+  };
+}
+
+function mergeAnalysisRecords(
+  disk: AnalysisRecord[],
+  remote: AnalysisRecord[]
+): AnalysisRecord[] {
+  const byId = new Map<string, AnalysisRecord>();
+  for (const e of [...disk, ...remote]) {
+    const prev = byId.get(e.id);
+    if (!prev || e.createdAt.localeCompare(prev.createdAt) > 0) {
+      byId.set(e.id, e);
+    }
+  }
+  return [...byId.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+async function listAnalysisRecordsFromSupabase(userId: string): Promise<AnalysisRecord[]> {
+  const supabase = await createClientIfConfigured();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from('analysis_history')
+    .select(
+      'id, created_at, query, answer, ticker, stock_name, sector, market_cap_bucket, market_cap_cr, verdict, agent_mode, session_id'
+    )
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(500);
+
+  if (error) {
+    console.error('analysis_history list failed:', error.message);
+    return [];
+  }
+  return (data ?? []).map((row) => rowToRecord(row as AnalysisHistoryRow));
+}
+
+async function getAnalysisRecordFromSupabase(
+  userId: string,
+  id: string
+): Promise<AnalysisRecord | null> {
+  const supabase = await createClientIfConfigured();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from('analysis_history')
+    .select(
+      'id, created_at, query, answer, ticker, stock_name, sector, market_cap_bucket, market_cap_cr, verdict, agent_mode, session_id'
+    )
+    .eq('user_id', userId)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('analysis_history get failed:', error.message);
+    return null;
+  }
+  return data ? rowToRecord(data as AnalysisHistoryRow) : null;
+}
 
 export interface AnalysisRecord {
   id: string;
@@ -155,7 +256,7 @@ export interface SaveAnalysisInput {
 }
 
 /** Persist Ask Agent Q&A to user Analysis Log (disk + Supabase). */
-export async function saveAnalysisRecord(input: SaveAnalysisInput): Promise<AnalysisRecord> {
+export async function saveAnalysisRecord(input: SaveAnalysisInput): Promise<SavedAnalysisResult> {
   assertSafeTenantId(input.tenantId);
 
   const meta = await resolveStockMeta(input.query, {
@@ -179,10 +280,13 @@ export async function saveAnalysisRecord(input: SaveAnalysisInput): Promise<Anal
     sessionId: input.sessionId ?? null,
   };
 
+  let persisted = false;
+
   if (!isServerlessReadOnlyFs()) {
     const index = await readIndex(input.tenantId);
     index.entries.unshift(record);
     await writeIndex(input.tenantId, index);
+    persisted = true;
   }
 
   // Per-entry markdown for Cursor cross-ref
@@ -223,28 +327,45 @@ ${record.answer}
         agent_mode: record.agentMode,
         metadata: { mode: record.agentMode },
       });
-      if (error) console.error('analysis_history insert failed:', error.message);
+      if (error) {
+        console.error('analysis_history insert failed:', error.message);
+      } else {
+        persisted = true;
+      }
     }
   }
 
-  return record;
+  return { record, persisted };
 }
 
-export async function listAnalysisRecords(tenantId: string): Promise<AnalysisRecord[]> {
+export async function listAnalysisRecords(
+  tenantId: string,
+  ctx?: AnalysisLogReadContext
+): Promise<AnalysisRecord[]> {
   assertSafeTenantId(tenantId);
   const index = await readIndex(tenantId);
-  return index.entries.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const disk = index.entries.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+  if (ctx?.authMode === 'supabase' && ctx.userId) {
+    const remote = await listAnalysisRecordsFromSupabase(ctx.userId);
+    if (remote.length > 0 || isServerlessReadOnlyFs()) {
+      return mergeAnalysisRecords(disk, remote);
+    }
+  }
+
+  return disk;
 }
 
 /** Ask Agent entries for one stock (newest first). */
 export async function listAnalysisRecordsForStock(
   tenantId: string,
-  opts: { ticker?: string; stockName?: string; limit?: number }
+  opts: { ticker?: string; stockName?: string; limit?: number },
+  ctx?: AnalysisLogReadContext
 ): Promise<AnalysisRecord[]> {
   const limit = opts.limit ?? 12;
   const ticker = opts.ticker?.toUpperCase();
   const stockName = opts.stockName?.trim();
-  const all = await listAnalysisRecords(tenantId);
+  const all = await listAnalysisRecords(tenantId, ctx);
   const filtered = all.filter((e) => {
     if (ticker && e.ticker?.toUpperCase() === ticker) return true;
     if (stockName && e.stockName?.toLowerCase() === stockName.toLowerCase()) return true;
@@ -274,10 +395,17 @@ export function analysisRecordsToChatMessages(records: AnalysisRecord[]): StockC
 
 export async function getAnalysisRecord(
   tenantId: string,
-  id: string
+  id: string,
+  ctx?: AnalysisLogReadContext
 ): Promise<AnalysisRecord | null> {
-  const entries = await listAnalysisRecords(tenantId);
-  return entries.find((e) => e.id === id) ?? null;
+  const entries = await listAnalysisRecords(tenantId, ctx);
+  const fromList = entries.find((e) => e.id === id);
+  if (fromList) return fromList;
+
+  if (ctx?.authMode === 'supabase' && ctx.userId) {
+    return getAnalysisRecordFromSupabase(ctx.userId, id);
+  }
+  return null;
 }
 
 export interface AnalysisLogSectorGroup {

@@ -16,7 +16,10 @@ interface Props {
 export default async function JournalAnalysisDetailPage({ params }: Props) {
   const { id } = await params;
   const session = await requireSession();
-  const entry = await getAnalysisRecord(session.tenantId, id);
+  const entry = await getAnalysisRecord(session.tenantId, id, {
+    userId: session.userId,
+    authMode: session.authMode,
+  });
   if (!entry) notFound();
 
   const when = new Date(entry.createdAt).toLocaleString('en-IN', {

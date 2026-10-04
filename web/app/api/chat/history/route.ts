@@ -22,11 +22,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: 'ticker or stockName required' }, { status: 400 });
   }
 
-  const records = await listAnalysisRecordsForStock(session.tenantId, {
-    ticker,
-    stockName,
-    limit,
-  });
+  const records = await listAnalysisRecordsForStock(
+    session.tenantId,
+    {
+      ticker,
+      stockName,
+      limit,
+    },
+    { userId: session.userId, authMode: session.authMode }
+  );
 
   const messages = analysisRecordsToChatMessages(records);
   const sessionId =
