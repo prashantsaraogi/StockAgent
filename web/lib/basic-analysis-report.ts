@@ -87,7 +87,10 @@ export async function generateBasicFrameworkReport(
     analysis.peParameters.cmpSource ?? analysis.riskDecision.cmpSource ?? 'PARAMETERS';
 
   const pcclSource =
-    stockMd.detail ?? stockMd.summary ?? getBundledParametersMd(analysis.ticker);
+    stockMd.detail ??
+    stockMd.summary ??
+    stockMd.faq ??
+    getBundledParametersMd(analysis.ticker);
   const pcclBase = extractPcclAnchor(pcclSource);
   const pcclApplied = appliedPccl(pcclBase, cmp, holding);
   const premiumPccl = premiumToPcclPct(cmp, pcclApplied);
@@ -110,6 +113,7 @@ export async function generateBasicFrameworkReport(
     discipline,
     oneLine,
     faq: stockMd.faq,
+    summaryMd: stockMd.summary,
     declineSection,
   });
 

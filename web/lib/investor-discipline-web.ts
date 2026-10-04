@@ -13,6 +13,8 @@ export interface DisciplineRule {
   surplusPct: number;
   legacyAction: string;
   surplusAction: string;
+  /** When user has 0 shares — avoids legacy YoC / averaging language */
+  freshSurplusAction?: string;
   bucket: DisciplineSurplusAction;
   reason: string;
   quote?: string;
@@ -63,6 +65,8 @@ export function getDisciplineRule(
         ? 'HOLD legacy for dividend/compounding — pause aggressive adds'
         : 'Not in your portfolio',
       surplusAction: '0% aggressive add — bottom of FMCG surplus rank until YoC path clear',
+      freshSurplusAction:
+        '**0% fresh surplus** — WATCHLIST only; rank higher FMCG peers without tax/regulatory bucket first',
       bucket: 'regulatory-itc',
       reason: 'Tobacco taxation / GST regulatory overhang on cigarette economics',
       quote:

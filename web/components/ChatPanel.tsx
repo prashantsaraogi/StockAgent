@@ -222,7 +222,7 @@ export function ChatPanel({
                   }
                 />
                 {msg.meta?.analysisType === 'stock-full' && (
-                  <p className="muted small chat-meta">Full stock analysis · modules + StockBook</p>
+                  <p className="muted small chat-meta">Investment view report</p>
                 )}
                 {msg.meta?.analysisPath && (
                   <p className="muted small chat-meta">
