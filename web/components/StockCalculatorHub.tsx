@@ -183,7 +183,9 @@ export function StockCalculatorHub() {
             <strong>{DEFAULT_YEARS}-year</strong> horizon. P/E comes from the{' '}
             <strong>live NSE/Yahoo quote</strong> when available; if not, we use a{' '}
             <strong>25× placeholder</strong> so all six modules still run (CAGR, P/E, earnings,
-            margin, business quality, risk). Use <strong>PEG</strong> tab for the growth scorecard.
+            margin, business quality, risk). After you run, open the saved report — module tabs
+            (CAGR, P/E, earnings, etc.) appear there. <strong>PEG</strong> scorecard is under
+            Services or the P/E module when you need it.
           </p>
         ) : (
           <p className="muted small calc-analysis-mode-hint">

@@ -182,9 +182,8 @@ export function StockCalculatorFullResults({
             ))}
           </div>
           <p className="muted small">
-            Use the tabs above or <strong>View module detail</strong> on each card — full results are
-            in this report. Saved copies also appear under each module&apos;s history tab when
-            Supabase history is enabled.
+            Use the tabs above or <strong>View module detail</strong> on each card — all six modules
+            are in this report for this stock.
           </p>
         </section>
       )}

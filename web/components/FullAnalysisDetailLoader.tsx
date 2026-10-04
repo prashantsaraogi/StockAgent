@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { StockCalculatorFullResults, type FullResultTabId } from '@/components/StockCalculatorFullResults';
 import { StockAnalysisRefreshBar } from '@/components/StockAnalysisRefreshBar';
-import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
 import {
   readFullAnalysisSessionCache,
@@ -114,7 +113,12 @@ export function FullAnalysisDetailLoader({ recordId, initialTab }: Props) {
             </>
           )}
         </p>
-        <StockCalculatorSubNav />
+        <p className="muted small">
+          <Link href="/stock-calculator/history">All saved analyses</Link>
+          {' · '}
+          Use the tabs below for Investment view, Overview, and each module (CAGR, P/E, earnings,
+          margin, business quality, risk).
+        </p>
       </header>
 
       {!fromSession && (

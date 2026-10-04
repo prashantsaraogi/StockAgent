@@ -38,18 +38,25 @@ export const STOCK_ANALYSIS_TITLE = 'Stock Analysis';
 export const STOCK_ANALYSIS_INTRO =
   'For stocks you hold or are planning to buy — valuation, quality, earnings, and risk in one place.';
 
-/** Stock Analysis sub-tabs (module drill-down + history) */
-export const STOCK_CALCULATOR_NAV = [
+/** Top sub-nav on Stock Analysis hub — module tabs live inside each stock report only */
+export const STOCK_CALCULATOR_HUB_NAV = [
   { href: '/stock-calculator', label: 'Analyze' },
-  { href: '/stock-calculator/cagr', label: 'CAGR' },
-  { href: '/stock-calculator/pe', label: 'P/E' },
-  { href: '/stock-calculator/peg', label: 'PEG' },
-  { href: '/stock-calculator/earnings-quality', label: 'Earnings Quality' },
-  { href: '/stock-calculator/margin', label: 'Margin' },
-  { href: '/stock-calculator/business-quality', label: 'Business Quality' },
-  { href: '/stock-calculator/risk-decision', label: 'Risk & Decision' },
   { href: '/stock-calculator/history', label: 'History' },
 ] as const;
+
+/** Standalone module routes (Services / power users — not shown on hub sub-nav) */
+export const STOCK_CALCULATOR_MODULE_ROUTES = [
+  '/stock-calculator/cagr',
+  '/stock-calculator/pe',
+  '/stock-calculator/peg',
+  '/stock-calculator/earnings-quality',
+  '/stock-calculator/margin',
+  '/stock-calculator/business-quality',
+  '/stock-calculator/risk-decision',
+] as const;
+
+/** @deprecated Use STOCK_CALCULATOR_HUB_NAV for UI; modules are per-report tabs */
+export const STOCK_CALCULATOR_NAV = STOCK_CALCULATOR_HUB_NAV;
 
 export const MAIN_NAV = [
   { href: '/home', label: 'Dashboard', icon: '⌂' },
