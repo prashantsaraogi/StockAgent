@@ -1,9 +1,11 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { createHash } from 'crypto';
 import { getDevUserPaths, getRepoRoot } from './framework-paths';
 import { isServerlessReadOnlyFs, safeMkdir } from './serverless-fs';
 
 const DEV_TENANT = 'dev';
+const DEV_EMAIL_NAMESPACE = 'my-agent-cookie-dev-v1';
 
 /** UUID v4 or literal `dev` — blocks path traversal in data/users/{tenantId}/ */
 const SAFE_TENANT_ID = /^(dev|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
@@ -12,6 +14,21 @@ export function assertSafeTenantId(tenantId: string): void {
   if (!SAFE_TENANT_ID.test(tenantId)) {
     throw new Error(`Invalid tenant id: ${tenantId}`);
   }
+}
+
+/**
+ * Cookie dev login (no Supabase): one stable UUID folder per email under data/users/{id}/.
+ * Never use shared `dev` for all emails — holdings must not leak across logins.
+ */
+export function tenantIdFromDevEmail(email: string): string {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return DEV_TENANT;
+  const hash = createHash('sha256').update(`${DEV_EMAIL_NAMESPACE}:${normalized}`).digest();
+  const bytes = Buffer.from(hash.subarray(0, 16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = bytes.toString('hex');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
 }
 
 /** Resolve on-disk paths for a tenant (Supabase user uuid or `dev`). */
@@ -39,7 +56,8 @@ function emptyHoldingsTemplate(tenantId: string): string {
 /**
  * Create data/users/{tenantId}/ on first login.
  * - Supabase users: empty portfolio (no other user's stocks)
- * - dev tenant: sample 3-stock file for local cookie mode only
+ * - Cookie dev: per-email tenant folder; empty portfolio unless that folder already exists
+ * - Legacy `dev` tenant only: may seed from data/users/dev/portfolio/holdings.md
  */
 export { isServerlessReadOnlyFs } from './serverless-fs';
 

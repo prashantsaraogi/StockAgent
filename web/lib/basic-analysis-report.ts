@@ -5,7 +5,12 @@
 
 import { readStockTabContent } from './content';
 import { getStockbookByTicker } from './stockbook-index';
-import { parseHoldingsTable, type HoldingRow } from './holdings';
+import type { HoldingRow } from './holdings';
+import type { LotPersistenceContext } from './holding-lots';
+import {
+  getUserHoldingForTicker,
+  stripAuthorPositionFromMarkdown,
+} from './portfolio-holdings';
 import {
   buildStockbookReportContext,
   type StockbookReportContext,
@@ -157,12 +162,17 @@ async function loadStockbookMd(
     readStockTabContent(sector, stockName, 'detail', tenantId),
   ]);
 
-  const summary =
+  const rawSummary =
     summaryFile?.content ?? getBundledSummaryMd(ticker) ?? null;
-  const faq = faqFile?.content ?? getBundledFaqMd(ticker) ?? null;
-  const approach =
+  const rawFaq = faqFile?.content ?? getBundledFaqMd(ticker) ?? null;
+  const rawApproach =
     approachFile?.content ?? getBundledApproachMd(ticker) ?? null;
-  const detail = detailFile?.content ?? null;
+  const rawDetail = detailFile?.content ?? null;
+
+  const summary = rawSummary ? stripAuthorPositionFromMarkdown(rawSummary) : null;
+  const faq = rawFaq ? stripAuthorPositionFromMarkdown(rawFaq) : null;
+  const approach = rawApproach ? stripAuthorPositionFromMarkdown(rawApproach) : null;
+  const detail = rawDetail ? stripAuthorPositionFromMarkdown(rawDetail) : null;
 
   const ctx = buildStockbookReportContext(summary, approach, faq);
   return { summary, faq, approach, detail, ctx };
@@ -266,7 +276,7 @@ ${detailExcerpt ? `\n${detailExcerpt}\n` : ''}
 
 | Capital | Action |
 |---------|--------|
-| Legacy holder | ${discipline ? discipline.legacyAction : holding ? '**HOLD** — no trim for valuation alone' : '—'} |
+| Legacy holder | ${holding ? (discipline ? discipline.legacyAction : '**HOLD** — no trim for valuation alone') : '**Not in your portfolio** — fresh-capital lens only'} |
 | Fresh / surplus | ${discipline ? discipline.surplusAction : analysis.riskDecision.notScreamingBuy ? '**WAIT / WATCHLIST** — confirm PCCL and sector rank' : '**STAGED STARTER OK** — small size until proof'} |
 ${disciplineTable}
 
@@ -309,18 +319,17 @@ ${quotes.join('\n\n')}
 
 export async function generateBasicFrameworkReport(
   analysis: StockCalculatorFullResult,
-  tenantId: string
+  tenantId: string,
+  lotCtx?: LotPersistenceContext
 ): Promise<BasicFrameworkReport> {
   const loc = await getStockbookByTicker(analysis.ticker);
   const sector = loc?.sector ?? analysis.sector;
   const stockName = loc?.stock ?? analysis.stockName;
 
-  const [holdings, stockMd] = await Promise.all([
-    parseHoldingsTable(tenantId),
+  const [holding, stockMd] = await Promise.all([
+    getUserHoldingForTicker(tenantId, analysis.ticker, lotCtx),
     loadStockbookMd(analysis.ticker, sector, stockName, tenantId),
   ]);
-
-  const holding = holdings.find((h) => h.ticker === analysis.ticker.toUpperCase()) ?? null;
   const cmp = analysis.peParameters.cmp ?? analysis.riskDecision.cmp ?? analysis.cagr.snapshot.cmp;
   const cmpSource = analysis.peParameters.cmpSource ?? analysis.riskDecision.cmpSource;
 
@@ -330,7 +339,7 @@ export async function generateBasicFrameworkReport(
   const pcclApplied = appliedPccl(pcclBase, cmp, holding);
   const premiumPccl = premiumToPcclPct(cmp, pcclApplied);
 
-  const discipline = getDisciplineRule(analysis.ticker);
+  const discipline = getDisciplineRule(analysis.ticker, { hasPosition: holding != null });
   const oneLine = deriveOneLineVerdict(analysis, discipline, holding, premiumPccl);
 
   const detailExcerpt = stockMd.detail

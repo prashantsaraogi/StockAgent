@@ -14,6 +14,7 @@ import {
   generateBasicFrameworkReport,
   type BasicFrameworkReport,
 } from './basic-analysis-report';
+import type { LotPersistenceContext } from './holding-lots';
 
 export interface StockCalculatorFullInputs {
   peBasis: PeBasis;
@@ -83,6 +84,7 @@ export async function runFullStockCalculatorAnalysis(input: {
   purchasePrice?: number | null;
   purchaseDate?: string | null;
   basicAnalysis?: boolean;
+  portfolioLotContext?: LotPersistenceContext;
 }): Promise<StockCalculatorFullResult | null> {
   const resolved = await resolveStock(input.ticker.trim());
   if (!resolved) return null;
@@ -168,7 +170,8 @@ export async function runFullStockCalculatorAnalysis(input: {
             riskVerdict: riskDecision.investmentVerdict,
           },
         },
-        input.tenantId
+        input.tenantId,
+        input.portfolioLotContext
       )
     : null;
 

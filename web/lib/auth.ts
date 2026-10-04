@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClientIfConfigured } from '@/lib/supabase/server';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
-import { ensureUserDataDir } from '@/lib/tenant';
+import { ensureUserDataDir, tenantIdFromDevEmail } from '@/lib/tenant';
 import type { LotPersistenceContext } from '@/lib/holding-lots';
 
 export const SESSION_COOKIE = 'my-agent-session';
@@ -20,8 +20,9 @@ export interface AppSession {
 const SUPABASE_TENANT_ID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Vercel: persist lots in Supabase when tenant folder is a real auth user uuid (not `dev`). */
+/** Vercel: portfolio lots in Postgres only for Supabase auth (real auth.users id). */
 export function portfolioLotContext(session: AppSession): LotPersistenceContext {
+  if (session.authMode !== 'supabase') return {};
   const id = session.tenantId;
   if (SUPABASE_TENANT_ID.test(id) && id === session.userId) {
     return { userId: id, email: session.email };
@@ -38,10 +39,11 @@ async function getCookieDevSession(): Promise<AppSession | null> {
   const session = jar.get(SESSION_COOKIE)?.value;
   const email = jar.get(EMAIL_COOKIE)?.value;
   if (session === 'active' && email) {
+    const tenantId = tenantIdFromDevEmail(email);
     return {
-      userId: 'dev',
+      userId: tenantId,
       email,
-      tenantId: 'dev',
+      tenantId,
       authMode: 'cookie-dev',
     };
   }

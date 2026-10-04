@@ -3,6 +3,7 @@ import { createClientIfConfigured } from '@/lib/supabase/server';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
 import { cookies } from 'next/headers';
 import { EMAIL_COOKIE, isValidEmail, SESSION_COOKIE } from '@/lib/auth';
+import { ensureUserDataDir, tenantIdFromDevEmail } from '@/lib/tenant';
 
 /** Cookie dev login — used only when Supabase env is not set. */
 export async function POST(request: Request) {
@@ -33,6 +34,12 @@ export async function POST(request: Request) {
     path: '/',
     maxAge: 60 * 60 * 24 * 30,
   });
+
+  try {
+    await ensureUserDataDir(tenantIdFromDevEmail(email));
+  } catch {
+    /* non-fatal */
+  }
 
   return NextResponse.json({ ok: true, email, mode: 'cookie-dev' });
 }

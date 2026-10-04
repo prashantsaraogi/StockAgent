@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/auth';
+import { getSession, portfolioLotContext } from '@/lib/auth';
 import { runFullStockCalculatorAnalysis } from '@/lib/stock-calculator-full';
 import { saveFullAnalysisRecord } from '@/lib/stock-calculator-full-history';
 import type { PeBasis } from '@/lib/stock-calculator-engine';
@@ -52,6 +52,7 @@ export async function POST(request: Request) {
       purchasePrice,
       purchaseDate,
       basicAnalysis,
+      portfolioLotContext: portfolioLotContext(session),
     });
 
     if (!analysis) {

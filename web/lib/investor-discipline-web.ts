@@ -22,13 +22,19 @@ const IT_CLUSTER = new Set(['TCS', 'INFY', 'HCLTECH', 'WIPRO', 'TECHM']);
 
 const PAUSE_REGISTRY = new Set(['TCS', 'HDFCLIFE', 'ITC', 'IGL']);
 
-export function getDisciplineRule(ticker: string): DisciplineRule | null {
+export function getDisciplineRule(
+  ticker: string,
+  opts?: { hasPosition?: boolean }
+): DisciplineRule | null {
   const t = ticker.toUpperCase();
+  const hasPosition = opts?.hasPosition ?? false;
 
   if (IT_CLUSTER.has(t)) {
     return {
       surplusPct: 0,
-      legacyAction: 'HOLD legacy only — no ADD, no fair-value scale-in',
+      legacyAction: hasPosition
+        ? 'HOLD legacy only — no ADD, no fair-value scale-in'
+        : 'Not in your portfolio',
       surplusAction: '0% surplus — redirect to non-IT ranked names',
       bucket: 'structural-it',
       reason: 'AI / automation may permanently compress labour-arbitrage moat (structural-threat)',
@@ -40,7 +46,9 @@ export function getDisciplineRule(ticker: string): DisciplineRule | null {
   if (t === 'HDFCBANK') {
     return {
       surplusPct: 0,
-      legacyAction: 'HOLD legacy — do not add to support largest bank line',
+      legacyAction: hasPosition
+        ? 'HOLD legacy — do not add to support largest bank line'
+        : 'Not in your portfolio',
       surplusAction: '0% fresh scale — prefer ICICI / Axis for bank surplus',
       bucket: 'governance-hdfcbank',
       reason: 'RBI strictures, leadership transition, governance overhang for D-SIB',
@@ -51,7 +59,9 @@ export function getDisciplineRule(ticker: string): DisciplineRule | null {
   if (t === 'ITC') {
     return {
       surplusPct: 0,
-      legacyAction: 'HOLD legacy for dividend/compounding — pause aggressive adds',
+      legacyAction: hasPosition
+        ? 'HOLD legacy for dividend/compounding — pause aggressive adds'
+        : 'Not in your portfolio',
       surplusAction: '0% aggressive add — bottom of FMCG surplus rank until YoC path clear',
       bucket: 'regulatory-itc',
       reason: 'Tobacco taxation / GST regulatory overhang on cigarette economics',
@@ -60,7 +70,7 @@ export function getDisciplineRule(ticker: string): DisciplineRule | null {
     };
   }
 
-  if (PAUSE_REGISTRY.has(t)) {
+  if (PAUSE_REGISTRY.has(t) && hasPosition) {
     return {
       surplusPct: 0,
       legacyAction: 'HOLD legacy — PAUSE ADDS (loss + expensive entry trap)',

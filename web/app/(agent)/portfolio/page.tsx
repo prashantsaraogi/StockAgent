@@ -20,7 +20,8 @@ export default async function PortfolioPage() {
         <h1>Portfolio</h1>
         <p className="muted">
           Each purchase is a separate lot (date, qty, price). Same stock bought again adds a new
-          row for per-lot CAGR. Sector is assigned from StockBook automatically.
+          row for per-lot CAGR. Sector is assigned from StockBook automatically. Holdings are
+          private to your login ({session.email}) — not shared with other users.
         </p>
       </header>
 

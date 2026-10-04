@@ -2,7 +2,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import { readRepoFile } from '@/lib/stockbook';
 import { getSharedFrameworkPaths } from '@/lib/framework-paths';
-import { parseHoldingsTable } from '@/lib/holdings';
+import type { LotPersistenceContext } from '@/lib/holding-lots';
+import { getPortfolioHoldingsRows } from '@/lib/portfolio-holdings';
 import { readStockTabContent } from '@/lib/content';
 import { getStockbookByTicker } from '@/lib/stockbook-index';
 import { getUserPaths } from '@/lib/tenant';
@@ -12,6 +13,7 @@ import {
   stockQuestionPlaybookForAgent,
 } from '@/lib/stock-question-types';
 import { sanitizeUserFacingAnswer } from '@/lib/investor-report-format';
+import { stripAuthorPositionFromMarkdown } from '@/lib/portfolio-holdings';
 
 export interface AgentQueryContext {
   tenantId: string;
@@ -19,6 +21,7 @@ export interface AgentQueryContext {
   ticker?: string;
   sector?: string;
   stockName?: string;
+  portfolioLotContext?: LotPersistenceContext;
 }
 
 export interface AgentQueryResult {
@@ -67,7 +70,9 @@ async function loadStockContext(
   for (const tab of ['summary', 'faq', 'approach', 'parameters'] as const) {
     const file = await readStockTabContent(sectorFolder, stockFolder, tab, tenantId);
     if (file?.content) {
-      parts.push(`### ${file.filename}\n${clip(file.content, 6000)}`);
+      parts.push(
+        `### ${file.filename}\n${clip(stripAuthorPositionFromMarkdown(file.content), 6000)}`
+      );
     }
   }
 
@@ -91,9 +96,12 @@ async function loadStockContext(
   return parts.join('\n\n');
 }
 
-async function buildHoldingsContext(tenantId: string): Promise<string> {
+async function buildHoldingsContext(
+  tenantId: string,
+  lotCtx?: LotPersistenceContext
+): Promise<string> {
   try {
-    const rows = await parseHoldingsTable(tenantId);
+    const rows = await getPortfolioHoldingsRows(tenantId, lotCtx);
     if (rows.length === 0) return 'User portfolio: empty (no holdings imported yet).';
     const lines = rows.map(
       (r) =>
@@ -348,7 +356,7 @@ export async function runFrameworkQuery(
     ),
     readRepoFile('investor-wisdom/quotes.md').catch(() => ''),
     readRepoFile('StockBook/STOCK-QUESTION-FRAMEWORK.md').catch(() => ''),
-    buildHoldingsContext(context.tenantId),
+    buildHoldingsContext(context.tenantId, context.portfolioLotContext),
     loadStockContext(context.tenantId, context.ticker, context.sector, context.stockName),
   ]);
 

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
-import { getSession } from '@/lib/auth';
+import { getSession, portfolioLotContext } from '@/lib/auth';
 import { createAnalysisJob, saveChatExchange } from '@/lib/db/records';
 import { saveAnalysisRecord } from '@/lib/analysis-history';
 import { runFrameworkQuery } from '@/lib/agent/framework-agent';
@@ -31,12 +31,14 @@ export async function POST(request: Request) {
     const resolvedStockName = route.stock?.company ?? stockName;
     const resolvedSector = route.stock?.sector ?? sector;
 
+    const lotCtx = portfolioLotContext(session);
     const agentContext = {
       tenantId: session.tenantId,
       email: session.email,
       ticker: resolvedTicker,
       sector: resolvedSector,
       stockName: resolvedStockName,
+      portfolioLotContext: lotCtx,
     };
 
     let analysisType: 'stock-full' | 'news' | 'general' = 'general';
@@ -47,7 +49,11 @@ export async function POST(request: Request) {
       result = await runNewsFrameworkQuery(query, agentContext);
     } else if (route.kind === 'stock-analysis' && route.stock) {
       analysisType = 'stock-full';
-      const stockResult = await runAskAgentStockAnalysis(session.tenantId, route.stock);
+      const stockResult = await runAskAgentStockAnalysis(
+        session.tenantId,
+        route.stock,
+        portfolioLotContext(session)
+      );
       result =
         stockResult ??
         (await runFrameworkQuery(query, agentContext));
