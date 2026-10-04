@@ -27,15 +27,17 @@ function parsePcclRangeLoHi(loRaw: string, hiRaw: string): number {
 export function extractPcclAnchor(md: string | null): number | null {
   if (!md) return null;
 
-  const patterns: RegExp[] = [
-    /\*\*PCCL anchor\*\*[^|]*\|\s*[^|]*\|\s*[^|]*\|\s*\*\*₹([\d,]+)\*\*/i,
+  /** Prefer explicit pessimistic / PCCL labels — avoid fair-P/E implied price tables (e.g. 28×–30× rows). */
+  const labeledPatterns: RegExp[] = [
+    /PCCL anchor\s*\(\s*pessimistic\s*\)[^|\n]*\|\s*₹([\d,]+)\s*[–-]\s*₹?\s*([\d,]+)/i,
+    /Pessimistic anchor[^|\n]*\|\s*₹([\d,]+)\s*[–-]\s*₹?\s*([\d,]+)/i,
     /Rational PCCL[^₹|\n]*₹([\d,]+)\s*[–-]\s*₹?\s*([\d,]+)/i,
     /PCCL anchor[^₹|\n]*₹([\d,]+)\s*[–-]\s*₹?\s*([\d,]+)/i,
+    /\*\*PCCL anchor\*\*[^|]*\|\s*[^|]*\|\s*[^|]*\|\s*\*\*₹([\d,]+)\*\*/i,
     /PCCL[^₹|\n]{0,40}₹([\d,]+)\s*[–-]\s*₹?\s*([\d,]+)/i,
-    /\|\s*₹([\d,]+)\s*[–-]\s*([\d,]+)/,
   ];
 
-  for (const re of patterns) {
+  for (const re of labeledPatterns) {
     const m = md.match(re);
     if (m && m[2]) return parsePcclRangeLoHi(m[1], m[2]);
   }
@@ -121,7 +123,14 @@ export function deriveInvestorOneLine(
   }
 
   if (!holding && premiumPccl != null && premiumPccl < -5) {
+    if (!analysis.riskDecision.notScreamingBuy && analysis.riskDecision.verdictTone !== 'avoid') {
+      return 'STEADY SIP / STAGED STARTER OK — below Rational PCCL; size-capped (tier 4–5), not lump sum';
+    }
     return 'WATCHLIST — cheap vs pessimistic anchor; confirm core problem before starter size';
+  }
+
+  if (holding && premiumPccl != null && premiumPccl <= 0) {
+    return 'HOLD legacy · STEADY / ACCELERATE SIP (tier 4–5) — at or below Rational PCCL if core-problem clear';
   }
 
   if (holding && premiumPccl != null && premiumPccl > 15) {
@@ -297,7 +306,7 @@ ${valuationBlock}
 
 **Growth vs your ${analysis.inputs.expectedCagrPct}% CAGR assumption:** ${formatCagrGapPp(c.cagrGap.cagrGapPp)} — ${c.frameworkVerdict ?? c.impliedVerdict}
 
-${!holding && pcclBase != null && premiumPccl != null && premiumPccl < 0 ? `*Fresh-buy read:* CMP is **below** the pessimistic PCCL anchor — run the core-problem test (policy, regulation, earnings path) before sizing; cheap vs **history** ≠ automatic buy.\n` : ''}
+${pcclBase != null && premiumPccl != null && premiumPccl < 0 ? `*Below Rational PCCL:* Pessimistic anchor is a **stress floor**, not “max buy price.” If core-problem test passes (no structural break), framework allows **tier 4–5 steady / staged SIP** — not a full lump-sum ADD while P/E is still in the **expensive** band vs India fair **~24–28×**.\n` : pcclBase != null && premiumPccl != null && premiumPccl > 0 && premiumPccl < 15 ? `*Above Rational PCCL:* Price is **above** the pessimistic anchor — default is **token SIP** (tier 1–3) unless legacy book and size caps apply.\n` : ''}
 
 ---
 
