@@ -123,17 +123,23 @@ interface SectorScoreCardLinkProps {
   label: string;
   filePath: string;
   score: ParsedSectorScore;
+  /** Sector detail (score + cap tiers). Falls back to markdown view. */
+  detailHref?: string;
 }
 
-export function SectorScoreCardLink({ label, filePath, score }: SectorScoreCardLinkProps) {
+export function SectorScoreCardLink({
+  label,
+  filePath,
+  score,
+  detailHref,
+}: SectorScoreCardLinkProps) {
   const view = sectorViewFromScore(score.weightedTotal);
   const score100 = scoreTo100(score.weightedTotal);
+  const href =
+    detailHref ?? `/industry-analysis/view?file=${encodeURIComponent(filePath)}`;
 
   return (
-    <Link
-      href={`/industry-analysis/view?file=${encodeURIComponent(filePath)}`}
-      className={`sector-score-link-card sector-score-total-${view.cssBand}`}
-    >
+    <Link href={href} className={`sector-score-link-card sector-score-total-${view.cssBand}`}>
       <div className="sector-score-link-head">
         <strong>{label}</strong>
         <span className="sector-score-link-total">

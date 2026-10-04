@@ -1,6 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { getRepoRoot } from './framework-paths';
+import {
+  getBundledComparativeRankMd,
+  getBundledSectorOutlookMd,
+} from './load-bundled-sector-outlook';
 import { getUserPaths } from './tenant';
 import { toSlug } from './navigation';
 import { STOCKBOOK_TABS, type StockbookTabId } from './navigation';
@@ -167,7 +171,11 @@ export async function readRepoMarkdown(relativePath: string): Promise<string | n
     tried.add(full);
     if (await exists(full)) return fs.readFile(full, 'utf8');
   }
-  return null;
+  return (
+    getBundledSectorOutlookMd(relativePath) ??
+    getBundledComparativeRankMd(relativePath) ??
+    null
+  );
 }
 
 export async function listSectorOutlookFiles(): Promise<{ name: string; path: string; label: string }[]> {

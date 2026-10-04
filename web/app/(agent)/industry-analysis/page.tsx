@@ -1,9 +1,6 @@
 import Link from 'next/link';
 import { loadSectorOutlookSummaries } from '@/lib/sector-outlook';
-import { sectorViewFromScore, scoreTo100 } from '@/lib/sector-score-framework';
-import { sectorSlugFromOutlookPath } from '@/lib/sector-slugs';
-import { SectorCapTierCardLink } from '@/components/SectorCapTierPanel';
-import { SectorScoreLegend } from '@/components/SectorScorePanel';
+import { SectorScoreCardLink, SectorScoreLegend } from '@/components/SectorScorePanel';
 
 export default async function IndustryAnalysisPage() {
   const { outlooks, comparativeRanks } = await loadSectorOutlookSummaries();
@@ -23,24 +20,24 @@ export default async function IndustryAnalysisPage() {
           <h2>Sectors</h2>
           <SectorScoreLegend />
         </div>
-        <div className="sector-score-link-grid">
-          {outlooks.map((o) => {
-            const slug = sectorSlugFromOutlookPath(o.path);
-            const view = sectorViewFromScore(o.score.weightedTotal);
-            if (!slug) return null;
-            return (
-              <SectorCapTierCardLink
+        {outlooks.length === 0 ? (
+          <p className="muted">
+            Sector outlook files are not available on this host. Run{' '}
+            <code>npm run sync-bundled-docs</code> and redeploy, or open the app from the full repo.
+          </p>
+        ) : (
+          <div className="sector-score-link-grid">
+            {outlooks.map((o) => (
+              <SectorScoreCardLink
                 key={o.path}
-                slug={slug}
                 label={o.label}
-                score100={scoreTo100(o.score.weightedTotal)}
-                viewLabel={view.label}
-                viewEmoji={view.emoji}
-                cssBand={view.cssBand}
+                filePath={o.path}
+                score={o.score}
+                detailHref={`/industry-analysis/${o.slug}`}
               />
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {comparativeRanks.length > 0 && (
