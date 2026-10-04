@@ -37,3 +37,21 @@ export function readFullAnalysisSessionCache(recordId: string): CachedFullAnalys
     return null;
   }
 }
+
+/** Runs stored in this browser tab/session (Vercel fallback when server history is empty). */
+export function listFullAnalysisSessionCache(): CachedFullAnalysis[] {
+  if (typeof window === 'undefined') return [];
+  const out: CachedFullAnalysis[] = [];
+  try {
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      if (!key?.startsWith(KEY_PREFIX)) continue;
+      const id = key.slice(KEY_PREFIX.length);
+      const item = readFullAnalysisSessionCache(id);
+      if (item) out.push(item);
+    }
+  } catch {
+    return [];
+  }
+  return out.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}

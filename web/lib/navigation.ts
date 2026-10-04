@@ -24,6 +24,7 @@ export const STOCK_CALCULATOR_NAV = [
   { href: '/stock-calculator/margin', label: 'Margin' },
   { href: '/stock-calculator/business-quality', label: 'Business Quality' },
   { href: '/stock-calculator/risk-decision', label: 'Risk & Decision' },
+  { href: '/stock-calculator/history', label: 'History' },
 ] as const;
 
 export const MAIN_NAV = [
