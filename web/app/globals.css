@@ -788,6 +788,14 @@ button.stock-quick-q:disabled {
   margin-top: 0.5rem;
 }
 
+.stock-analysis-saved-bar-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+
 /* ——— Report iframe ——— */
 .report-frame-wrap {
   width: 100%;

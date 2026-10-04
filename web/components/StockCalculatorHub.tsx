@@ -123,8 +123,13 @@ export function StockCalculatorHub() {
         return;
       }
 
+      const id = data.record?.id as string | undefined;
+      if (id && data.detailPath) {
+        router.push(data.detailPath as string);
+        return;
+      }
       setAnalysis(data.analysis);
-      setRecordId(data.record?.id ?? null);
+      setRecordId(id ?? null);
       setChildIds(data.record?.childIds ?? null);
       setSavedAt(data.record?.createdAt ?? null);
       router.refresh();

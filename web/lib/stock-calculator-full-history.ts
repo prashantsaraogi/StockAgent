@@ -3,6 +3,7 @@ import path from 'path';
 import { randomUUID } from 'crypto';
 import { getUserPaths, assertSafeTenantId } from './tenant';
 import { writeTenantIndexFile, writeTenantMarkdownFile } from './tenant-disk-persist';
+import { isServerlessReadOnlyFs } from './serverless-fs';
 import { groupByYearMonthDate, type DateYearGroup } from './date-history-group';
 import { createClientIfConfigured } from './supabase/server';
 import {
@@ -119,13 +120,69 @@ export interface SaveFullAnalysisInput {
   userId: string;
   authMode: 'supabase' | 'cookie-dev';
   analysis: StockCalculatorFullResult;
+  /** Re-run and replace this saved record (same URL / id). */
+  refreshRecordId?: string;
+}
+
+export interface SavedFullAnalysisOutcome {
+  record: StockCalculatorFullRecord;
+  persisted: boolean;
+}
+
+function mergeFullRecords(
+  disk: StockCalculatorFullRecord[],
+  remote: StockCalculatorFullRecord[]
+): StockCalculatorFullRecord[] {
+  const byId = new Map<string, StockCalculatorFullRecord>();
+  for (const e of [...disk, ...remote]) {
+    const prev = byId.get(e.id);
+    if (!prev || e.createdAt.localeCompare(prev.createdAt) > 0) {
+      byId.set(e.id, e);
+    }
+  }
+  return [...byId.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+async function listFromSupabase(userId: string): Promise<StockCalculatorFullRecord[]> {
+  if (isSupabaseTableUnavailable(FULL_HISTORY_TABLE)) return [];
+  const supabase = await createClientIfConfigured();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from(FULL_HISTORY_TABLE)
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(300);
+
+  if (error) {
+    if (isMissingTableError(error)) {
+      markSupabaseTableUnavailable(FULL_HISTORY_TABLE);
+      warnMissingTableOnce(FULL_HISTORY_TABLE, '009_stock_calculator_full_history.sql');
+    }
+    return [];
+  }
+  return (data ?? []).map((row) => rowToRecord(row as FullHistoryRow));
 }
 
 export async function saveFullAnalysisRecord(
   input: SaveFullAnalysisInput
-): Promise<StockCalculatorFullRecord> {
+): Promise<SavedFullAnalysisOutcome> {
   assertSafeTenantId(input.tenantId);
   const { analysis } = input;
+
+  let recordId = input.refreshRecordId ?? randomUUID();
+  if (input.refreshRecordId) {
+    const existing = await getFullAnalysisRecord(
+      input.tenantId,
+      input.refreshRecordId,
+      input.userId,
+      input.authMode
+    );
+    if (!existing || existing.ticker !== analysis.ticker) {
+      recordId = randomUUID();
+    }
+  }
 
   const [cagrRec, eqRec, marginRec, bqRec, riskRec, peRec] = await Promise.all([
     saveCalculatorRecord({
@@ -168,9 +225,8 @@ export async function saveFullAnalysisRecord(
       : Promise.resolve(null),
   ]);
 
-  const id = randomUUID();
   const record: StockCalculatorFullRecord = {
-    id,
+    id: recordId,
     createdAt: new Date().toISOString(),
     ticker: analysis.ticker,
     stockName: analysis.stockName,
@@ -191,9 +247,15 @@ export async function saveFullAnalysisRecord(
     analysis,
   };
 
+  let persisted = false;
+
   const index = await readIndex(input.tenantId);
-  index.entries.unshift(record);
+  const existingIdx = index.entries.findIndex((e) => e.id === record.id);
+  if (existingIdx >= 0) index.entries[existingIdx] = record;
+  else index.entries.unshift(record);
   await writeIndex(input.tenantId, index);
+  if (!isServerlessReadOnlyFs()) persisted = true;
+
   await writeTenantMarkdownFile(
     path.join(fullDir(input.tenantId), `${record.id}.md`),
     record.report
@@ -202,7 +264,7 @@ export async function saveFullAnalysisRecord(
   if (input.authMode === 'supabase') {
     const supabase = await createClientIfConfigured();
     if (supabase && !isSupabaseTableUnavailable(FULL_HISTORY_TABLE)) {
-      const { error } = await supabase.from(FULL_HISTORY_TABLE).insert({
+      const row = {
         id: record.id,
         user_id: input.userId,
         ticker: record.ticker,
@@ -215,15 +277,24 @@ export async function saveFullAnalysisRecord(
         child_ids: record.childIds,
         report: record.report,
         analysis: record.analysis,
-      });
+        created_at: record.createdAt,
+      };
+
+      const isRefresh = Boolean(input.refreshRecordId && input.refreshRecordId === record.id);
+      const { error } = isRefresh
+        ? await supabase.from(FULL_HISTORY_TABLE).update(row).eq('id', record.id).eq('user_id', input.userId)
+        : await supabase.from(FULL_HISTORY_TABLE).insert(row);
+
       if (error && isMissingTableError(error)) {
         markSupabaseTableUnavailable(FULL_HISTORY_TABLE);
         warnMissingTableOnce(FULL_HISTORY_TABLE, '009_stock_calculator_full_history.sql');
+      } else if (!error) {
+        persisted = true;
       }
     }
   }
 
-  return record;
+  return { record, persisted };
 }
 
 function rowToRecord(row: FullHistoryRow): StockCalculatorFullRecord {
@@ -287,7 +358,28 @@ export async function listFullAnalysisRecords(
   authMode?: 'supabase' | 'cookie-dev'
 ): Promise<StockCalculatorFullRecord[]> {
   assertSafeTenantId(tenantId);
-  return (await readIndex(tenantId)).entries.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const disk = (await readIndex(tenantId)).entries;
+
+  if (authMode === 'supabase' && userId) {
+    const remote = await listFromSupabase(userId);
+    if (remote.length > 0 || isServerlessReadOnlyFs()) {
+      return mergeFullRecords(disk, remote);
+    }
+  }
+
+  return disk.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/** Latest saved full analysis for one ticker (this user). */
+export async function getLatestFullAnalysisByTicker(
+  tenantId: string,
+  ticker: string,
+  userId?: string,
+  authMode?: 'supabase' | 'cookie-dev'
+): Promise<StockCalculatorFullRecord | null> {
+  const key = ticker.trim().toUpperCase();
+  const all = await listFullAnalysisRecords(tenantId, userId, authMode);
+  return all.find((e) => e.ticker.toUpperCase() === key) ?? null;
 }
 
 export async function getFullAnalysisRecord(

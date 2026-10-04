@@ -28,6 +28,10 @@ export async function POST(request: Request) {
     const investmentAmountInr = optionalPositiveNumber(body.investmentAmountInr);
     const purchasePrice = optionalPositiveNumber(body.purchasePrice);
     const purchaseDate = body.purchaseDate ? String(body.purchaseDate) : null;
+    const refreshRecordId =
+      typeof body.refreshRecordId === 'string' && body.refreshRecordId.length > 0
+        ? body.refreshRecordId
+        : undefined;
     const basicAnalysis =
       body.analysisMode !== 'advanced' && body.basicAnalysis !== false;
 
@@ -66,11 +70,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const record = await saveFullAnalysisRecord({
+    const { record, persisted } = await saveFullAnalysisRecord({
       tenantId: session.tenantId,
       userId: session.userId,
       authMode: session.authMode,
       analysis,
+      refreshRecordId,
     });
 
     return NextResponse.json({
@@ -84,6 +89,7 @@ export async function POST(request: Request) {
         childIds: record.childIds,
       },
       detailPath: `/stock-calculator/full/${record.id}`,
+      historyPersisted: persisted,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';

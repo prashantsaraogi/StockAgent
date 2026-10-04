@@ -6,6 +6,7 @@ import {
   StockCalculatorFullResults,
   type FullResultTabId,
 } from '@/components/StockCalculatorFullResults';
+import { StockAnalysisRefreshBar } from '@/components/StockAnalysisRefreshBar';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
 
@@ -62,6 +63,15 @@ export default async function FullAnalysisDetailPage({ params, searchParams }: P
         </p>
         <StockCalculatorSubNav />
       </header>
+
+      <StockAnalysisRefreshBar
+        recordId={entry.id}
+        ticker={entry.ticker}
+        stockName={entry.stockName}
+        inputs={entry.analysis.inputs}
+        basicAnalysis={entry.analysis.basicAnalysis ?? false}
+        savedAt={entry.createdAt}
+      />
 
       <StockCalculatorFullResults
         analysis={entry.analysis}
