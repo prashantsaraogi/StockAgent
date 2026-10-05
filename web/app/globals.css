@@ -1781,6 +1781,87 @@ button.stock-quick-q:disabled {
   font-size: 0.8rem;
 }
 
+.portfolio-yearly-rank-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.portfolio-yearly-rank-panel h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.portfolio-yearly-rank-panel.card {
+  padding: 0.85rem 1rem;
+}
+
+.portfolio-rank-section-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.portfolio-rank-section-title:not(:first-of-type) {
+  margin-top: 1rem;
+}
+
+.portfolio-index-report-head {
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.portfolio-index-report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.portfolio-index-report-actions .btn-secondary {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.portfolio-index-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.portfolio-index-summary-card {
+  background: var(--surface-elevated, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+}
+
+.portfolio-index-summary-card .label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}
+
+.portfolio-index-summary-card .value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.portfolio-index-summary-card .value.positive {
+  color: #15803d;
+}
+
+.portfolio-index-summary-card .value.negative {
+  color: #b91c1c;
+}
+
 .lots-details {
   margin-top: 1.25rem;
 }

@@ -1,6 +1,6 @@
 ﻿# Maruti Suzuki - Stock Parameters
 
-**Ticker:** MARUTI | **CMP:** Rs 11,386 (2026-10-04)  
+**Ticker:** MARUTI | **CMP:** Rs 11,386 (2026-10-05)  
 **Part 1:** FY2016-FY2025 (10Y rear-view) | **Part 2:** FY2027-FY2031 (5Y forward)  
 **Your avg cost:** Rs 11156 (57 sh) — **+22%** vs CMP
 

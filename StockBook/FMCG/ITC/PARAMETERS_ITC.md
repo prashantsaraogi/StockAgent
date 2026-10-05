@@ -1,6 +1,6 @@
 ﻿# ITC - Stock Parameters
 
-**Ticker:** ITC | **CMP:** Rs 255.9 (2026-10-04)
+**Ticker:** ITC | **CMP:** Rs 255.9 (2026-10-05)
 **Part 1:** FY2016-FY2025 (10Y rear-view) | **Part 2:** FY2027-FY2031 (5Y forward)
 
 > **Batch-generated** - Part 1 from 10Y P/E; Part 2 skeleton from sector EPS CAGR + fair P/E. Deep-fill Blocks B/C + forward thesis from annual report. Hand-built: HDFCBANK, MAXHEALTH, HINDUNILVR.

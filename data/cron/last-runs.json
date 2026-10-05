@@ -4,15 +4,15 @@
     "daily-market-pack": {
       "action": "daily-market-pack",
       "trigger": "cli",
-      "startedAt": "2026-10-04T02:36:46.534Z",
-      "finishedAt": "2026-10-04T02:36:49.256Z",
-      "ok": false,
-      "summary": "2/3 steps OK",
+      "startedAt": "2026-10-05T03:33:57.150Z",
+      "finishedAt": "2026-10-05T03:33:58.067Z",
+      "ok": true,
+      "summary": "3/3 steps OK",
       "steps": [
         {
           "action": "refresh-portfolio-cmp",
           "ok": true,
-          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-04",
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-05",
           "details": {
             "failed": [],
             "updated": 3
@@ -20,22 +20,115 @@
         },
         {
           "action": "scan-quarter-results",
-          "ok": false,
-          "summary": "",
-          "error": "String.prototype.matchAll called with a non-global RegExp argument"
+          "ok": true,
+          "summary": "3/3 holdings may need Q3 FY27 results refresh",
+          "details": {
+            "scannedAt": "2026-10-05",
+            "expectedQuarter": "Q3 FY27",
+            "items": [
+              {
+                "ticker": "ITC",
+                "company": "ITC",
+                "lastMention": "Q3 FY26",
+                "expectedQuarter": "Q3 FY27",
+                "stale": true,
+                "reason": "No Q3 FY27 mention — last seen: Q3 FY26"
+              },
+              {
+                "ticker": "MARUTI",
+                "company": "Maruti Suzuki",
+                "lastMention": "Q1 FY27",
+                "expectedQuarter": "Q3 FY27",
+                "stale": true,
+                "reason": "No Q3 FY27 mention — last seen: Q1 FY27"
+              },
+              {
+                "ticker": "MAXHEALTH",
+                "company": "Max Healthcare",
+                "lastMention": "Q4 FY27",
+                "expectedQuarter": "Q3 FY27",
+                "stale": true,
+                "reason": "No Q3 FY27 mention — last seen: Q4 FY27"
+              }
+            ],
+            "staleCount": 3
+          }
         },
         {
           "action": "news-today",
           "ok": true,
-          "summary": "News summary written for 2026-10-04",
+          "summary": "News summary written for 2026-10-05",
           "details": {
-            "newsWebPath": "/journal/news/2026/10/04"
+            "newsWebPath": "/journal/news/2026/10/05"
           }
         }
       ]
     }
   },
   "history": [
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-10-05T03:33:57.150Z",
+      "finishedAt": "2026-10-05T03:33:58.067Z",
+      "ok": true,
+      "summary": "3/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-05",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": true,
+          "summary": "3/3 holdings may need Q3 FY27 results refresh",
+          "details": {
+            "scannedAt": "2026-10-05",
+            "expectedQuarter": "Q3 FY27",
+            "items": [
+              {
+                "ticker": "ITC",
+                "company": "ITC",
+                "lastMention": "Q3 FY26",
+                "expectedQuarter": "Q3 FY27",
+                "stale": true,
+                "reason": "No Q3 FY27 mention — last seen: Q3 FY26"
+              },
+              {
+                "ticker": "MARUTI",
+                "company": "Maruti Suzuki",
+                "lastMention": "Q1 FY27",
+                "expectedQuarter": "Q3 FY27",
+                "stale": true,
+                "reason": "No Q3 FY27 mention — last seen: Q1 FY27"
+              },
+              {
+                "ticker": "MAXHEALTH",
+                "company": "Max Healthcare",
+                "lastMention": "Q4 FY27",
+                "expectedQuarter": "Q3 FY27",
+                "stale": true,
+                "reason": "No Q3 FY27 mention — last seen: Q4 FY27"
+              }
+            ],
+            "staleCount": 3
+          }
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-10-05",
+          "details": {
+            "newsWebPath": "/journal/news/2026/10/05"
+          }
+        }
+      ]
+    },
     {
       "action": "daily-market-pack",
       "trigger": "cli",

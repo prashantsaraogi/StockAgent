@@ -517,6 +517,18 @@ normalize PAT · sync table · PARAMETERS 10Y P/E · holder PCCL/add-gate · FAQ
 Update holdings.md · CAGR lot file · quadrant-map if needed · StockBook faq write-back.`,
       },
       {
+        id: 'portfolio-index-benchmark',
+        categoryId: 'portfolio',
+        title: 'Stock vs index report (per login)',
+        description:
+          'On Portfolio: vs your cost (P&L), monthly/yearly stock vs sector index, top-5 lag/lead. Download CSV/HTML — built from that user’s lots only (Supabase or dev tenant).',
+        cadence: 'weekly',
+        actionType: 'link',
+        channel: 'web',
+        href: '/portfolio',
+        hrefLabel: 'Open Portfolio report',
+      },
+      {
         id: 'portfolio-dividend-rank',
         categoryId: 'portfolio',
         title: 'Portfolio dividend rank — YoC + absolute ₹',

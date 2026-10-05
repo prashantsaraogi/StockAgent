@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { HoldingForm } from '@/components/HoldingForm';
 import { HoldingsLotsTable } from '@/components/HoldingsLotsTable';
 import { PortfolioDividendRankPanel } from '@/components/PortfolioDividendRankPanel';
+import { PortfolioIndexBenchmarkTable } from '@/components/PortfolioIndexBenchmarkTable';
 import { requireSession, portfolioLotContext } from '@/lib/auth';
 import { listLotsWithMetrics, aggregateRows } from '@/lib/holding-lots';
 import { getPortfolioDividendRank } from '@/lib/portfolio-dividend-rank';
@@ -13,6 +14,10 @@ export default async function PortfolioPage() {
     getPortfolioDividendRank(session.tenantId, portfolioLotContext(session)),
   ]);
   const summary = aggregateRows(lots);
+  const indexReportRefreshKey = summary
+    .map((r) => `${r.ticker}:${r.qty}:${r.costBasis}`)
+    .sort()
+    .join('|');
 
   return (
     <div className="page">
@@ -28,6 +33,8 @@ export default async function PortfolioPage() {
       <HoldingForm />
 
       <PortfolioDividendRankPanel data={dividendRank} />
+
+      <PortfolioIndexBenchmarkTable refreshKey={indexReportRefreshKey} />
 
       <section className="card wide">
         <div className="section-head">

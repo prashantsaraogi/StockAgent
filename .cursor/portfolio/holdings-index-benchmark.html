@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio — Stock vs index</title>
+<style>
+body{font-family:Segoe UI,system-ui,sans-serif;max-width:100%;margin:0 auto;padding:1.5rem;line-height:1.5;background:#f8fafc;color:#0f172a}
+.header{background:linear-gradient(135deg,#1e3a8a,#1e40af);color:#fff;padding:1.25rem 1.5rem;border-radius:10px;margin-bottom:1.25rem;max-width:1280px;margin-left:auto;margin-right:auto}
+.header h1{margin:0 0 .35rem;font-size:1.35rem}
+.header p{margin:.25rem 0;opacity:.95;font-size:.92rem}
+.note{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:.75rem 1rem;margin:0 auto 1rem;max-width:1280px;font-size:.88rem;color:#475569}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;margin:0 auto 1.25rem;max-width:1280px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:.85rem 1rem}
+.card h3{margin:0 0 .35rem;font-size:.75rem;color:#64748b;text-transform:uppercase;letter-spacing:.04em}
+.card .val{font-size:1.15rem;font-weight:700}
+.wrap{overflow-x:auto;background:#fff;border:1px solid #e2e8f0;border-radius:8px;margin:0 auto;max-width:100%}
+table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:1280px}
+th,td{border-bottom:1px solid #e2e8f0;padding:7px 8px;vertical-align:top}
+th{background:#f1f5f9;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.02em;color:#475569}
+th.group{background:#e2e8f0;text-align:center;font-size:.75rem}
+th.num{text-align:right}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.ticker{font-size:.78rem;color:#64748b}
+.pos{color:#15803d;font-weight:600}
+.neg{color:#b91c1c;font-weight:600}
+.spread{background:#f8fafc}
+.rank-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem;margin:0 auto 1.25rem;max-width:1280px}
+.rank-box{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:.85rem 1rem;overflow-x:auto}
+.rank-box h2{margin:0 0 .5rem;font-size:1rem;color:#0f172a}
+.rank-box p{margin:0 0 .65rem;font-size:.82rem;color:#64748b}
+.rank-box table{min-width:0;font-size:.8rem}
+.rank-box th,.rank-box td{padding:6px 8px}
+.muted{color:#94a3b8}
+footer{margin:1.5rem auto;font-size:.8rem;color:#64748b;max-width:1280px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>Portfolio — Stock vs index (monthly / yearly)</h1>
+<p>Generated 2026-10-05 · 51 stocks · CMP live (51/51)</p>
+<p>Compare <strong>stock price</strong> change vs <strong>sector index</strong> — same time windows. Excel: open <code>holdings-index-benchmark.csv</code> in the same folder.</p>
+</div>
+<div class="cards">
+<div class="card"><h3>Total purchase cost</h3><div class="val">₹1,28,83,742</div></div>
+<div class="card"><h3>Total current value</h3><div class="val">₹1,53,05,369</div></div>
+<div class="card"><h3>Positions</h3><div class="val">51</div></div>
+<div class="card"><h3>Total P&amp;L vs cost</h3><div class="val pos">+₹24,21,627 <span style="font-size:.9rem">(+18.8%)</span></div></div>
+</div>
+<p class="note">Vs cost % = (CMP − your avg cost) ÷ avg cost on deployed capital; P&amp;L ₹ = current value − purchase cost. Market windows: stock/index % over ~21 sessions / ~12 months; “Stock vs index” = stock % minus index %. UNVERIFIED live data.</p>
+<div class="rank-grid">
+<div class="rank-box">
+<h2>Monthly (~21 sessions) — Top 5 lagging vs index</h2>
+<p>Lowest / highest <strong>Stock − Index</strong> (pp) over ~21 trading sessions.</p>
+<table>
+<thead><tr><th class="num">#</th><th>Stock</th><th>Index</th><th class="num">Mo index</th><th class="num">Mo stock</th><th class="num">Stock − Index</th></tr></thead>
+<tbody><tr>
+<td class="num">1</td>
+<td><strong>HEG</strong><br><span class="ticker">HEG</span></td>
+<td>Nifty 50</td>
+<td class="num neg">-5.7%</td>
+<td class="num neg">-66.1%</td>
+<td class="num neg">-60.4 pp</td>
+</tr>
+<tr>
+<td class="num">2</td>
+<td><strong>Fortis Healthcare</strong><br><span class="ticker">FORTIS</span></td>
+<td>Nifty Pharma</td>
+<td class="num neg">-2.6%</td>
+<td class="num neg">-16.2%</td>
+<td class="num neg">-13.6 pp</td>
+</tr>
+<tr>
+<td class="num">3</td>
+<td><strong>Max Healthcare</strong><br><span class="ticker">MAXHEALTH</span></td>
+<td>Nifty Pharma</td>
+<td class="num neg">-2.6%</td>
+<td class="num neg">-7.9%</td>
+<td class="num neg">-5.3 pp</td>
+</tr>
+<tr>
+<td class="num">4</td>
+<td><strong>Global Health (Medanta)</strong><br><span class="ticker">MEDANTA</span></td>
+<td>Nifty Pharma</td>
+<td class="num neg">-2.6%</td>
+<td class="num neg">-7.9%</td>
+<td class="num neg">-5.3 pp</td>
+</tr>
+<tr>
+<td class="num">5</td>
+<td><strong>Sun Pharmaceutical</strong><br><span class="ticker">SUNPHARMA</span></td>
+<td>Nifty Pharma</td>
+<td class="num neg">-2.6%</td>
+<td class="num neg">-7.0%</td>
+<td class="num neg">-4.4 pp</td>
+</tr></tbody>
+</table>
+</div>
+<div class="rank-box">
+<h2>Monthly (~21 sessions) — Top 5 leading vs index</h2>
+<p>Lowest / highest <strong>Stock − Index</strong> (pp) over ~21 trading sessions.</p>
+<table>
+<thead><tr><th class="num">#</th><th>Stock</th><th>Index</th><th class="num">Mo index</th><th class="num">Mo stock</th><th class="num">Stock − Index</th></tr></thead>
+<tbody><tr>
+<td class="num">1</td>
+<td><strong>Delta Corp</strong><br><span class="ticker">DELTACORP</span></td>
+<td>Nifty 50</td>
+<td class="num neg">-5.7%</td>
+<td class="num pos">+49.4%</td>
+<td class="num pos">+55.1 pp</td>
+</tr>
+<tr>
+<td class="num">2</td>
+<td><strong>Ujjivan Small Finance Bank</strong><br><span class="ticker">UJJIVANSFB</span></td>
+<td>Nifty Bank</td>
+<td class="num neg">-4.2%</td>
+<td class="num pos">+6.0%</td>
+<td class="num pos">+10.2 pp</td>
+</tr>
+<tr>
+<td class="num">3</td>
+<td><strong>Dr. Reddy's Laboratories</strong><br><span class="ticker">DRREDDY</span></td>
+<td>Nifty Pharma</td>
+<td class="num neg">-2.6%</td>
+<td class="num pos">+3.9%</td>
+<td class="num pos">+6.5 pp</td>
+</tr>
+<tr>
+<td class="num">4</td>
+<td><strong>Tech Mahindra</strong><br><span class="ticker">TECHM</span></td>
+<td>Nifty IT</td>
+<td class="num neg">-9.1%</td>
+<td class="num neg">-3.9%</td>
+<td class="num pos">+5.2 pp</td>
+</tr>
+<tr>
+<td class="num">5</td>
+<td><strong>ITC Hotels</strong><br><span class="ticker">ITCHOTELS</span></td>
+<td>Nifty 50</td>
+<td class="num neg">-5.7%</td>
+<td class="num neg">-0.6%</td>
+<td class="num pos">+5.1 pp</td>
+</tr></tbody>
+</table>
+</div>
+</div>
+<div class="rank-grid">
+<div class="rank-box">
+<h2>Yearly (~12M) — Top 5 lagging vs index</h2>
+<p>Lowest / highest <strong>Stock − Index</strong> (pp) over ~12 months.</p>
+<table>
+<thead><tr><th class="num">#</th><th>Stock</th><th>Index</th><th class="num">Yr index</th><th class="num">Yr stock</th><th class="num">Stock − Index</th></tr></thead>
+<tbody><tr>
+<td class="num">1</td>
+<td><strong>HEG</strong><br><span class="ticker">HEG</span></td>
+<td>Nifty 50</td>
+<td class="num neg">-10.1%</td>
+<td class="num neg">-59.3%</td>
+<td class="num neg">-49.2 pp</td>
+</tr>
+<tr>
+<td class="num">2</td>
+<td><strong>Fortis Healthcare</strong><br><span class="ticker">FORTIS</span></td>
+<td>Nifty Pharma</td>
+<td class="num pos">+19.8%</td>
+<td class="num neg">-27.0%</td>
+<td class="num neg">-46.8 pp</td>
+</tr>
+<tr>
+<td class="num">3</td>
+<td><strong>Max Healthcare</strong><br><span class="ticker">MAXHEALTH</span></td>
+<td>Nifty Pharma</td>
+<td class="num pos">+19.8%</td>
+<td class="num neg">-19.6%</td>
+<td class="num neg">-39.4 pp</td>
+</tr>
+<tr>
+<td class="num">4</td>
+<td><strong>Cipla</strong><br><span class="ticker">CIPLA</span></td>
+<td>Nifty Pharma</td>
+<td class="num pos">+19.8%</td>
+<td class="num neg">-11.7%</td>
+<td class="num neg">-31.5 pp</td>
+</tr>
+<tr>
+<td class="num">5</td>
+<td><strong>HDFC Bank</strong><br><span class="ticker">HDFCBANK</span></td>
+<td>Nifty Bank</td>
+<td class="num neg">-2.4%</td>
+<td class="num neg">-27.5%</td>
+<td class="num neg">-25.1 pp</td>
+</tr></tbody>
+</table>
+</div>
+<div class="rank-box">
+<h2>Yearly (~12M) — Top 5 leading vs index</h2>
+<p>Lowest / highest <strong>Stock − Index</strong> (pp) over ~12 months.</p>
+<table>
+<thead><tr><th class="num">#</th><th>Stock</th><th>Index</th><th class="num">Yr index</th><th class="num">Yr stock</th><th class="num">Stock − Index</th></tr></thead>
+<tbody><tr>
+<td class="num">1</td>
+<td><strong>Ujjivan Small Finance Bank</strong><br><span class="ticker">UJJIVANSFB</span></td>
+<td>Nifty Bank</td>
+<td class="num neg">-2.4%</td>
+<td class="num pos">+36.5%</td>
+<td class="num pos">+38.9 pp</td>
+</tr>
+<tr>
+<td class="num">2</td>
+<td><strong>Tech Mahindra</strong><br><span class="ticker">TECHM</span></td>
+<td>Nifty IT</td>
+<td class="num neg">-18.6%</td>
+<td class="num pos">+6.7%</td>
+<td class="num pos">+25.3 pp</td>
+</tr>
+<tr>
+<td class="num">3</td>
+<td><strong>Delta Corp</strong><br><span class="ticker">DELTACORP</span></td>
+<td>Nifty 50</td>
+<td class="num neg">-10.1%</td>
+<td class="num pos">+4.3%</td>
+<td class="num pos">+14.4 pp</td>
+</tr>
+<tr>
+<td class="num">4</td>
+<td><strong>State Bank of India</strong><br><span class="ticker">SBIN</span></td>
+<td>Nifty Bank</td>
+<td class="num neg">-2.4%</td>
+<td class="num pos">+9.7%</td>
+<td class="num pos">+12.1 pp</td>
+</tr>
+<tr>
+<td class="num">5</td>
+<td><strong>Indian Hotels</strong><br><span class="ticker">INDHOTEL</span></td>
+<td>Nifty 50</td>
+<td class="num neg">-10.1%</td>
+<td class="num neg">-0.3%</td>
+<td class="num pos">+9.8 pp</td>
+</tr></tbody>
+</table>
+</div>
+</div>
+<div class="wrap">
+<table>
+<thead>
+<tr>
+<th rowspan="2">Stock Name</th>
+<th rowspan="2">Index Category</th>
+<th rowspan="2" class="num">Qty</th>
+<th rowspan="2" class="num">Purchase Cost</th>
+<th rowspan="2" class="num">Current Value</th>
+<th colspan="4" class="group">Vs your cost (deployed capital)</th>
+<th colspan="3" class="group">Monthly (~21 sessions)</th>
+<th colspan="3" class="group">Yearly (~12M)</th>
+</tr>
+<tr>
+<th class="num">Avg cost</th><th class="num">CMP</th><th class="num">P&amp;L ₹</th><th class="num spread">Vs cost %</th>
+<th class="num">Index</th><th class="num">Stock</th><th class="num spread">Stock − Index</th>
+<th class="num">Index</th><th class="num">Stock</th><th class="num spread">Stock − Index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Max Healthcare</strong><br><span class="ticker">MAXHEALTH</span></td>
+<td>Nifty Pharma</td>
+<td class="num">2,000</td>
+<td class="num">₹13,11,680</td>
+<td class="num">₹18,32,400</td>
+<td class="num">₹655.84</td>
+<td class="num">₹916.20</td>
+<td class="num pos">+₹5,20,720</td>
+<td class="num pos">+39.7%</td>
+<td class="num neg">-2.6%</td>
+<td class="num neg">-7.9%</td>
+<td class="num neg">-5.3 pp</td>
+<td class="num pos">+19.8%</td>
+<td class="num neg">-19.6%</td>
+<td class="num neg">-39.4 pp</td>
+</tr>
+<tr>
+<td><strong>ITC</strong><br><span class="ticker">ITC</span></td>
+<td>Nifty FMCG</td>
+<td class="num">3,000</td>
+<td class="num">₹10,73,820</td>
+<td class="num">₹8,03,700</td>
+<td class="num">₹357.94</td>
+<td class="num">₹267.90</td>
+<td class="num neg">-₹2,70,120</td>
+<td class="num neg">-25.2%</td>
+<td class="num ">—</td>
+<td class="num pos">+1.9%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-33.2%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Tata Consultancy Services</strong><br><span class="ticker">TCS</span></td>
+<td>Nifty IT</td>
+<td class="num">299</td>
+<td class="num">₹9,87,747</td>
+<td class="num">₹6,29,335</td>
+<td class="num">₹3,303.50</td>
+<td class="num">₹2,104.80</td>
+<td class="num neg">-₹3,58,412</td>
+<td class="num neg">-36.3%</td>
+<td class="num neg">-9.1%</td>
+<td class="num neg">-9.3%</td>
+<td class="num neg">-0.2 pp</td>
+<td class="num neg">-18.6%</td>
+<td class="num neg">-29.6%</td>
+<td class="num neg">-11.0 pp</td>
+</tr>
+<tr>
+<td><strong>HDFC Bank</strong><br><span class="ticker">HDFCBANK</span></td>
+<td>Nifty Bank</td>
+<td class="num">1,125</td>
+<td class="num">₹8,72,224</td>
+<td class="num">₹7,93,294</td>
+<td class="num">₹775.31</td>
+<td class="num">₹705.15</td>
+<td class="num neg">-₹78,930</td>
+<td class="num neg">-9.0%</td>
+<td class="num neg">-4.2%</td>
+<td class="num neg">-0.2%</td>
+<td class="num pos">+4.0 pp</td>
+<td class="num neg">-2.4%</td>
+<td class="num neg">-27.5%</td>
+<td class="num neg">-25.1 pp</td>
+</tr>
+<tr>
+<td><strong>Maruti Suzuki</strong><br><span class="ticker">MARUTI</span></td>
+<td>Nifty Auto</td>
+<td class="num">64</td>
+<td class="num">₹7,24,152</td>
+<td class="num">₹7,35,936</td>
+<td class="num">₹11,314.88</td>
+<td class="num">₹11,499.00</td>
+<td class="num pos">+₹11,784</td>
+<td class="num pos">+1.6%</td>
+<td class="num ">—</td>
+<td class="num neg">-10.6%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-28.1%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Infosys</strong><br><span class="ticker">INFY</span></td>
+<td>Nifty IT</td>
+<td class="num">435</td>
+<td class="num">₹6,44,100</td>
+<td class="num">₹4,43,635</td>
+<td class="num">₹1,480.69</td>
+<td class="num">₹1,019.85</td>
+<td class="num neg">-₹2,00,465</td>
+<td class="num neg">-31.1%</td>
+<td class="num neg">-9.1%</td>
+<td class="num neg">-9.8%</td>
+<td class="num neg">-0.7 pp</td>
+<td class="num neg">-18.6%</td>
+<td class="num neg">-30.9%</td>
+<td class="num neg">-12.3 pp</td>
+</tr>
+<tr>
+<td><strong>Hindustan Unilever</strong><br><span class="ticker">HINDUNILVR</span></td>
+<td>Nifty FMCG</td>
+<td class="num">250</td>
+<td class="num">₹6,05,600</td>
+<td class="num">₹4,59,000</td>
+<td class="num">₹2,422.40</td>
+<td class="num">₹1,836.00</td>
+<td class="num neg">-₹1,46,600</td>
+<td class="num neg">-24.2%</td>
+<td class="num ">—</td>
+<td class="num neg">-6.4%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-27.8%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Bharti Airtel</strong><br><span class="ticker">BHARTIARTL</span></td>
+<td>Nifty 50</td>
+<td class="num">415</td>
+<td class="num">₹5,03,089</td>
+<td class="num">₹7,36,376</td>
+<td class="num">₹1,212.26</td>
+<td class="num">₹1,774.40</td>
+<td class="num pos">+₹2,33,287</td>
+<td class="num pos">+46.4%</td>
+<td class="num neg">-5.7%</td>
+<td class="num neg">-5.1%</td>
+<td class="num pos">+0.6 pp</td>
+<td class="num neg">-10.1%</td>
+<td class="num neg">-6.8%</td>
+<td class="num pos">+3.3 pp</td>
+</tr>
+<tr>
+<td><strong>Tata Consumer Products</strong><br><span class="ticker">TATACONSUM</span></td>
+<td>Nifty FMCG</td>
+<td class="num">602</td>
+<td class="num">₹4,71,942</td>
+<td class="num">₹5,70,636</td>
+<td class="num">₹783.96</td>
+<td class="num">₹947.90</td>
+<td class="num pos">+₹98,694</td>
+<td class="num pos">+20.9%</td>
+<td class="num ">—</td>
+<td class="num neg">-7.0%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-17.0%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Kotak Mahindra Bank</strong><br><span class="ticker">KOTAKBANK</span></td>
+<td>Nifty Bank</td>
+<td class="num">1,250</td>
+<td class="num">₹4,39,100</td>
+<td class="num">₹5,20,813</td>
+<td class="num">₹351.28</td>
+<td class="num">₹416.65</td>
+<td class="num pos">+₹81,713</td>
+<td class="num pos">+18.6%</td>
+<td class="num neg">-4.2%</td>
+<td class="num neg">-1.1%</td>
+<td class="num pos">+3.1 pp</td>
+<td class="num neg">-2.4%</td>
+<td class="num neg">-2.9%</td>
+<td class="num neg">-0.5 pp</td>
+</tr>
+<tr>
+<td><strong>HCL Technologies</strong><br><span class="ticker">HCLTECH</span></td>
+<td>Nifty IT</td>
+<td class="num">360</td>
+<td class="num">₹4,36,352</td>
+<td class="num">₹4,32,684</td>
+<td class="num">₹1,212.09</td>
+<td class="num">₹1,201.90</td>
+<td class="num neg">-₹3,668</td>
+<td class="num neg">-0.8%</td>
+<td class="num neg">-9.1%</td>
+<td class="num neg">-8.9%</td>
+<td class="num pos">+0.2 pp</td>
+<td class="num neg">-18.6%</td>
+<td class="num neg">-15.2%</td>
+<td class="num pos">+3.4 pp</td>
+</tr>
+<tr>
+<td><strong>Indraprastha Gas</strong><br><span class="ticker">IGL</span></td>
+<td>Nifty Energy</td>
+<td class="num">2,050</td>
+<td class="num">₹4,35,605</td>
+<td class="num">₹2,93,622</td>
+<td class="num">₹212.49</td>
+<td class="num">₹143.23</td>
+<td class="num neg">-₹1,41,983</td>
+<td class="num neg">-32.6%</td>
+<td class="num ">—</td>
+<td class="num neg">-4.1%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-31.2%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Larsen &amp; Toubro</strong><br><span class="ticker">LT</span></td>
+<td>Nifty Infra</td>
+<td class="num">175</td>
+<td class="num">₹4,03,205</td>
+<td class="num">₹6,51,455</td>
+<td class="num">₹2,304.03</td>
+<td class="num">₹3,722.60</td>
+<td class="num pos">+₹2,48,250</td>
+<td class="num pos">+61.6%</td>
+<td class="num ">—</td>
+<td class="num neg">-6.3%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-0.4%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>HDFC Life Insurance</strong><br><span class="ticker">HDFCLIFE</span></td>
+<td>Nifty Financial Services</td>
+<td class="num">650</td>
+<td class="num">₹4,02,474</td>
+<td class="num">₹3,44,013</td>
+<td class="num">₹619.19</td>
+<td class="num">₹529.25</td>
+<td class="num neg">-₹58,461</td>
+<td class="num neg">-14.5%</td>
+<td class="num ">—</td>
+<td class="num neg">-0.8%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-30.6%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Fortis Healthcare</strong><br><span class="ticker">FORTIS</span></td>
+<td>Nifty Pharma</td>
+<td class="num">1,200</td>
+<td class="num">₹3,98,484</td>
+<td class="num">₹9,22,680</td>
+<td class="num">₹332.07</td>
+<td class="num">₹768.90</td>
+<td class="num pos">+₹5,24,196</td>
+<td class="num pos">+131.5%</td>
+<td class="num neg">-2.6%</td>
+<td class="num neg">-16.2%</td>
+<td class="num neg">-13.6 pp</td>
+<td class="num pos">+19.8%</td>
+<td class="num neg">-27.0%</td>
+<td class="num neg">-46.8 pp</td>
+</tr>
+<tr>
+<td><strong>Tata Motors Passenger Vehicles</strong><br><span class="ticker">TMPV</span></td>
+<td>Nifty Auto</td>
+<td class="num">820</td>
+<td class="num">₹3,78,217</td>
+<td class="num">₹2,35,545</td>
+<td class="num">₹461.24</td>
+<td class="num">₹287.25</td>
+<td class="num neg">-₹1,42,672</td>
+<td class="num neg">-37.7%</td>
+<td class="num ">—</td>
+<td class="num neg">-7.9%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-59.7%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>HDFC Asset Management</strong><br><span class="ticker">HDFCAMC</span></td>
+<td>Nifty Financial Services</td>
+<td class="num">237</td>
+<td class="num">₹3,55,732</td>
+<td class="num">₹5,58,799</td>
+<td class="num">₹1,500.98</td>
+<td class="num">₹2,357.80</td>
+<td class="num pos">+₹2,03,067</td>
+<td class="num pos">+57.1%</td>
+<td class="num ">—</td>
+<td class="num neg">-6.1%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-16.7%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>ITC Hotels</strong><br><span class="ticker">ITCHOTELS</span></td>
+<td>Nifty 50</td>
+<td class="num">1,185</td>
+<td class="num">₹2,64,705</td>
+<td class="num">₹1,88,830</td>
+<td class="num">₹223.38</td>
+<td class="num">₹159.35</td>
+<td class="num neg">-₹75,875</td>
+<td class="num neg">-28.7%</td>
+<td class="num neg">-5.7%</td>
+<td class="num neg">-0.6%</td>
+<td class="num pos">+5.1 pp</td>
+<td class="num neg">-10.1%</td>
+<td class="num neg">-26.1%</td>
+<td class="num neg">-16.0 pp</td>
+</tr>
+<tr>
+<td><strong>Global Health (Medanta)</strong><br><span class="ticker">MEDANTA</span></td>
+<td>Nifty Pharma</td>
+<td class="num">212</td>
+<td class="num">₹2,25,063</td>
+<td class="num">₹2,82,172</td>
+<td class="num">₹1,061.62</td>
+<td class="num">₹1,331.00</td>
+<td class="num pos">+₹57,109</td>
+<td class="num pos">+25.4%</td>
+<td class="num neg">-2.6%</td>
+<td class="num neg">-7.9%</td>
+<td class="num neg">-5.3 pp</td>
+<td class="num pos">+19.8%</td>
+<td class="num neg">-2.6%</td>
+<td class="num neg">-22.4 pp</td>
+</tr>
+<tr>
+<td><strong>Delta Corp</strong><br><span class="ticker">DELTACORP</span></td>
+<td>Nifty 50</td>
+<td class="num">1,560</td>
+<td class="num">₹2,06,700</td>
+<td class="num">₹1,30,962</td>
+<td class="num">₹132.50</td>
+<td class="num">₹83.95</td>
+<td class="num neg">-₹75,738</td>
+<td class="num neg">-36.6%</td>
+<td class="num neg">-5.7%</td>
+<td class="num pos">+49.4%</td>
+<td class="num pos">+55.1 pp</td>
+<td class="num neg">-10.1%</td>
+<td class="num pos">+4.3%</td>
+<td class="num pos">+14.4 pp</td>
+</tr>
+<tr>
+<td><strong>Muthoot Finance</strong><br><span class="ticker">MUTHOOTFIN</span></td>
+<td>Nifty Financial Services</td>
+<td class="num">125</td>
+<td class="num">₹1,61,218</td>
+<td class="num">₹3,38,938</td>
+<td class="num">₹1,289.74</td>
+<td class="num">₹2,711.50</td>
+<td class="num pos">+₹1,77,720</td>
+<td class="num pos">+110.2%</td>
+<td class="num ">—</td>
+<td class="num neg">-7.3%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-16.0%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Ujjivan Small Finance Bank</strong><br><span class="ticker">UJJIVANSFB</span></td>
+<td>Nifty Bank</td>
+<td class="num">3,115</td>
+<td class="num">₹1,45,066</td>
+<td class="num">₹2,07,926</td>
+<td class="num">₹46.57</td>
+<td class="num">₹66.75</td>
+<td class="num pos">+₹62,860</td>
+<td class="num pos">+43.3%</td>
+<td class="num neg">-4.2%</td>
+<td class="num pos">+6.0%</td>
+<td class="num pos">+10.2 pp</td>
+<td class="num neg">-2.4%</td>
+<td class="num pos">+36.5%</td>
+<td class="num pos">+38.9 pp</td>
+</tr>
+<tr>
+<td><strong>ICICI Bank</strong><br><span class="ticker">ICICIBANK</span></td>
+<td>Nifty Bank</td>
+<td class="num">143</td>
+<td class="num">₹1,27,021</td>
+<td class="num">₹1,90,476</td>
+<td class="num">₹888.26</td>
+<td class="num">₹1,332.00</td>
+<td class="num pos">+₹63,455</td>
+<td class="num pos">+50.0%</td>
+<td class="num neg">-4.2%</td>
+<td class="num neg">-6.9%</td>
+<td class="num neg">-2.7 pp</td>
+<td class="num neg">-2.4%</td>
+<td class="num neg">-2.3%</td>
+<td class="num pos">+0.1 pp</td>
+</tr>
+<tr>
+<td><strong>Tata Motors (CV)</strong><br><span class="ticker">TATAMOTORS</span></td>
+<td>Nifty Auto</td>
+<td class="num">830</td>
+<td class="num">₹1,21,877</td>
+<td class="num">₹3,54,618</td>
+<td class="num">₹146.84</td>
+<td class="num">₹427.25</td>
+<td class="num pos">+₹2,32,741</td>
+<td class="num pos">+191.0%</td>
+<td class="num ">—</td>
+<td class="num neg">-7.2%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num pos">+29.7%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Bajaj Finserv</strong><br><span class="ticker">BAJAJFINSV</span></td>
+<td>Nifty Financial Services</td>
+<td class="num">60</td>
+<td class="num">₹1,01,984</td>
+<td class="num">₹1,04,136</td>
+<td class="num">₹1,699.73</td>
+<td class="num">₹1,735.60</td>
+<td class="num pos">+₹2,152</td>
+<td class="num pos">+2.1%</td>
+<td class="num ">—</td>
+<td class="num neg">-12.9%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-14.6%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Sun Pharmaceutical</strong><br><span class="ticker">SUNPHARMA</span></td>
+<td>Nifty Pharma</td>
+<td class="num">180</td>
+<td class="num">₹95,893</td>
+<td class="num">₹3,20,580</td>
+<td class="num">₹532.74</td>
+<td class="num">₹1,781.00</td>
+<td class="num pos">+₹2,24,687</td>
+<td class="num pos">+234.3%</td>
+<td class="num neg">-2.6%</td>
+<td class="num neg">-7.0%</td>
+<td class="num neg">-4.4 pp</td>
+<td class="num pos">+19.8%</td>
+<td class="num pos">+7.6%</td>
+<td class="num neg">-12.2 pp</td>
+</tr>
+<tr>
+<td><strong>Hero MotoCorp</strong><br><span class="ticker">HEROMOTOCO</span></td>
+<td>Nifty Auto</td>
+<td class="num">30</td>
+<td class="num">₹93,521</td>
+<td class="num">₹1,52,775</td>
+<td class="num">₹3,117.37</td>
+<td class="num">₹5,092.50</td>
+<td class="num pos">+₹59,254</td>
+<td class="num pos">+63.4%</td>
+<td class="num ">—</td>
+<td class="num neg">-4.0%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-8.7%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Bank of India</strong><br><span class="ticker">BANKINDIA</span></td>
+<td>Nifty Bank</td>
+<td class="num">1,105</td>
+<td class="num">₹86,599</td>
+<td class="num">₹1,47,319</td>
+<td class="num">₹78.37</td>
+<td class="num">₹133.32</td>
+<td class="num pos">+₹60,720</td>
+<td class="num pos">+70.1%</td>
+<td class="num neg">-4.2%</td>
+<td class="num neg">-8.1%</td>
+<td class="num neg">-3.9 pp</td>
+<td class="num neg">-2.4%</td>
+<td class="num pos">+5.8%</td>
+<td class="num pos">+8.2 pp</td>
+</tr>
+<tr>
+<td><strong>State Bank of India</strong><br><span class="ticker">SBIN</span></td>
+<td>Nifty Bank</td>
+<td class="num">400</td>
+<td class="num">₹76,840</td>
+<td class="num">₹3,83,440</td>
+<td class="num">₹192.10</td>
+<td class="num">₹958.60</td>
+<td class="num pos">+₹3,06,600</td>
+<td class="num pos">+399.0%</td>
+<td class="num neg">-4.2%</td>
+<td class="num neg">-6.3%</td>
+<td class="num neg">-2.1 pp</td>
+<td class="num neg">-2.4%</td>
+<td class="num pos">+9.7%</td>
+<td class="num pos">+12.1 pp</td>
+</tr>
+<tr>
+<td><strong>Punjab National Bank</strong><br><span class="ticker">PNB</span></td>
+<td>Nifty Bank</td>
+<td class="num">1,563</td>
+<td class="num">₹76,102</td>
+<td class="num">₹1,74,665</td>
+<td class="num">₹48.69</td>
+<td class="num">₹111.75</td>
+<td class="num pos">+₹98,563</td>
+<td class="num pos">+129.5%</td>
+<td class="num neg">-4.2%</td>
+<td class="num neg">-3.9%</td>
+<td class="num pos">+0.3 pp</td>
+<td class="num neg">-2.4%</td>
+<td class="num neg">-2.4%</td>
+<td class="num pos">+0.0 pp</td>
+</tr>
+<tr>
+<td><strong>Cupid Ltd</strong><br><span class="ticker">CUPID</span></td>
+<td>Nifty FMCG</td>
+<td class="num">600</td>
+<td class="num">₹72,000</td>
+<td class="num">₹1,86,840</td>
+<td class="num">₹120.00</td>
+<td class="num">₹311.40</td>
+<td class="num pos">+₹1,14,840</td>
+<td class="num pos">+159.5%</td>
+<td class="num ">—</td>
+<td class="num pos">+11.2%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num pos">+615.6%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Havells India</strong><br><span class="ticker">HAVELLS</span></td>
+<td>Nifty FMCG</td>
+<td class="num">65</td>
+<td class="num">₹68,212</td>
+<td class="num">₹67,997</td>
+<td class="num">₹1,049.42</td>
+<td class="num">₹1,046.10</td>
+<td class="num neg">-₹215</td>
+<td class="num neg">-0.3%</td>
+<td class="num ">—</td>
+<td class="num neg">-12.8%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-30.2%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Indian Oil Corporation</strong><br><span class="ticker">IOC</span></td>
+<td>Nifty Energy</td>
+<td class="num">1,003</td>
+<td class="num">₹66,860</td>
+<td class="num">₹1,31,483</td>
+<td class="num">₹66.66</td>
+<td class="num">₹131.09</td>
+<td class="num pos">+₹64,623</td>
+<td class="num pos">+96.7%</td>
+<td class="num ">—</td>
+<td class="num neg">-4.9%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-15.3%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Samvardhana Motherson</strong><br><span class="ticker">MOTHERSON</span></td>
+<td>Nifty Auto</td>
+<td class="num">1,000</td>
+<td class="num">₹65,270</td>
+<td class="num">₹1,55,940</td>
+<td class="num">₹65.27</td>
+<td class="num">₹155.94</td>
+<td class="num pos">+₹90,670</td>
+<td class="num pos">+138.9%</td>
+<td class="num ">—</td>
+<td class="num neg">-3.7%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num pos">+46.8%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Wipro</strong><br><span class="ticker">WIPRO</span></td>
+<td>Nifty IT</td>
+<td class="num">200</td>
+<td class="num">₹53,566</td>
+<td class="num">₹32,440</td>
+<td class="num">₹267.83</td>
+<td class="num">₹162.20</td>
+<td class="num neg">-₹21,126</td>
+<td class="num neg">-39.4%</td>
+<td class="num neg">-9.1%</td>
+<td class="num neg">-7.7%</td>
+<td class="num pos">+1.4 pp</td>
+<td class="num neg">-18.6%</td>
+<td class="num neg">-33.0%</td>
+<td class="num neg">-14.4 pp</td>
+</tr>
+<tr>
+<td><strong>Balkrishna Industries</strong><br><span class="ticker">BALKRISIND</span></td>
+<td>Nifty Auto</td>
+<td class="num">21</td>
+<td class="num">₹41,404</td>
+<td class="num">₹43,529</td>
+<td class="num">₹1,971.62</td>
+<td class="num">₹2,072.80</td>
+<td class="num pos">+₹2,125</td>
+<td class="num pos">+5.1%</td>
+<td class="num ">—</td>
+<td class="num neg">-10.9%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-9.7%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>General Insurance Corp</strong><br><span class="ticker">GICRE</span></td>
+<td>Nifty Financial Services</td>
+<td class="num">215</td>
+<td class="num">₹39,412</td>
+<td class="num">₹68,832</td>
+<td class="num">₹183.31</td>
+<td class="num">₹320.15</td>
+<td class="num pos">+₹29,420</td>
+<td class="num pos">+74.6%</td>
+<td class="num ">—</td>
+<td class="num neg">-10.1%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-16.0%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Indian Hotels</strong><br><span class="ticker">INDHOTEL</span></td>
+<td>Nifty 50</td>
+<td class="num">400</td>
+<td class="num">₹37,844</td>
+<td class="num">₹2,88,640</td>
+<td class="num">₹94.61</td>
+<td class="num">₹721.60</td>
+<td class="num pos">+₹2,50,796</td>
+<td class="num pos">+662.7%</td>
+<td class="num neg">-5.7%</td>
+<td class="num neg">-1.4%</td>
+<td class="num pos">+4.3 pp</td>
+<td class="num neg">-10.1%</td>
+<td class="num neg">-0.3%</td>
+<td class="num pos">+9.8 pp</td>
+</tr>
+<tr>
+<td><strong>Oil &amp; Natural Gas Corp</strong><br><span class="ticker">ONGC</span></td>
+<td>Nifty Energy</td>
+<td class="num">400</td>
+<td class="num">₹34,592</td>
+<td class="num">₹90,108</td>
+<td class="num">₹86.48</td>
+<td class="num">₹225.27</td>
+<td class="num pos">+₹55,516</td>
+<td class="num pos">+160.5%</td>
+<td class="num ">—</td>
+<td class="num neg">-4.5%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-8.4%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Cipla</strong><br><span class="ticker">CIPLA</span></td>
+<td>Nifty Pharma</td>
+<td class="num">25</td>
+<td class="num">₹30,507</td>
+<td class="num">₹33,413</td>
+<td class="num">₹1,220.28</td>
+<td class="num">₹1,336.50</td>
+<td class="num pos">+₹2,906</td>
+<td class="num pos">+9.5%</td>
+<td class="num neg">-2.6%</td>
+<td class="num neg">-4.2%</td>
+<td class="num neg">-1.6 pp</td>
+<td class="num pos">+19.8%</td>
+<td class="num neg">-11.7%</td>
+<td class="num neg">-31.5 pp</td>
+</tr>
+<tr>
+<td><strong>Dr. Reddy's Laboratories</strong><br><span class="ticker">DRREDDY</span></td>
+<td>Nifty Pharma</td>
+<td class="num">25</td>
+<td class="num">₹29,625</td>
+<td class="num">₹30,008</td>
+<td class="num">₹1,185.00</td>
+<td class="num">₹1,200.30</td>
+<td class="num pos">+₹383</td>
+<td class="num pos">+1.3%</td>
+<td class="num neg">-2.6%</td>
+<td class="num pos">+3.9%</td>
+<td class="num pos">+6.5 pp</td>
+<td class="num pos">+19.8%</td>
+<td class="num neg">-3.9%</td>
+<td class="num neg">-23.7 pp</td>
+</tr>
+<tr>
+<td><strong>Lupin</strong><br><span class="ticker">LUPIN</span></td>
+<td>Nifty Pharma</td>
+<td class="num">32</td>
+<td class="num">₹24,804</td>
+<td class="num">₹64,355</td>
+<td class="num">₹775.13</td>
+<td class="num">₹2,011.10</td>
+<td class="num pos">+₹39,551</td>
+<td class="num pos">+159.5%</td>
+<td class="num neg">-2.6%</td>
+<td class="num neg">-5.7%</td>
+<td class="num neg">-3.1 pp</td>
+<td class="num pos">+19.8%</td>
+<td class="num pos">+3.8%</td>
+<td class="num neg">-16.0 pp</td>
+</tr>
+<tr>
+<td><strong>Tech Mahindra</strong><br><span class="ticker">TECHM</span></td>
+<td>Nifty IT</td>
+<td class="num">27</td>
+<td class="num">₹23,236</td>
+<td class="num">₹41,448</td>
+<td class="num">₹860.59</td>
+<td class="num">₹1,535.10</td>
+<td class="num pos">+₹18,212</td>
+<td class="num pos">+78.4%</td>
+<td class="num neg">-9.1%</td>
+<td class="num neg">-3.9%</td>
+<td class="num pos">+5.2 pp</td>
+<td class="num neg">-18.6%</td>
+<td class="num pos">+6.7%</td>
+<td class="num pos">+25.3 pp</td>
+</tr>
+<tr>
+<td><strong>HEG</strong><br><span class="ticker">HEG</span></td>
+<td>Nifty 50</td>
+<td class="num">100</td>
+<td class="num">₹15,722</td>
+<td class="num">₹24,850</td>
+<td class="num">₹157.22</td>
+<td class="num">₹248.50</td>
+<td class="num pos">+₹9,128</td>
+<td class="num pos">+58.1%</td>
+<td class="num neg">-5.7%</td>
+<td class="num neg">-66.1%</td>
+<td class="num neg">-60.4 pp</td>
+<td class="num neg">-10.1%</td>
+<td class="num neg">-59.3%</td>
+<td class="num neg">-49.2 pp</td>
+</tr>
+<tr>
+<td><strong>Kwality Walls India</strong><br><span class="ticker">KWIL</span></td>
+<td>Nifty FMCG</td>
+<td class="num">250</td>
+<td class="num">₹11,568</td>
+<td class="num">₹9,570</td>
+<td class="num">₹46.27</td>
+<td class="num">₹38.28</td>
+<td class="num neg">-₹1,998</td>
+<td class="num neg">-17.3%</td>
+<td class="num ">—</td>
+<td class="num neg">-9.5%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num pos">+30.1%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Raajmarg Infra Investment</strong><br><span class="ticker">RAAJINFRA</span></td>
+<td>Nifty Infra</td>
+<td class="num">100</td>
+<td class="num">₹11,046</td>
+<td class="num">₹10,500</td>
+<td class="num">₹110.46</td>
+<td class="num">₹105.00</td>
+<td class="num neg">-₹546</td>
+<td class="num neg">-4.9%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>United Breweries</strong><br><span class="ticker">UBL</span></td>
+<td>Nifty FMCG</td>
+<td class="num">10</td>
+<td class="num">₹10,413</td>
+<td class="num">₹11,858</td>
+<td class="num">₹1,041.30</td>
+<td class="num">₹1,185.80</td>
+<td class="num pos">+₹1,445</td>
+<td class="num pos">+13.9%</td>
+<td class="num ">—</td>
+<td class="num neg">-7.7%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num neg">-33.8%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Wonderla Holidays</strong><br><span class="ticker">WONDERLA</span></td>
+<td>Nifty 50</td>
+<td class="num">50</td>
+<td class="num">₹8,538</td>
+<td class="num">₹25,000</td>
+<td class="num">₹170.76</td>
+<td class="num">₹500.00</td>
+<td class="num pos">+₹16,462</td>
+<td class="num pos">+192.8%</td>
+<td class="num neg">-5.7%</td>
+<td class="num neg">-5.5%</td>
+<td class="num pos">+0.2 pp</td>
+<td class="num neg">-10.1%</td>
+<td class="num neg">-15.1%</td>
+<td class="num neg">-5.0 pp</td>
+</tr>
+<tr>
+<td><strong>Eicher Motors</strong><br><span class="ticker">EICHERMOT</span></td>
+<td>Nifty Auto</td>
+<td class="num">3</td>
+<td class="num">₹8,007</td>
+<td class="num">₹21,090</td>
+<td class="num">₹2,669.00</td>
+<td class="num">₹7,030.00</td>
+<td class="num pos">+₹13,083</td>
+<td class="num pos">+163.4%</td>
+<td class="num ">—</td>
+<td class="num neg">-8.6%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num pos">+2.2%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Ashok Leyland</strong><br><span class="ticker">ASHOKLEY</span></td>
+<td>Nifty Auto</td>
+<td class="num">100</td>
+<td class="num">₹4,021</td>
+<td class="num">₹15,274</td>
+<td class="num">₹40.21</td>
+<td class="num">₹152.74</td>
+<td class="num pos">+₹11,253</td>
+<td class="num pos">+279.9%</td>
+<td class="num ">—</td>
+<td class="num neg">-9.8%</td>
+<td class="num ">—</td>
+<td class="num ">—</td>
+<td class="num pos">+10.9%</td>
+<td class="num ">—</td>
+</tr>
+<tr>
+<td><strong>Glenmark Pharma</strong><br><span class="ticker">GLENMARK</span></td>
+<td>Nifty Pharma</td>
+<td class="num">5</td>
+<td class="num">₹983</td>
+<td class="num">₹11,434</td>
+<td class="num">₹196.60</td>
+<td class="num">₹2,286.70</td>
+<td class="num pos">+₹10,451</td>
+<td class="num pos">+1063.1%</td>
+<td class="num neg">-2.6%</td>
+<td class="num neg">-7.0%</td>
+<td class="num neg">-4.4 pp</td>
+<td class="num pos">+19.8%</td>
+<td class="num pos">+16.0%</td>
+<td class="num neg">-3.8 pp</td>
+</tr>
+</tbody>
+</table>
+</div>
+<footer>Not investment advice. “Stock − Index” in percentage points (pp): positive = stock outperformed the benchmark over that window. Refresh: <code>cd web &amp;&amp; npx tsx scripts/generate-holdings-index-table.ts</code></footer>
+</body>
+</html>

@@ -1,0 +1,84 @@
+﻿Stock Name,Ticker,Index Category,Quantity,Purchase Cost (INR),Current Value (INR),Avg Cost per Share (INR),CMP (INR),Unrealized P and L (INR),Vs Cost (pct),Monthly Index Variation,Monthly Stock Variation,Monthly Stock vs Index (pp),Yearly Index Variation,Yearly Stock Variation,Yearly Stock vs Index (pp)
+Max Healthcare,MAXHEALTH,Nifty Pharma,2000,1311680,1832400,655.84,916.20,520720,+39.7%,-2.6%,-7.9%,-5.3 pp,+19.8%,-19.6%,-39.4 pp
+ITC,ITC,Nifty FMCG,3000,1073820,803700,357.94,267.90,-270120,-25.2%,—,+1.9%,—,—,-33.2%,—
+Tata Consultancy Services,TCS,Nifty IT,299,987747,629335,3303.50,2104.80,-358412,-36.3%,-9.1%,-9.3%,-0.2 pp,-18.6%,-29.6%,-11.0 pp
+HDFC Bank,HDFCBANK,Nifty Bank,1125,872224,793294,775.31,705.15,-78930,-9.0%,-4.2%,-0.2%,+4.0 pp,-2.4%,-27.5%,-25.1 pp
+Maruti Suzuki,MARUTI,Nifty Auto,64,724152,735936,11314.88,11499.00,11784,+1.6%,—,-10.6%,—,—,-28.1%,—
+Infosys,INFY,Nifty IT,435,644100,443635,1480.69,1019.85,-200465,-31.1%,-9.1%,-9.8%,-0.7 pp,-18.6%,-30.9%,-12.3 pp
+Hindustan Unilever,HINDUNILVR,Nifty FMCG,250,605600,459000,2422.40,1836.00,-146600,-24.2%,—,-6.4%,—,—,-27.8%,—
+Bharti Airtel,BHARTIARTL,Nifty 50,415,503089,736376,1212.26,1774.40,233287,+46.4%,-5.7%,-5.1%,+0.6 pp,-10.1%,-6.8%,+3.3 pp
+Tata Consumer Products,TATACONSUM,Nifty FMCG,602,471942,570636,783.96,947.90,98694,+20.9%,—,-7.0%,—,—,-17.0%,—
+Kotak Mahindra Bank,KOTAKBANK,Nifty Bank,1250,439100,520813,351.28,416.65,81713,+18.6%,-4.2%,-1.1%,+3.1 pp,-2.4%,-2.9%,-0.5 pp
+HCL Technologies,HCLTECH,Nifty IT,360,436352,432684,1212.09,1201.90,-3668,-0.8%,-9.1%,-8.9%,+0.2 pp,-18.6%,-15.2%,+3.4 pp
+Indraprastha Gas,IGL,Nifty Energy,2050,435605,293622,212.49,143.23,-141983,-32.6%,—,-4.1%,—,—,-31.2%,—
+Larsen & Toubro,LT,Nifty Infra,175,403205,651455,2304.03,3722.60,248250,+61.6%,—,-6.3%,—,—,-0.4%,—
+HDFC Life Insurance,HDFCLIFE,Nifty Financial Services,650,402474,344013,619.19,529.25,-58461,-14.5%,—,-0.8%,—,—,-30.6%,—
+Fortis Healthcare,FORTIS,Nifty Pharma,1200,398484,922680,332.07,768.90,524196,+131.5%,-2.6%,-16.2%,-13.6 pp,+19.8%,-27.0%,-46.8 pp
+Tata Motors Passenger Vehicles,TMPV,Nifty Auto,820,378217,235545,461.24,287.25,-142672,-37.7%,—,-7.9%,—,—,-59.7%,—
+HDFC Asset Management,HDFCAMC,Nifty Financial Services,237,355732,558799,1500.98,2357.80,203067,+57.1%,—,-6.1%,—,—,-16.7%,—
+ITC Hotels,ITCHOTELS,Nifty 50,1185,264705,188830,223.38,159.35,-75875,-28.7%,-5.7%,-0.6%,+5.1 pp,-10.1%,-26.1%,-16.0 pp
+Global Health (Medanta),MEDANTA,Nifty Pharma,212,225063,282172,1061.62,1331.00,57109,+25.4%,-2.6%,-7.9%,-5.3 pp,+19.8%,-2.6%,-22.4 pp
+Delta Corp,DELTACORP,Nifty 50,1560,206700,130962,132.50,83.95,-75738,-36.6%,-5.7%,+49.4%,+55.1 pp,-10.1%,+4.3%,+14.4 pp
+Muthoot Finance,MUTHOOTFIN,Nifty Financial Services,125,161218,338938,1289.74,2711.50,177720,+110.2%,—,-7.3%,—,—,-16.0%,—
+Ujjivan Small Finance Bank,UJJIVANSFB,Nifty Bank,3115,145066,207926,46.57,66.75,62860,+43.3%,-4.2%,+6.0%,+10.2 pp,-2.4%,+36.5%,+38.9 pp
+ICICI Bank,ICICIBANK,Nifty Bank,143,127021,190476,888.26,1332.00,63455,+50.0%,-4.2%,-6.9%,-2.7 pp,-2.4%,-2.3%,+0.1 pp
+Tata Motors (CV),TATAMOTORS,Nifty Auto,830,121877,354618,146.84,427.25,232741,+191.0%,—,-7.2%,—,—,+29.7%,—
+Bajaj Finserv,BAJAJFINSV,Nifty Financial Services,60,101984,104136,1699.73,1735.60,2152,+2.1%,—,-12.9%,—,—,-14.6%,—
+Sun Pharmaceutical,SUNPHARMA,Nifty Pharma,180,95893,320580,532.74,1781.00,224687,+234.3%,-2.6%,-7.0%,-4.4 pp,+19.8%,+7.6%,-12.2 pp
+Hero MotoCorp,HEROMOTOCO,Nifty Auto,30,93521,152775,3117.37,5092.50,59254,+63.4%,—,-4.0%,—,—,-8.7%,—
+Bank of India,BANKINDIA,Nifty Bank,1105,86599,147319,78.37,133.32,60720,+70.1%,-4.2%,-8.1%,-3.9 pp,-2.4%,+5.8%,+8.2 pp
+State Bank of India,SBIN,Nifty Bank,400,76840,383440,192.10,958.60,306600,+399.0%,-4.2%,-6.3%,-2.1 pp,-2.4%,+9.7%,+12.1 pp
+Punjab National Bank,PNB,Nifty Bank,1563,76102,174665,48.69,111.75,98563,+129.5%,-4.2%,-3.9%,+0.3 pp,-2.4%,-2.4%,+0.0 pp
+Cupid Ltd,CUPID,Nifty FMCG,600,72000,186840,120.00,311.40,114840,+159.5%,—,+11.2%,—,—,+615.6%,—
+Havells India,HAVELLS,Nifty FMCG,65,68212,67997,1049.42,1046.10,-215,-0.3%,—,-12.8%,—,—,-30.2%,—
+Indian Oil Corporation,IOC,Nifty Energy,1003,66860,131483,66.66,131.09,64623,+96.7%,—,-4.9%,—,—,-15.3%,—
+Samvardhana Motherson,MOTHERSON,Nifty Auto,1000,65270,155940,65.27,155.94,90670,+138.9%,—,-3.7%,—,—,+46.8%,—
+Wipro,WIPRO,Nifty IT,200,53566,32440,267.83,162.20,-21126,-39.4%,-9.1%,-7.7%,+1.4 pp,-18.6%,-33.0%,-14.4 pp
+Balkrishna Industries,BALKRISIND,Nifty Auto,21,41404,43529,1971.62,2072.80,2125,+5.1%,—,-10.9%,—,—,-9.7%,—
+General Insurance Corp,GICRE,Nifty Financial Services,215,39412,68832,183.31,320.15,29420,+74.6%,—,-10.1%,—,—,-16.0%,—
+Indian Hotels,INDHOTEL,Nifty 50,400,37844,288640,94.61,721.60,250796,+662.7%,-5.7%,-1.4%,+4.3 pp,-10.1%,-0.3%,+9.8 pp
+Oil & Natural Gas Corp,ONGC,Nifty Energy,400,34592,90108,86.48,225.27,55516,+160.5%,—,-4.5%,—,—,-8.4%,—
+Cipla,CIPLA,Nifty Pharma,25,30507,33413,1220.28,1336.50,2906,+9.5%,-2.6%,-4.2%,-1.6 pp,+19.8%,-11.7%,-31.5 pp
+Dr. Reddy's Laboratories,DRREDDY,Nifty Pharma,25,29625,30008,1185.00,1200.30,383,+1.3%,-2.6%,+3.9%,+6.5 pp,+19.8%,-3.9%,-23.7 pp
+Lupin,LUPIN,Nifty Pharma,32,24804,64355,775.13,2011.10,39551,+159.5%,-2.6%,-5.7%,-3.1 pp,+19.8%,+3.8%,-16.0 pp
+Tech Mahindra,TECHM,Nifty IT,27,23236,41448,860.59,1535.10,18212,+78.4%,-9.1%,-3.9%,+5.2 pp,-18.6%,+6.7%,+25.3 pp
+HEG,HEG,Nifty 50,100,15722,24850,157.22,248.50,9128,+58.1%,-5.7%,-66.1%,-60.4 pp,-10.1%,-59.3%,-49.2 pp
+Kwality Walls India,KWIL,Nifty FMCG,250,11568,9570,46.27,38.28,-1998,-17.3%,—,-9.5%,—,—,+30.1%,—
+Raajmarg Infra Investment,RAAJINFRA,Nifty Infra,100,11046,10500,110.46,105.00,-546,-4.9%,—,—,—,—,—,—
+United Breweries,UBL,Nifty FMCG,10,10413,11858,1041.30,1185.80,1445,+13.9%,—,-7.7%,—,—,-33.8%,—
+Wonderla Holidays,WONDERLA,Nifty 50,50,8538,25000,170.76,500.00,16462,+192.8%,-5.7%,-5.5%,+0.2 pp,-10.1%,-15.1%,-5.0 pp
+Eicher Motors,EICHERMOT,Nifty Auto,3,8007,21090,2669.00,7030.00,13083,+163.4%,—,-8.6%,—,—,+2.2%,—
+Ashok Leyland,ASHOKLEY,Nifty Auto,100,4021,15274,40.21,152.74,11253,+279.9%,—,-9.8%,—,—,+10.9%,—
+Glenmark Pharma,GLENMARK,Nifty Pharma,5,983,11434,196.60,2286.70,10451,+1063.1%,-2.6%,-7.0%,-4.4 pp,+19.8%,+16.0%,-3.8 pp
+
+MONTHLY TOP 5 LAGGING VS INDEX (lowest Stock minus Index pp)
+Rank,Stock Name,Ticker,Index Category,Monthly Index Variation,Monthly Stock Variation,Stock vs Index (pp)
+1,HEG,HEG,Nifty 50,-5.7%,-66.1%,-60.4 pp
+2,Fortis Healthcare,FORTIS,Nifty Pharma,-2.6%,-16.2%,-13.6 pp
+3,Max Healthcare,MAXHEALTH,Nifty Pharma,-2.6%,-7.9%,-5.3 pp
+4,Global Health (Medanta),MEDANTA,Nifty Pharma,-2.6%,-7.9%,-5.3 pp
+5,Sun Pharmaceutical,SUNPHARMA,Nifty Pharma,-2.6%,-7.0%,-4.4 pp
+
+MONTHLY TOP 5 LEADING VS INDEX (highest Stock minus Index pp)
+Rank,Stock Name,Ticker,Index Category,Monthly Index Variation,Monthly Stock Variation,Stock vs Index (pp)
+1,Delta Corp,DELTACORP,Nifty 50,-5.7%,+49.4%,+55.1 pp
+2,Ujjivan Small Finance Bank,UJJIVANSFB,Nifty Bank,-4.2%,+6.0%,+10.2 pp
+3,Dr. Reddy's Laboratories,DRREDDY,Nifty Pharma,-2.6%,+3.9%,+6.5 pp
+4,Tech Mahindra,TECHM,Nifty IT,-9.1%,-3.9%,+5.2 pp
+5,ITC Hotels,ITCHOTELS,Nifty 50,-5.7%,-0.6%,+5.1 pp
+
+YEARLY TOP 5 LAGGING VS INDEX (lowest Stock minus Index pp)
+Rank,Stock Name,Ticker,Index Category,Yearly Index Variation,Yearly Stock Variation,Stock vs Index (pp)
+1,HEG,HEG,Nifty 50,-10.1%,-59.3%,-49.2 pp
+2,Fortis Healthcare,FORTIS,Nifty Pharma,+19.8%,-27.0%,-46.8 pp
+3,Max Healthcare,MAXHEALTH,Nifty Pharma,+19.8%,-19.6%,-39.4 pp
+4,Cipla,CIPLA,Nifty Pharma,+19.8%,-11.7%,-31.5 pp
+5,HDFC Bank,HDFCBANK,Nifty Bank,-2.4%,-27.5%,-25.1 pp
+
+YEARLY TOP 5 LEADING VS INDEX (highest Stock minus Index pp)
+Rank,Stock Name,Ticker,Index Category,Yearly Index Variation,Yearly Stock Variation,Stock vs Index (pp)
+1,Ujjivan Small Finance Bank,UJJIVANSFB,Nifty Bank,-2.4%,+36.5%,+38.9 pp
+2,Tech Mahindra,TECHM,Nifty IT,-18.6%,+6.7%,+25.3 pp
+3,Delta Corp,DELTACORP,Nifty 50,-10.1%,+4.3%,+14.4 pp
+4,State Bank of India,SBIN,Nifty Bank,-2.4%,+9.7%,+12.1 pp
+5,Indian Hotels,INDHOTEL,Nifty 50,-10.1%,-0.3%,+9.8 pp

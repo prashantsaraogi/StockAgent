@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { formatCagr, gainClass } from '@/lib/format-gain';
 import { cmpSourceLabel } from '@/lib/cmp-labels';
 import type { CmpSource } from '@/lib/cmp-labels';
+import { notifyPortfolioHoldingsChanged } from '@/lib/portfolio-events';
 
 export interface LotRow {
   id: string;
@@ -77,6 +78,7 @@ export function HoldingsLotsTable({ lots, summaryCount }: HoldingsLotsTableProps
         return;
       }
       setEditingId(null);
+      notifyPortfolioHoldingsChanged();
       router.refresh();
     } catch {
       setError('Network error');
@@ -97,6 +99,7 @@ export function HoldingsLotsTable({ lots, summaryCount }: HoldingsLotsTableProps
         return;
       }
       if (editingId === lotId) setEditingId(null);
+      notifyPortfolioHoldingsChanged();
       router.refresh();
     } catch {
       setError('Network error');

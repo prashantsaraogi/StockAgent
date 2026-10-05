@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useStockSearchSuggestions } from '@/hooks/useStockSearchSuggestions';
 import { StockSearchSuggestions } from '@/components/StockSearchSuggestions';
 import type { StockSearchResult } from '@/lib/stock-search';
+import { notifyPortfolioHoldingsChanged } from '@/lib/portfolio-events';
 
 export function HoldingForm() {
   const router = useRouter();
@@ -83,6 +84,7 @@ export function HoldingForm() {
       setSelected(null);
       setQty('');
       setPrice('');
+      notifyPortfolioHoldingsChanged();
       router.refresh();
     } catch {
       setError('Network error');
