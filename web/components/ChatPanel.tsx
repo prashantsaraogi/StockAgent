@@ -58,7 +58,6 @@ export function ChatPanel({
 
   const [messages, setMessages] = useState<StockChatMessage[]>([]);
   const [generalInput, setGeneralInput] = useState('');
-  const [stockNote, setStockNote] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingHint, setLoadingHint] = useState('');
   const [hydrating, setHydrating] = useState(Boolean(threadKey));
@@ -222,8 +221,10 @@ export function ChatPanel({
         : null);
 
     if (!stock && !stockScoped) {
+      const q = stockQuery.trim();
+      if (!q) return;
       void postChat({
-        message: stockQuery.trim() || stockNote.trim(),
+        message: q,
         queryMode: 'stock',
         selectedStock: null,
       });
@@ -232,14 +233,11 @@ export function ChatPanel({
 
     if (!stock) return;
 
-    const note = stockNote.trim();
-    const message =
-      note.length > 0
-        ? note
-        : `Investment view for ${stock.company} (${stock.ticker})`;
-
-    void postChat({ message, queryMode: 'stock', selectedStock: stock });
-    setStockNote('');
+    void postChat({
+      message: `Investment view for ${stock.company} (${stock.ticker})`,
+      queryMode: 'stock',
+      selectedStock: stock,
+    });
   }
 
   function sendGeneral() {
@@ -422,23 +420,6 @@ export function ChatPanel({
               Stock: <strong>{context.stockName ?? context.ticker}</strong> ({context.ticker})
             </p>
           )}
-          <div className="form-field">
-            <label htmlFor="chat-stock-note">Optional question</label>
-            <textarea
-              id="chat-stock-note"
-              value={stockNote}
-              onChange={(e) => setStockNote(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  sendStockAnalysis();
-                }
-              }}
-              placeholder="Leave blank for full investment view, or e.g. Should I add today?"
-              rows={2}
-              disabled={loading || hydrating}
-            />
-          </div>
           <button
             type="button"
             className="btn-primary"
