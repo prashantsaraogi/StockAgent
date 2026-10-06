@@ -8,9 +8,10 @@ export default function ChatPage() {
       <header className="page-header">
         <h1>Ask Agent</h1>
         <p className="muted">
-          Type a stock name or a question — you get a clear investment view; discipline and PCCL run
-          behind the scenes.{' '}
-          <Link href="/chat/prompts">Prompt Guidelines</Link> live under{' '}
+          Two modes: <strong>Stock search</strong> (name → investment view summary) and{' '}
+          <strong>General question</strong> (anything else → summary-first answer). Discipline runs
+          in the background — replies show useful information only.{' '}
+          <Link href="/chat/prompts">Prompt Guidelines</Link> ·{' '}
           <Link href="/resources">Resources &amp; Playbook</Link>.
         </p>
       </header>

@@ -415,16 +415,30 @@ No sell-to-rotate.`,
         placeholders: ['{AMOUNT}'],
       },
       {
-        id: 'ask-agent-stock-one-word',
-        title: 'Ask Agent — one-word stock analysis',
+        id: 'ask-agent-stock-search',
+        title: 'Ask Agent — Stock search tab',
         description:
-          'Web `/chat`: type `{TICKER}` or “Analyze ITC” — full investor-facing report.',
-        prompt: `Web Ask Agent — user typed: {TICKER}
+          'Web `/chat` → **Stock search**: pick ticker → investment view (user-facing summary only).',
+        prompt: `Web Ask Agent — Stock search mode — {TICKER}
 
-Same output as Stock Analysis → Basic Investment view: one-line, position, PCCL, discipline, quotes.`,
+Full investor view (same engine as Stock Analysis → Basic): one-line, your position, valuation, what to do — no internal framework headings.`,
         channel: 'web',
         framework: ['buy-decision-workflow', 'personal-discipline', 'PCCL'],
         placeholders: ['{TICKER}'],
+      },
+      {
+        id: 'ask-agent-general-query',
+        title: 'Ask Agent — General question tab',
+        description:
+          'Web `/chat` → **General question**: portfolio, sector, news, compare — summary-first answer.',
+        prompt: `Web Ask Agent — General question mode
+
+User question: {QUERY}
+
+Reply with **Summary** (2–4 sentences) then short **Details** only. Framework runs internally; no file paths or workflow steps in the reply.`,
+        channel: 'web',
+        framework: ['buy-decision-workflow', 'portfolio-analysis'],
+        placeholders: ['{QUERY}'],
       },
       {
         id: 'portfolio-review',

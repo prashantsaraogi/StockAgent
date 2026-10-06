@@ -1,6 +1,6 @@
 # Max Healthcare - Broker Target Prices
 
-**Ticker:** MAXHEALTH (NSE) | **CMP:** Rs 940.95 (2026-10-05) | **CMP date:** 2026-10-05  
+**Ticker:** MAXHEALTH (NSE) | **CMP:** Rs 917 (2026-10-06) | **CMP date:** 2026-10-06  
 **Trendlyne consensus:** Rs 1252 (upside 23.43%) | 6 analysts  
 **As of:** 2026-08-29 | **Horizon:** ~12-month broker targets (typical)
 
@@ -12,12 +12,12 @@ Cross-ref: `BROKER-TARGET-FRAMEWORK.md` | `summary-analysis.md` | `.cursor/portf
 
 | Broker | Date | Reco | Target (Rs) | Upside % | Source |
 |--------|------|------|------------:|---------:|--------|
-| Motilal Oswal | 2026-08-14 | 1410 | 1,410 | +49.8% | Trendlyne |
-| Edelweiss | 2025-02-04 | 1320 | 1,320 | +40.3% | Trendlyne |
-| ICICI Securities | 2026-08-16 | 1275 | 1,275 | +35.5% | Trendlyne |
-| Axis Direct | 2026-02-09 | 1250 | 1,250 | +32.8% | Trendlyne |
-| Anand Rathi | 2026-08-17 | 1220 | 1,220 | +29.7% | Trendlyne |
-| Prabhudas Lilladhar | 2026-05-24 | 1175 | 1,175 | +24.9% | Trendlyne |
+| Motilal Oswal | 2026-08-14 | 1410 | 1,410 | +53.8% | Trendlyne |
+| Edelweiss | 2025-02-04 | 1320 | 1,320 | +43.9% | Trendlyne |
+| ICICI Securities | 2026-08-16 | 1275 | 1,275 | +39% | Trendlyne |
+| Axis Direct | 2026-02-09 | 1250 | 1,250 | +36.3% | Trendlyne |
+| Anand Rathi | 2026-08-17 | 1220 | 1,220 | +33% | Trendlyne |
+| Prabhudas Lilladhar | 2026-05-24 | 1175 | 1,175 | +28.1% | Trendlyne |
 **Street avg (listed brokers):** â‚¹1275 | **Upside vs CMP:** 25.7% | **Brokers counted:** 6
 ---
 

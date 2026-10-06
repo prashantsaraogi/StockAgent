@@ -1,6 +1,6 @@
 ﻿# Maruti Suzuki - Stock Parameters
 
-**Ticker:** MARUTI | **CMP:** Rs 11,386 (2026-10-05)  
+**Ticker:** MARUTI | **CMP:** Rs 11,532 (2026-10-06)  
 **Part 1:** FY2016-FY2025 (10Y rear-view) | **Part 2:** FY2027-FY2031 (5Y forward)  
 **Your avg cost:** Rs 11156 (57 sh) — **+22%** vs CMP
 
@@ -25,7 +25,7 @@
 | Parameter | What it measures | Link to stock price | 10Y avg (normal) | 10Y avg (incl. COVID) | **Today @ CMP** | **vs normal avg** | **Read** |
 |-----------|------------------|---------------------|------------------|----------------------|-----------------|-------------------|----------|
 | **Owner Earnings Yield** | EPS / price | Higher = cheaper | **3.6%** | 3.5% | **3.4%** | -6% | **Fair** on yield |
-| **P/E** | Price / EPS | Higher = pays more per profit | **28x** | 28x | **24.7x** | +6% | **Fair** vs 10Y |
+| **P/E** | Price / EPS | Higher = pays more per profit | **28x** | 28x | **25.0x** | +6% | **Fair** vs 10Y |
 | **P/B** | Price / book | PV leader multiple | **4.2x** | 4.3x | **4.5x** | +7% | **Slight premium** |
 | **Premium to IV (@28x)** | vs normal fair | Negative = margin | **+2%** | +3% | **+6%** | +4 pp | **Above** normal IV |
 | **Premium to Graham** | vs Graham max | Negative = Graham zone | **+18%** | +20% | **+22%** | +4 pp | **Above Graham** |

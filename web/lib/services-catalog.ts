@@ -662,9 +662,9 @@ Run Stock Analysis → PEG tab to verify scorecard + 100-pt total.`,
       {
         id: 'ask-agent-stock',
         categoryId: 'stock-calculator',
-        title: 'Ask Agent — stock by name',
+        title: 'Ask Agent — stock search & general Q&A',
         description:
-          'Type a stock name on `/chat` (even one word). Full investor report — same output as Stock Analysis Basic mode.',
+          '`/chat` has **Stock search** (pick name → investment view) and **General question** (summary-first answer). User-facing text only.',
         cadence: 'on-demand',
         actionType: 'link',
         href: '/chat',

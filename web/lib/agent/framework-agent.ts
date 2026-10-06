@@ -22,6 +22,8 @@ export interface AgentQueryContext {
   sector?: string;
   stockName?: string;
   portfolioLotContext?: LotPersistenceContext;
+  /** User chose General question mode — prefer concise summary-first answer. */
+  generalQuery?: boolean;
 }
 
 export interface AgentQueryResult {
@@ -210,7 +212,8 @@ function buildUserPrompt(
   isBuyQuery: boolean,
   stockPlaybook: string,
   ticker?: string,
-  stockName?: string
+  stockName?: string,
+  generalQuery?: boolean
 ): string {
   const scope =
     ticker || stockName
@@ -238,7 +241,13 @@ ${stockPlaybook ? 'Include results / P/E sync / driver tables **inside** Busines
 
 ${isBuyQuery ? 'Buy/add query: run full workflow internally; ≥3 quotes under **Quotes**.' : 'Include ≥1 quote when patience or deployment is relevant.'}
 
-If pause registry or discipline blocks adds, say **PAUSE ADDS** or **0% surplus** clearly in **What to do**. Never mention .mdc files or workflow step numbers.`;
+If pause registry or discipline blocks adds, say **PAUSE ADDS** or **0% surplus** clearly in **What to do**. Never mention .mdc files or workflow step numbers.
+
+${
+  generalQuery
+    ? '**General question mode:** Open with a **Summary** (2–4 sentences). Keep only decision-useful detail — no long methodology dumps.'
+    : ''
+}`;
 }
 
 async function callGemini(system: string, userPrompt: string): Promise<string | null> {
@@ -390,7 +399,8 @@ export async function runFrameworkQuery(
     isBuyQuery,
     stockPlaybook,
     context.ticker,
-    context.stockName
+    context.stockName,
+    context.generalQuery
   );
 
   let answer: string;

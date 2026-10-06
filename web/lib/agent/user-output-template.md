@@ -54,6 +54,16 @@ Use this outline. Omit sections only when truly N/A (e.g. no position → skip �
 - “Run full workflow” / “Layer 1 / Layer 2” language
 - Generic chatbot disclaimers (“consult a financial advisor”)
 
+## General questions (portfolio, sector, compare, process, macro)
+
+When the user did **not** request a full single-stock report:
+
+1. Start with **Summary** — 2–4 sentences: the actionable takeaway first.
+2. Then **Details** — short bullets only where they add decision value.
+3. Skip StockBook-style full sections unless the question is about one named stock.
+4. Stay under ~600 words unless the user asked for depth.
+5. No file paths, workflow steps, or internal headings.
+
 ## Verdict vocabulary
 
 Use framework terms in **One-line** and **What to do**: HOLD · PAUSE ADDS · WAIT · STAGED STARTER OK · WATCHLIST · INVESTIGATE · 0% surplus rank
