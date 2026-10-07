@@ -102,6 +102,9 @@ export async function generateBasicFrameworkReport(
     extractFaqSection(stockMd.faq, 'Q3') ??
     extractFaqSection(stockMd.faq, 'Why did the stock fall');
 
+  const { fetchLiveNseCmp } = await import('./nse-cmp');
+  const liveQuote = await fetchLiveNseCmp(analysis.ticker);
+
   const markdown = buildInvestorStockReportMarkdown({
     analysis,
     holding,
@@ -115,6 +118,8 @@ export async function generateBasicFrameworkReport(
     faq: stockMd.faq,
     summaryMd: stockMd.summary,
     declineSection,
+    fiftyTwoWeekHigh: liveQuote?.fiftyTwoWeekHigh ?? null,
+    fiftyTwoWeekLow: liveQuote?.fiftyTwoWeekLow ?? null,
   });
 
   return { markdown, oneLineVerdict: oneLine, reportMode: 'framework-local' };

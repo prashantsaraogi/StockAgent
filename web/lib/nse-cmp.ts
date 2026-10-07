@@ -20,6 +20,9 @@ export interface CmpQuote {
   trailingEps?: number | null;
   /** Trailing P/E from NSE when available (else derive from price / EPS) */
   trailingPe?: number | null;
+  /** From Yahoo chart meta when available */
+  fiftyTwoWeekHigh?: number | null;
+  fiftyTwoWeekLow?: number | null;
 }
 
 /** NSE symbol when portfolio ticker differs from NSE trading symbol. */
@@ -213,6 +216,15 @@ async function fetchYahooNse(nseSymbol: string, originalTicker: string): Promise
       trailingPe = Math.round((price / trailingEps) * 10) / 10;
     }
 
+    const fiftyTwoWeekHigh =
+      typeof meta?.fiftyTwoWeekHigh === 'number' && meta.fiftyTwoWeekHigh > 0
+        ? meta.fiftyTwoWeekHigh
+        : null;
+    const fiftyTwoWeekLow =
+      typeof meta?.fiftyTwoWeekLow === 'number' && meta.fiftyTwoWeekLow > 0
+        ? meta.fiftyTwoWeekLow
+        : null;
+
     return {
       ticker: originalTicker.toUpperCase(),
       nseSymbol,
@@ -221,6 +233,8 @@ async function fetchYahooNse(nseSymbol: string, originalTicker: string): Promise
       asOf,
       trailingEps,
       trailingPe,
+      fiftyTwoWeekHigh,
+      fiftyTwoWeekLow,
     };
   } catch {
     return null;

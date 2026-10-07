@@ -6,6 +6,7 @@ import type { HoldingRow } from './holdings';
 import type { StockCalculatorFullResult } from './stock-calculator-full';
 import type { DisciplineRule } from './investor-discipline-web';
 import { buildInvestorScorecardMarkdown } from './investor-scorecard';
+import { buildInvestorFactorLensMarkdown } from './investor-factor-lens';
 
 export function extractFaqSection(faq: string | null, headingPrefix: string): string | null {
   if (!faq) return null;
@@ -164,6 +165,8 @@ export interface InvestorReportParts {
   faq: string | null;
   summaryMd: string | null;
   declineSection: string | null;
+  fiftyTwoWeekHigh?: number | null;
+  fiftyTwoWeekLow?: number | null;
 }
 
 export function buildInvestorStockReportMarkdown(parts: InvestorReportParts): string {
@@ -180,6 +183,8 @@ export function buildInvestorStockReportMarkdown(parts: InvestorReportParts): st
     faq,
     summaryMd,
     declineSection,
+    fiftyTwoWeekHigh,
+    fiftyTwoWeekLow,
   } = parts;
 
   const c = analysis.cagr;
@@ -228,6 +233,12 @@ export function buildInvestorStockReportMarkdown(parts: InvestorReportParts): st
       ? 'WATCHLIST / WAIT (0% fresh surplus)'
       : analysis.overview.riskVerdict;
 
+  const factorBlock = buildInvestorFactorLensMarkdown(analysis, {
+    cmp,
+    premiumPccl,
+    fiftyTwoWeekHigh,
+    fiftyTwoWeekLow,
+  });
   const scorecardBlock = buildInvestorScorecardMarkdown(analysis, scorecardRisk, discipline);
 
   const freshAction = discipline
@@ -268,6 +279,10 @@ export function buildInvestorStockReportMarkdown(parts: InvestorReportParts): st
 **CMP:** ${cmp != null ? formatInr(cmp) : '—'} (${cmpSource})
 
 > **One-line:** ${oneLine}
+
+---
+
+${factorBlock}
 
 ---
 
