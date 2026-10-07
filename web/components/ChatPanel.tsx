@@ -18,28 +18,17 @@ import {
 import { useStockSearchSuggestions } from '@/hooks/useStockSearchSuggestions';
 import type { StockSearchResult } from '@/lib/stock-search';
 
-export type AskAgentQueryMode = 'stock' | 'general';
-
 interface ChatPanelProps {
   /** When true (default if ticker set), show structured quick questions */
   showStockQuestions?: boolean;
   context?: { ticker?: string; sector?: string; stockName?: string };
-  /** Global /chat only — StockBook sidebar always uses stock mode. */
-  defaultQueryMode?: AskAgentQueryMode;
 }
 
-export function ChatPanel({
-  showStockQuestions,
-  context,
-  defaultQueryMode = 'stock',
-}: ChatPanelProps) {
+export function ChatPanel({ showStockQuestions, context }: ChatPanelProps) {
   const stockScoped = Boolean(context?.ticker || context?.stockName);
   const showQuick = showStockQuestions ?? stockScoped;
   const threadKey = stockChatThreadKey(context);
 
-  const [queryMode, setQueryMode] = useState<AskAgentQueryMode>(
-    stockScoped ? 'stock' : defaultQueryMode
-  );
   const [selectedStock, setSelectedStock] = useState<StockSearchResult | null>(
     context?.ticker
       ? {
@@ -58,7 +47,6 @@ export function ChatPanel({
   const stockWrapRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<StockChatMessage[]>([]);
-  const [generalInput, setGeneralInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingHint, setLoadingHint] = useState('');
   const [hydrating, setHydrating] = useState(threadKey != null);
@@ -176,7 +164,6 @@ export function ChatPanel({
 
   async function postChat(payload: {
     message: string;
-    queryMode: AskAgentQueryMode;
     selectedStock?: StockSearchResult | null;
   }) {
     const trimmed = payload.message.trim();
@@ -187,9 +174,7 @@ export function ChatPanel({
     saveThread(withUser);
     setLoading(true);
     setLoadingHint(
-      payload.queryMode === 'stock'
-        ? `Building investment view${payload.selectedStock ? ` for ${payload.selectedStock.ticker}` : ''}…`
-        : 'Preparing summary…'
+      `Building investment view${payload.selectedStock ? ` for ${payload.selectedStock.ticker}` : ''}…`
     );
 
     try {
@@ -199,7 +184,7 @@ export function ChatPanel({
         body: JSON.stringify({
           message: trimmed,
           sessionId: sessionIdRef.current,
-          queryMode: payload.queryMode,
+          queryMode: 'stock',
           selectedStock: payload.selectedStock
             ? {
                 ticker: payload.selectedStock.ticker,
@@ -253,7 +238,6 @@ export function ChatPanel({
       if (!q) return;
       void postChat({
         message: q,
-        queryMode: 'stock',
         selectedStock: null,
       });
       return;
@@ -263,23 +247,14 @@ export function ChatPanel({
 
     void postChat({
       message: `Investment view for ${stock.company} (${stock.ticker})`,
-      queryMode: 'stock',
       selectedStock: stock,
     });
-  }
-
-  function sendGeneral() {
-    const trimmed = generalInput.trim();
-    if (!trimmed) return;
-    setGeneralInput('');
-    void postChat({ message: trimmed, queryMode: 'general' });
   }
 
   function sendText(text: string) {
     void postChat({
       message: text,
-      queryMode: stockScoped ? 'stock' : queryMode,
-      selectedStock: stockScoped ? selectedStock : queryMode === 'stock' ? selectedStock : null,
+      selectedStock: stockScoped ? selectedStock : selectedStock,
     });
   }
 
@@ -296,33 +271,8 @@ export function ChatPanel({
     setMessages([]);
   }
 
-  const activeMode: AskAgentQueryMode = stockScoped ? 'stock' : queryMode;
-
   return (
     <div className="chat-panel">
-      {!stockScoped && (
-        <div className="chat-mode-tabs" role="tablist" aria-label="Ask Agent mode">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={queryMode === 'stock'}
-            className={queryMode === 'stock' ? 'active' : ''}
-            onClick={() => setQueryMode('stock')}
-          >
-            Stock search
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={queryMode === 'general'}
-            className={queryMode === 'general' ? 'active' : ''}
-            onClick={() => setQueryMode('general')}
-          >
-            General question
-          </button>
-        </div>
-      )}
-
       {threadKey && messages.length > 0 && (
         <div className="chat-thread-toolbar">
           <span className="muted small">
@@ -349,31 +299,17 @@ export function ChatPanel({
         )}
         {!hydrating && messages.length === 0 && (
           <div className="chat-empty">
-            {activeMode === 'stock' ? (
-              <>
-                <p>
-                  <strong>Stock search</strong> — pick a name, get a concise{' '}
-                  <strong>investment view</strong> (position, valuation, what to do). No jargon or
-                  internal workflow in the reply.
-                </p>
-                <ul>
-                  <li>Uses your holdings, StockBook, and live CMP where available</li>
-                  <li>Saved to <strong>Analysis Log</strong></li>
-                </ul>
-              </>
-            ) : (
-              <>
-                <p>
-                  <strong>General question</strong> — portfolio, sectors, news, compare names, or
-                  process. You get a <strong>summary-first</strong> answer with only useful detail.
-                </p>
-                <ul>
-                  <li>Not a full stock report unless you ask about a specific name</li>
-                  <li>Saved to <strong>Analysis Log</strong></li>
-                </ul>
-              </>
-            )}
-            {showQuick && activeMode === 'stock' && (
+            <p>
+              Pick a stock name or ticker for a structured <strong>investment view</strong> (factor
+              lens, scorecard, valuation, what to do). Portfolio-wide or news workflows live in{' '}
+              <Link href="/chat/prompts">Prompt library</Link> (Cursor) or{' '}
+              <Link href="/journal/news">Journal → News</Link>.
+            </p>
+            <ul>
+              <li>Uses your holdings, StockBook, and live CMP where available</li>
+              <li>Saved to <strong>Analysis Log</strong></li>
+            </ul>
+            {showQuick && (
               <div className="stock-quick-questions">
                 <p className="muted small">Quick prompts for this stock:</p>
                 <div className="stock-quick-questions-grid">
@@ -405,9 +341,6 @@ export function ChatPanel({
                 {msg.meta?.analysisType === 'stock-full' && (
                   <p className="muted small chat-meta">Investment view report</p>
                 )}
-                {msg.meta?.analysisType === 'general' && (
-                  <p className="muted small chat-meta">Summary answer</p>
-                )}
                 {msg.meta?.analysisPath && (
                   <p className="muted small chat-meta">
                     <Link href={msg.meta.analysisPath}>Open in Analysis Log →</Link>
@@ -425,75 +358,49 @@ export function ChatPanel({
         <div ref={bottomRef} />
       </div>
 
-      {activeMode === 'stock' ? (
-        <div className="chat-input-stack">
-          {!stockScoped && (
-            <div className="form-field autocomplete-wrap chat-stock-search" ref={stockWrapRef}>
-              <label htmlFor="chat-stock-search">Stock name or ticker</label>
-              <input
-                id="chat-stock-search"
-                type="text"
-                placeholder="e.g. ITC or Cipla"
-                value={stockQuery}
-                onChange={(e) => {
-                  setStockQuery(e.target.value);
-                  setSelectedStock(null);
-                  queueSearch(e.target.value);
-                  setShowSuggestions(true);
-                }}
-                onFocus={() => stockQuery && setShowSuggestions(true)}
-                disabled={loading || hydrating}
-                autoComplete="off"
-              />
-              {selectedStock && (
-                <p className="field-hint ok">
-                  {selectedStock.ticker} · {selectedStock.sector}
-                </p>
-              )}
-              {showSuggestions && suggestions.length > 0 && (
-                <StockSearchSuggestions suggestions={suggestions} onPick={pickStock} />
-              )}
-            </div>
-          )}
-          {stockScoped && context?.ticker && (
-            <p className="muted small chat-stock-pinned">
-              Stock: <strong>{context.stockName ?? context.ticker}</strong> ({context.ticker})
-            </p>
-          )}
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={sendStockAnalysis}
-            disabled={loading || hydrating || (!stockScoped && !selectedStock && !stockQuery.trim())}
-          >
-            {loading ? '…' : 'Analyze stock'}
-          </button>
-        </div>
-      ) : (
-        <div className="chat-input-row">
-          <textarea
-            value={generalInput}
-            onChange={(e) => setGeneralInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendGeneral();
-              }
-            }}
-            placeholder="Ask anything — e.g. Where should surplus go this month? Summarize today’s news for my holdings."
-            rows={3}
-            disabled={loading || hydrating}
-          />
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={sendGeneral}
-            disabled={loading || hydrating}
-          >
-            {loading ? '…' : 'Ask'}
-          </button>
-        </div>
-      )}
+      <div className="chat-input-stack">
+        {!stockScoped && (
+          <div className="form-field autocomplete-wrap chat-stock-search" ref={stockWrapRef}>
+            <label htmlFor="chat-stock-search">Stock name or ticker</label>
+            <input
+              id="chat-stock-search"
+              type="text"
+              placeholder="e.g. PFC, ITC, or Cipla"
+              value={stockQuery}
+              onChange={(e) => {
+                setStockQuery(e.target.value);
+                setSelectedStock(null);
+                queueSearch(e.target.value);
+                setShowSuggestions(true);
+              }}
+              onFocus={() => stockQuery && setShowSuggestions(true)}
+              disabled={loading || hydrating}
+              autoComplete="off"
+            />
+            {selectedStock && (
+              <p className="field-hint ok">
+                {selectedStock.ticker} · {selectedStock.sector}
+              </p>
+            )}
+            {showSuggestions && suggestions.length > 0 && (
+              <StockSearchSuggestions suggestions={suggestions} onPick={pickStock} />
+            )}
+          </div>
+        )}
+        {stockScoped && context?.ticker && (
+          <p className="muted small chat-stock-pinned">
+            Stock: <strong>{context.stockName ?? context.ticker}</strong> ({context.ticker})
+          </p>
+        )}
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={sendStockAnalysis}
+          disabled={loading || hydrating || (!stockScoped && !selectedStock && !stockQuery.trim())}
+        >
+          {loading ? '…' : 'Analyze stock'}
+        </button>
+      </div>
     </div>
   );
 }

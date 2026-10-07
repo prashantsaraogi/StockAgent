@@ -30,7 +30,7 @@ export default async function HomePage() {
         </section>
         <section className="card">
           <h3>Ask Agent</h3>
-          <p className="muted small">Stock search or general questions — summary answers only.</p>
+          <p className="muted small">Stock search — investment view per ticker.</p>
           <Link href="/chat" className="card-link">
             Start chat →
           </Link>

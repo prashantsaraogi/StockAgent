@@ -662,7 +662,7 @@ Run Stock Analysis → PEG tab to verify scorecard + 100-pt total.`,
       {
         id: 'ask-agent-stock',
         categoryId: 'stock-calculator',
-        title: 'Ask Agent — stock search & general Q&A',
+        title: 'Ask Agent — stock search only',
         description:
           '`/chat` **Stock search** returns a **Factor lens** quick table (earnings, valuation, technical, risk) plus module scorecard. History saved per user in **Analysis Log**.',
         cadence: 'on-demand',

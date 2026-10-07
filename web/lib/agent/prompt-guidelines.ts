@@ -416,9 +416,9 @@ No sell-to-rotate.`,
       },
       {
         id: 'ask-agent-stock-search',
-        title: 'Ask Agent — Stock search tab',
+        title: 'Ask Agent — stock search (web)',
         description:
-          'Web `/chat` → **Stock search**: pick ticker → investment view with **Factor lens** table (🟢/🟡/🔴) + scorecard. Thread restores from your account + Analysis Log.',
+          'Web `/chat` only — pick ticker → investment view (**Factor lens** + scorecard). No free-form chat. Thread restores from Analysis Log.',
         prompt: `Web Ask Agent — Stock search mode — {TICKER}
 
 Full investor view (same engine as Stock Analysis → Basic): one-line, your position, valuation, what to do — no internal framework headings.`,
@@ -428,15 +428,13 @@ Full investor view (same engine as Stock Analysis → Basic): one-line, your pos
       },
       {
         id: 'ask-agent-general-query',
-        title: 'Ask Agent — General question tab',
+        title: 'Portfolio / sector question (Cursor — not web /chat)',
         description:
-          'Web `/chat` → **General question**: portfolio, sector, news, compare — summary-first answer. Saved per user; `/chat` reloads recent Q&A.',
-        prompt: `Web Ask Agent — General question mode
+          'Open-ended portfolio, sector rank, or news — use **Cursor** or **Prompt library** copy-paste. Web Ask Agent is **stock search only**.',
+        prompt: `Portfolio or sector question (Cursor) — {QUERY}
 
-User question: {QUERY}
-
-Reply with **Summary** (2–4 sentences) then short **Details** only. Framework runs internally; no file paths or workflow steps in the reply.`,
-        channel: 'web',
+Summary-first answer; cite StockBook, News, holdings.md, buy-decision-workflow.`,
+        channel: 'cursor',
         framework: ['buy-decision-workflow', 'portfolio-analysis'],
         placeholders: ['{QUERY}'],
       },

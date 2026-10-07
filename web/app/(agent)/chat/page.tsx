@@ -8,9 +8,8 @@ export default function ChatPage() {
       <header className="page-header">
         <h1>Ask Agent</h1>
         <p className="muted">
-          Two modes: <strong>Stock search</strong> (name → investment view summary) and{' '}
-          <strong>General question</strong> (anything else → summary-first answer). Discipline runs
-          in the background — replies show useful information only.{' '}
+          <strong>Stock search</strong> — pick a name or ticker for an investment view (factor lens,
+          scorecard, PCCL, what to do). Portfolio-wide workflows:{' '}
           <Link href="/chat/prompts">Prompt Guidelines</Link> ·{' '}
           <Link href="/journal/analysis">Analysis Log</Link> ·{' '}
           <Link href="/resources">Resources &amp; Playbook</Link>. Conversation on this page
