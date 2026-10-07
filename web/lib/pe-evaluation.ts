@@ -22,6 +22,8 @@ export interface PeEvaluationResult {
   parametersDate: string | null;
   cmp: number | null;
   cmpSource: string;
+  /** TTM EPS from live quote or PARAMETERS when available */
+  trailingEps: number | null;
   ttmPe: number | null;
   forwardPe: number | null;
   avg10yPe: number | null;
@@ -60,11 +62,15 @@ export async function loadPeEvaluation(
 
   let cmp: number | null = null;
   let cmpSource = 'Unavailable';
+  let trailingEps: number | null = metrics.normalizedEps;
   try {
     const live = await fetchLiveNseCmp(resolved.ticker);
     if (live?.price != null && live.price > 0) {
       cmp = live.price;
       cmpSource = live.source;
+      if (live.trailingEps != null && live.trailingEps > 0) {
+        trailingEps = live.trailingEps;
+      }
       if (metrics.ttmPe == null && live.trailingPe != null && live.trailingPe > 0) {
         metrics.ttmPe = live.trailingPe;
       }
@@ -106,6 +112,7 @@ export async function loadPeEvaluation(
     parametersDate: metrics.parametersDate,
     cmp,
     cmpSource,
+    trailingEps,
     ttmPe: metrics.ttmPe,
     forwardPe: metrics.forwardPe,
     avg10yPe: metrics.avg10yPe,

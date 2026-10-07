@@ -175,36 +175,91 @@ function buildEarningsRow(analysis: StockCalculatorFullResult): ScorecardRow {
   return { check: 'Earnings', tone, currentValue, headline, bullets: bullets.slice(0, 3) };
 }
 
-function buildMarginRow(analysis: StockCalculatorFullResult): ScorecardRow {
-  const headline = stripEmojiPrefix(analysis.overview.marginVerdict);
-  const tone = classifyScorecardTone(headline, 'Margin');
-  const bullets: string[] = [
-    'Track **EBITDA / gross margin** vs 3–5Y range and stated drivers (input costs, mix, competition).',
-  ];
-  if (headline.toLowerCase().includes('mixed')) {
-    bullets.push('Direction unclear — margin recovery must show in **numbers**, not guidance alone.');
+type RecentEpsBand = 'good' | 'average' | 'bad' | 'unknown';
+
+function classifyRecentEps(yoyPct: number | null, eps: number | null): RecentEpsBand {
+  if (eps != null && eps < 0) return 'bad';
+  if (yoyPct == null || !Number.isFinite(yoyPct)) return 'unknown';
+  if (yoyPct >= 8) return 'good';
+  if (yoyPct <= -5) return 'bad';
+  return 'average';
+}
+
+function recentEpsHeadline(band: RecentEpsBand): string {
+  switch (band) {
+    case 'good':
+      return 'Good — recent EPS trend supportive';
+    case 'average':
+      return 'Average — EPS roughly flat vs year ago';
+    case 'bad':
+      return 'Bad — recent EPS weak or declining';
+    default:
+      return 'Average — EPS level known; YoY trend unverified';
+  }
+}
+
+function recentEpsTone(band: RecentEpsBand): ScorecardTone {
+  if (band === 'good') return 'good';
+  if (band === 'bad') return 'bad';
+  return 'caution';
+}
+
+function buildRecentEpsRow(analysis: StockCalculatorFullResult): ScorecardRow {
+  const eq = analysis.earningsQuality;
+  const pe = analysis.peParameters;
+  const qs = eq.quarterly ?? [];
+  const latestQ = qs[qs.length - 1];
+  const yoyQ = qs.length >= 5 ? qs[qs.length - 5] : qs.length >= 2 ? qs[0] : null;
+
+  let epsLevel: number | null = latestQ?.eps ?? pe.trailingEps ?? pe.normalizedEps ?? null;
+  if (epsLevel == null && pe.cmp != null && pe.ttmPe != null && pe.ttmPe > 0) {
+    epsLevel = Math.round((pe.cmp / pe.ttmPe) * 100) / 100;
   }
 
-  const m = analysis.margin;
-  const ebitdaRow = m.partB?.rows?.find((r) => /ebitda/i.test(r.metric));
+  let yoyPct: number | null = null;
+  let yoyLabel = 'YoY';
+  if (latestQ?.eps != null && yoyQ?.eps != null && yoyQ.eps !== 0) {
+    yoyPct = ((latestQ.eps - yoyQ.eps) / Math.abs(yoyQ.eps)) * 100;
+    yoyLabel = latestQ.quarter && yoyQ.quarter ? `${latestQ.quarter} vs ${yoyQ.quarter}` : 'YoY';
+  } else if (latestQ?.pat != null && yoyQ?.pat != null && yoyQ.pat !== 0) {
+    yoyPct = ((latestQ.pat - yoyQ.pat) / Math.abs(yoyQ.pat)) * 100;
+    yoyLabel = latestQ.quarter ? `${latestQ.quarter} PAT YoY` : 'PAT YoY';
+  } else {
+    const epsTrend = eq.quarterlyTrends?.find((t) => /eps/i.test(t.metric));
+    if (epsTrend?.changePct != null) yoyPct = epsTrend.changePct;
+  }
+
+  const band = classifyRecentEps(yoyPct, epsLevel);
+  const headline = recentEpsHeadline(band);
+  const tone = recentEpsTone(band);
+
+  const bullets: string[] = [];
+  if (epsLevel != null) {
+    bullets.push(
+      `Latest EPS proxy **₹${epsLevel.toLocaleString('en-IN', { maximumFractionDigits: 2 })}** (${pe.trailingEps != null ? pe.cmpSource : pe.normalizedEps != null ? 'PARAMETERS' : 'derived'}).`
+    );
+  }
+  if (yoyPct != null) {
+    bullets.push(
+      `Change **${yoyPct >= 0 ? '+' : ''}${yoyPct.toFixed(1)}%** (${yoyLabel}) — **${band}** vs simple hurdle (+8% good / −5% bad).`
+    );
+  } else {
+    bullets.push('Add **EARNINGS_QUALITY** file for quarter EPS/PAT YoY; live TTM EPS used when available.');
+  }
+  if (eq.warnings?.length) {
+    bullets.push(`**${eq.warnings.length}** earnings-quality flag(s) — read before trusting headline EPS.`);
+  }
+
   let currentValue = '—';
-  if (ebitdaRow?.todayPct != null) {
-    currentValue = `EBITDA margin **${formatPct1(ebitdaRow.todayPct)}**`;
-    if (ebitdaRow.avg10yPct != null) {
-      currentValue += ` · 10Y avg **${formatPct1(ebitdaRow.avg10yPct)}**`;
-    }
-    if (ebitdaRow.deltaPp != null) {
-      const d = ebitdaRow.deltaPp;
-      currentValue += ` (**${d >= 0 ? '+' : ''}${d.toFixed(1)} pp** vs avg)`;
-    }
-  } else if (m.partD?.changePp != null) {
-    currentValue = `Latest quarter margin Δ **${m.partD.changePp >= 0 ? '+' : ''}${m.partD.changePp.toFixed(1)} pp**`;
-  } else if (/no margin file/i.test(m.dataSource)) {
-    currentValue =
-      'No **MARGIN_** / **PARAMETERS** file — margins need StockBook data (not from Yahoo)';
+  if (epsLevel != null && yoyPct != null) {
+    currentValue = `EPS **₹${epsLevel.toFixed(2)}** · **${yoyPct >= 0 ? '+' : ''}${yoyPct.toFixed(1)}%** ${yoyLabel.includes('YoY') ? yoyLabel : 'YoY'}`;
+  } else if (epsLevel != null) {
+    currentValue = `TTM / latest EPS **₹${epsLevel.toFixed(2)}** (${pe.cmpSource})`;
+  } else if (yoyPct != null) {
+    currentValue = `EPS change **${yoyPct >= 0 ? '+' : ''}${yoyPct.toFixed(1)}%** · level **unverified**`;
   }
 
-  return { check: 'Margin', tone, currentValue, headline, bullets: bullets.slice(0, 3) };
+  return { check: 'Recent EPS', tone, currentValue, headline, bullets: bullets.slice(0, 3) };
 }
 
 function buildBusinessQualityRow(analysis: StockCalculatorFullResult): ScorecardRow {
@@ -259,7 +314,7 @@ export function buildInvestorScorecardRows(
     buildCagrRow(analysis),
     buildPeRow(analysis),
     buildEarningsRow(analysis),
-    buildMarginRow(analysis),
+    buildRecentEpsRow(analysis),
     buildBusinessQualityRow(analysis),
     buildRiskRow(analysis, riskHeadline, discipline),
   ];
