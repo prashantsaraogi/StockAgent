@@ -7,6 +7,7 @@ import type { StockCalculatorFullResult } from './stock-calculator-full';
 import type { DisciplineRule } from './investor-discipline-web';
 import { buildInvestorScorecardMarkdown } from './investor-scorecard';
 import { buildInvestorFactorLensMarkdown } from './investor-factor-lens';
+import { buildBusinessQualityVsRisksMarkdown } from './investor-evidenced-readings';
 
 export function extractFaqSection(faq: string | null, headingPrefix: string): string | null {
   if (!faq) return null;
@@ -189,7 +190,6 @@ export function buildInvestorStockReportMarkdown(parts: InvestorReportParts): st
 
   const c = analysis.cagr;
   const pe = analysis.peParameters;
-  const bq = analysis.businessQuality;
   const risk = analysis.riskDecision;
   const date = analysis.analyzedAt.slice(0, 10);
 
@@ -220,13 +220,6 @@ export function buildInvestorStockReportMarkdown(parts: InvestorReportParts): st
       ? `| Metric | Value |\n|--------|------:|\n${valuationRowLines.join('\n')}`
       : `| Metric | Value |\n|--------|------:|\n| CMP | ${cmp != null ? formatInr(cmp) : '—'} |\n| PCCL | *Refresh StockBook / PARAMETERS for this ticker* |`;
 
-  const overallRisk = displayOverallRiskView(holding, discipline, risk.investmentVerdict);
-  const businessReading = enrichBusinessQualityReading(
-    bq.verdict,
-    bq.businessQualityScore10,
-    faq,
-    summaryMd
-  );
   const scorecardRisk = holding
     ? analysis.overview.riskVerdict
     : discipline?.surplusPct === 0
@@ -271,6 +264,15 @@ export function buildInvestorStockReportMarkdown(parts: InvestorReportParts): st
 
   const declineBlock = formatEvidenceSectionBlock(declineSection, risk);
 
+  const businessQualityBlock =
+    buildBusinessQualityVsRisksMarkdown(analysis, {
+      holding,
+      discipline,
+      summaryMd,
+      faq,
+      concerns: risk.concerns,
+    }) ?? '';
+
   const quotes = pickInvestorQuotes(holding != null, discipline != null, c.cagrGap.gapTone);
 
   return `# ${analysis.stockName} (${analysis.ticker}) — Investment view
@@ -296,18 +298,7 @@ ${positionBlock}
 
 ---
 
-## Business quality vs risks
-
-| Area | Reading |
-|------|---------|
-| Business quality | ${businessReading} |
-| Earnings quality | ${analysis.earningsQuality.overallVerdict} |
-| Margin trend | ${analysis.margin.overallVerdict} |
-| Overall risk view | ${overallRisk} |
-
-${risk.concerns.length ? `**Key concerns:** ${risk.concerns.slice(0, 4).join(' · ')}` : ''}
-
-${holding && risk.thesis.whyOwn ? `**Why own (if held):** ${clip(risk.thesis.whyOwn, 400)}` : ''}
+${businessQualityBlock ? `${businessQualityBlock}\n\n` : ''}${holding && risk.thesis.whyOwn ? `**Why own (if held):** ${clip(risk.thesis.whyOwn, 400)}\n\n` : ''}
 ${!holding ? extractFreshCapitalFraming(summaryMd, discipline) : ''}
 ${risk.thesis.whyNotAggressive ? `\n**Why not add aggressively:** ${clip(risk.thesis.whyNotAggressive, 400)}` : ''}
 
@@ -368,26 +359,6 @@ function formatEvidenceSectionBlock(
     return `\n---\n\n## Why cheap / core problem\n\n${clip(risk.narrativeSummary, 900)}\n\n**Watch:** ${risk.thesisBreakers.slice(0, 3).map((t) => t.text).join(' · ') || '—'}\n`;
   }
   return '';
-}
-
-function enrichBusinessQualityReading(
-  moduleVerdict: string,
-  score: number,
-  faq: string | null,
-  summary: string | null
-): string {
-  const sector = summary?.match(/\*\*Sector:\*\*\s*([^\n]+)/)?.[1]?.trim();
-  const opsSnap =
-    summary?.match(/PAT \+[\d.]+%;\s*cig \+[\d.]+%/i)?.[0] ??
-    faq?.match(/cig rev \+[\d.]+% YoY/i)?.[0];
-  if (sector && opsSnap) {
-    return `${sector} · Ops check: ${opsSnap} — ${moduleVerdict.split('(')[0]?.trim() ?? moduleVerdict} (score ${score}/10)`;
-  }
-  const freshRow = summary?.match(/\|\s*\*\*Fresh capital\*\*[^\|]*\|\s*([^|]+)\|/i)?.[1]?.trim();
-  if (freshRow && score <= 7) {
-    return `${moduleVerdict.split('—')[0]?.trim() ?? moduleVerdict} — StockBook fresh lens: ${freshRow} (score ${score}/10)`;
-  }
-  return `${moduleVerdict} (score ${score}/10)`;
 }
 
 function extractFreshCapitalFraming(

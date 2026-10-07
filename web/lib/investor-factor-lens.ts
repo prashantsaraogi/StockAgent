@@ -105,9 +105,9 @@ function signalForDividend(analysis: StockCalculatorFullResult): FactorRow {
     return { factor: 'Dividend', view: 'Low yield', signal: '🟡' };
   }
   if (psu || isNbfcOrBank(analysis.sector, analysis.stockName)) {
-    return { factor: 'Dividend', view: 'Often attractive (verify yield @ CMP)', signal: '🟢' };
+    return { factor: 'Dividend', view: 'Yield UNVERIFIED — check annual report', signal: '🟡' };
   }
-  return { factor: 'Dividend', view: 'Not primary lens — check filings', signal: '🟡' };
+  return { factor: 'Dividend', view: 'No yield in PARAMETERS — omitted from thesis', signal: '🟡' };
 }
 
 function signalForValuation(analysis: StockCalculatorFullResult, premiumPccl: number | null): FactorRow {
