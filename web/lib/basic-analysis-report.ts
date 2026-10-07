@@ -126,22 +126,99 @@ export async function generateLiteInvestorReport(
   stock: StockSearchResult,
   lotCtx?: LotPersistenceContext
 ): Promise<BasicFrameworkReport | null> {
-  const [cagr, pe] = await Promise.all([
-    runStockCalculator({
+  let cagr: Awaited<ReturnType<typeof runStockCalculator>> | null = null;
+  try {
+    cagr = await runStockCalculator({
       stockQuery: stock.ticker,
       ticker: stock.ticker,
       peBasis: 'ttm',
       expectedCagrPct: 12,
       years: 5,
       basicAnalysis: true,
-    }),
-    loadPeEvaluation(stock.ticker, tenantId),
-  ]);
+    });
+  } catch {
+    cagr = null;
+  }
 
+  const pe = await loadPeEvaluation(stock.ticker, tenantId);
   if (!cagr || !pe) return null;
 
   const analysis = await buildMinimalFullResult(stock, cagr, pe);
   return generateBasicFrameworkReport(analysis, tenantId, lotCtx);
+}
+
+/** Last resort when live quote + modules fail (common on Vercel without NSE). */
+export async function buildFallbackInvestorReport(
+  tenantId: string,
+  stock: StockSearchResult,
+  lotCtx?: LotPersistenceContext,
+  diagnostic?: string
+): Promise<BasicFrameworkReport> {
+  const loc = await getStockbookByTicker(stock.ticker);
+  const sector = loc?.sector ?? stock.sector;
+  const stockName = loc?.stock ?? stock.company;
+  const [holding, stockMd] = await Promise.all([
+    getUserHoldingForTicker(tenantId, stock.ticker, lotCtx),
+    loadStockbookMd(stock.ticker, sector, stockName, tenantId),
+  ]);
+
+  const { fetchLiveNseCmp } = await import('./nse-cmp');
+  const live = await fetchLiveNseCmp(stock.ticker);
+  const date = new Date().toISOString().slice(0, 10);
+
+  const summarySnippet = stockMd.summary
+    ? stockMd.summary.slice(0, 2200).trim() + (stockMd.summary.length > 2200 ? '\n\n…' : '')
+    : '*No bundled summary for this ticker yet — add StockBook files or run sync-bundled-docs at build.*';
+
+  const cmpLine =
+    live?.price != null
+      ? `**CMP:** ₹${live.price.toLocaleString('en-IN')} (${live.source})`
+      : '**CMP:** UNVERIFIED — NSE/Yahoo blocked or timed out from this server';
+
+  const positionLine = holding
+    ? `You hold **${holding.qty}** sh @ avg **₹${holding.avgCost.toLocaleString('en-IN')}** (cost **₹${holding.costBasis.toLocaleString('en-IN')}**).`
+    : 'Not in your web portfolio lots — **fresh-entry lens**.';
+
+  const diag =
+    diagnostic && diagnostic.length > 0
+      ? `\n\n*Server note:* ${diagnostic.slice(0, 280).replace(/\n/g, ' ')}`
+      : '';
+
+  const markdown = `# ${stockName} (${stock.ticker}) — Investment view
+
+**Date checked:** ${date}  
+${cmpLine}
+
+> **One-line:** **WATCHLIST** — partial data; use StockBook summary below and retry live analysis when quotes load.
+
+---
+
+## Summary
+
+${summarySnippet}
+
+## Your position
+
+${positionLine}
+
+## What to do
+
+| Lens | Action |
+|------|--------|
+| Legacy / holder | **HOLD** — refresh after quarterly results unless StockBook says PAUSE |
+| Fresh surplus | **WAIT** — confirm PCCL and sector rank when CMP loads |
+
+- Retry **Analyze stock** in a minute (market hours help Yahoo/NSE).
+- Open **Stock Analysis → Basic** for full modules.
+${diag}
+
+*Not investment advice.*`;
+
+  return {
+    markdown,
+    oneLineVerdict: 'WATCHLIST — partial data; retry live analysis',
+    reportMode: 'framework-local',
+  };
 }
 
 async function buildMinimalFullResult(

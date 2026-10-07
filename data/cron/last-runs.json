@@ -4,15 +4,15 @@
     "daily-market-pack": {
       "action": "daily-market-pack",
       "trigger": "cli",
-      "startedAt": "2026-10-06T03:10:32.760Z",
-      "finishedAt": "2026-10-06T03:10:33.775Z",
+      "startedAt": "2026-10-07T04:10:30.353Z",
+      "finishedAt": "2026-10-07T04:10:31.818Z",
       "ok": true,
       "summary": "3/3 steps OK",
       "steps": [
         {
           "action": "refresh-portfolio-cmp",
           "ok": true,
-          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-06",
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-07",
           "details": {
             "failed": [],
             "updated": 3
@@ -23,7 +23,7 @@
           "ok": true,
           "summary": "3/3 holdings may need Q3 FY27 results refresh",
           "details": {
-            "scannedAt": "2026-10-06",
+            "scannedAt": "2026-10-07",
             "expectedQuarter": "Q3 FY27",
             "items": [
               {
@@ -57,15 +57,78 @@
         {
           "action": "news-today",
           "ok": true,
-          "summary": "News summary written for 2026-10-06",
+          "summary": "News summary written for 2026-10-07",
           "details": {
-            "newsWebPath": "/journal/news/2026/10/06"
+            "newsWebPath": "/journal/news/2026/10/07"
           }
         }
       ]
     }
   },
   "history": [
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-10-07T04:10:30.353Z",
+      "finishedAt": "2026-10-07T04:10:31.818Z",
+      "ok": true,
+      "summary": "3/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-07",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": true,
+          "summary": "3/3 holdings may need Q3 FY27 results refresh",
+          "details": {
+            "scannedAt": "2026-10-07",
+            "expectedQuarter": "Q3 FY27",
+            "items": [
+              {
+                "ticker": "ITC",
+                "company": "ITC",
+                "lastMention": "Q3 FY26",
+                "expectedQuarter": "Q3 FY27",
+                "stale": true,
+                "reason": "No Q3 FY27 mention — last seen: Q3 FY26"
+              },
+              {
+                "ticker": "MARUTI",
+                "company": "Maruti Suzuki",
+                "lastMention": "Q1 FY27",
+                "expectedQuarter": "Q3 FY27",
+                "stale": true,
+                "reason": "No Q3 FY27 mention — last seen: Q1 FY27"
+              },
+              {
+                "ticker": "MAXHEALTH",
+                "company": "Max Healthcare",
+                "lastMention": "Q4 FY27",
+                "expectedQuarter": "Q3 FY27",
+                "stale": true,
+                "reason": "No Q3 FY27 mention — last seen: Q4 FY27"
+              }
+            ],
+            "staleCount": 3
+          }
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-10-07",
+          "details": {
+            "newsWebPath": "/journal/news/2026/10/07"
+          }
+        }
+      ]
+    },
     {
       "action": "daily-market-pack",
       "trigger": "cli",

@@ -1,7 +1,7 @@
 # Max Healthcare - Holding CAGR
 
 **Ticker:** MAXHEALTH (NSE)  
-**CMP:** **Rs 917** | **CMP date:** 2026-10-06 | **Source:** Yahoo Finance NSE (.NS) - proxy for NSE last price  
+**CMP:** **Rs 893** | **CMP date:** 2026-10-07 | **Source:** Yahoo Finance NSE (.NS) - proxy for NSE last price  
 **Last calculated:** 2026-08-28
 
 Cross-ref: `CAGR-FRAMEWORK.md` | `.cursor/portfolio/holdings.md` | `summary-analysis.md`
@@ -24,7 +24,7 @@ Cross-ref: `CAGR-FRAMEWORK.md` | `.cursor/portfolio/holdings.md` | `summary-anal
 |--------|------:|
 | Total qty | 2,000 |
 | Total cost (Rs) | 1,311,680 |
-| Market value @ CMP (Rs) | 1,834.9.9.9.9.6.6.8.2.6.6.4.4.4.4.4.4.8.4 |
+| Market value @ CMP (Rs) | 1,786.9.9.9.9.6.6.8.2.6.6.4.4.4.4.4.4.8.4 |
 | Blended simple return % | **-99.9%** |
 | Cost-weighted CAGR % | **36.06%** |
 

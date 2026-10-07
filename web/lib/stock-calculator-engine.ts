@@ -332,20 +332,42 @@ export async function runStockCalculator(
     if (cmpMatch) cmpFromParams = parseNum(cmpMatch[1]);
   }
 
-  const cmp =
+  let cmp: number | null =
     quote?.price ??
     cmpFromParams ??
     (paramMetrics.normalizedEps && paramMetrics.forwardPe
       ? paramMetrics.normalizedEps * paramMetrics.forwardPe
       : null);
 
+  let cmpSourceLabel = quote?.source ?? (cmpFromParams ? 'parameters' : 'derived');
+
   if (cmp == null || cmp <= 0) {
-    throw new Error(`Could not resolve CMP for ${resolved.ticker}. Try again later.`);
+    if (input.basicAnalysis) {
+      const estimated =
+        cmpFromParams ??
+        (paramMetrics.framework5yFairPrice != null && paramMetrics.framework5yFairPrice > 0
+          ? paramMetrics.framework5yFairPrice
+          : null) ??
+        (paramMetrics.normalizedEps != null && paramMetrics.normalizedEps > 0
+          ? Math.round(paramMetrics.normalizedEps * BASIC_ANALYSIS_ASSUMED_PE * 100) / 100
+          : null);
+      if (estimated != null && estimated > 0) {
+        cmp = estimated;
+        cmpSourceLabel = quote
+          ? quote.source
+          : cmpFromParams
+            ? 'parameters'
+            : 'estimated (no live quote — Basic mode)';
+      }
+    }
+    if (cmp == null || cmp <= 0) {
+      throw new Error(`Could not resolve CMP for ${resolved.ticker}. Try again later.`);
+    }
   }
 
   const snapshot: PeSnapshot = {
     cmp,
-    cmpSource: quote?.source ?? (cmpFromParams ? 'parameters' : 'derived'),
+    cmpSource: cmpSourceLabel,
     ...paramMetrics,
   };
 

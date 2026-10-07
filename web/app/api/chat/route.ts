@@ -86,11 +86,7 @@ export async function POST(request: Request) {
       }
 
       analysisType = 'stock-full';
-      const stockResult = await runAskAgentStockAnalysis(session.tenantId, stock, lotCtx);
-      result = stockResult ?? {
-        answer: `Could not build a report for **${stock.ticker}**. Try **Stock Analysis → Basic** or check server logs.`,
-        mode: 'framework-local' as const,
-      };
+      result = await runAskAgentStockAnalysis(session.tenantId, stock, lotCtx);
 
       resolvedTicker = stock.ticker;
       resolvedStockName = stock.company;
@@ -146,15 +142,7 @@ export async function POST(request: Request) {
         result = await runNewsFrameworkQuery(query, agentContext);
       } else if (route.kind === 'stock-analysis' && route.stock) {
         analysisType = 'stock-full';
-        const stockResult = await runAskAgentStockAnalysis(
-          session.tenantId,
-          route.stock,
-          lotCtx
-        );
-        result = stockResult ?? {
-          answer: `Could not build a full report for **${route.stock.ticker}**. Try **Stock Analysis → Basic** or check server logs.`,
-          mode: 'framework-local' as const,
-        };
+        result = await runAskAgentStockAnalysis(session.tenantId, route.stock, lotCtx);
       } else {
         result = await runFrameworkQuery(query, agentContext);
       }

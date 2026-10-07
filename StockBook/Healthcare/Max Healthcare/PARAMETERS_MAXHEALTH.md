@@ -1,6 +1,6 @@
 ﻿# Max Healthcare - Stock Parameters
 
-**Ticker:** MAXHEALTH | **CMP:** Rs 917 (2026-10-06)  
+**Ticker:** MAXHEALTH | **CMP:** Rs 893 (2026-10-07)  
 **Part 1 window:** FY2016-FY2025 (10Y rear-view) | **Part 2 window:** FY2027-FY2031 (5Y forward)
 
 ---
@@ -24,7 +24,7 @@
 | Parameter | What it measures | Link to stock price | 10Y avg (normal) | 10Y avg (incl. COVID) | **Today @ CMP** | **vs normal avg** | **Read** |
 |-----------|------------------|---------------------|------------------|----------------------|-----------------|-------------------|----------|
 | **Owner Earnings Yield** | EPS / price | Higher = cheaper | **2.2%** | 2.2% | **1.6%** | -27% | **Expensive** on yield |
-| **P/E** | Price / EPS | Higher = pays more per Rs profit | **45x** | 45x | **59.3x** | +43% | **Expensive** vs 10Y |
+| **P/E** | Price / EPS | Higher = pays more per Rs profit | **45x** | 45x | **57.7x** | +43% | **Expensive** vs 10Y |
 | **Intrinsic Value (@40x EPS)** | Normal fair anchor | Below IV = margin | **-** | - | **Rs 620** | - | Premium **+61%** |
 | **Premium to IV (%)** | vs normal IV | Negative = below fair | *Est.* +35% | *Est.* | **+61%** | +26 pp | **Above** historical premium |
 

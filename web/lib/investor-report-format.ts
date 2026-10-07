@@ -51,7 +51,24 @@ function stripFrameworkJargon(text: string): string {
 
 /** Apply before returning any Ask Agent / journal answer. */
 export function sanitizeUserFacingAnswer(markdown: string): string {
-  return stripFrameworkJargon(toInvestorFacingReport(markdown));
+  const raw = (markdown ?? '').trim();
+  if (!raw) {
+    return (
+      '**Could not load a full answer** — live market data or analysis modules failed on the server.\n\n' +
+      '- Retry in a minute (during market hours)\n' +
+      '- Open **Stock Analysis → Basic** for the same ticker\n' +
+      '- On Vercel: ensure bundled StockBook sync ran at build; optional **GOOGLE_GENERATIVE_AI_API_KEY** helps general questions\n\n' +
+      '*Not investment advice.*'
+    );
+  }
+  const out = stripFrameworkJargon(toInvestorFacingReport(raw));
+  if (!out.trim()) {
+    return (
+      '**Answer was empty after formatting** — retry or use **Stock Analysis → Basic** for this stock.\n\n' +
+      '*Not investment advice.*'
+    );
+  }
+  return out;
 }
 
 /** Short verdict lines (tags, one-liners) — no internal methodology wording. */

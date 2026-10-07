@@ -409,7 +409,7 @@ export async function runFrameworkQuery(
 
   try {
     const geminiAnswer = await callGemini(system, userPrompt);
-    if (geminiAnswer) {
+    if (geminiAnswer?.trim()) {
       answer = sanitizeUserFacingAnswer(geminiAnswer);
       mode = 'gemini';
       model = process.env.GEMINI_MODEL ?? 'gemini-3.6-flash';
