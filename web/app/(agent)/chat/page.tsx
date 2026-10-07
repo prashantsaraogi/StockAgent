@@ -12,7 +12,9 @@ export default function ChatPage() {
           <strong>General question</strong> (anything else → summary-first answer). Discipline runs
           in the background — replies show useful information only.{' '}
           <Link href="/chat/prompts">Prompt Guidelines</Link> ·{' '}
-          <Link href="/resources">Resources &amp; Playbook</Link>.
+          <Link href="/journal/analysis">Analysis Log</Link> ·{' '}
+          <Link href="/resources">Resources &amp; Playbook</Link>. Conversation on this page
+          restores from your account (last 24 Q&amp;A pairs).
         </p>
       </header>
       <ProsePanel className="chat-panel-wrap">

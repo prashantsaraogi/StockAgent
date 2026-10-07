@@ -33,32 +33,7 @@ export function marketCapBucketLabel(bucket: MarketCapBucket): string {
 const capCache = new Map<string, { bucket: MarketCapBucket; mcapCr: number | null; expires: number }>();
 const CACHE_TTL = 24 * 60 * 60 * 1000;
 
-let yahooSession: { cookies: string; crumb: string; expires: number } | null = null;
-
-async function getYahooSession(): Promise<{ cookies: string; crumb: string } | null> {
-  if (yahooSession && Date.now() < yahooSession.expires) {
-    return yahooSession;
-  }
-  try {
-    const cookieRes = await fetch('https://fc.yahoo.com', {
-      redirect: 'manual',
-      headers: BROWSER_HEADERS,
-      signal: AbortSignal.timeout(12000),
-    });
-    const cookies = (cookieRes.headers.getSetCookie?.() ?? []).map((c) => c.split(';')[0]).join('; ');
-    const crumbRes = await fetch('https://query1.finance.yahoo.com/v1/test/getcrumb', {
-      headers: { ...BROWSER_HEADERS, Cookie: cookies },
-      signal: AbortSignal.timeout(12000),
-    });
-    if (!crumbRes.ok) return null;
-    const crumb = (await crumbRes.text()).trim();
-    if (!crumb) return null;
-    yahooSession = { cookies, crumb, expires: Date.now() + 60 * 60 * 1000 };
-    return yahooSession;
-  } catch {
-    return null;
-  }
-}
+import { fetchYahooQuoteSummary, getYahooFinanceSession } from './yahoo-finance-session';
 
 async function fetchChartPrice(nseSymbol: string): Promise<number | null> {
   try {
@@ -76,46 +51,20 @@ async function fetchChartPrice(nseSymbol: string): Promise<number | null> {
 /** Fetch live NSE market cap in ₹ crore (Yahoo quoteSummary + crumb; chart fallback). */
 export async function fetchMarketCapCr(ticker: string): Promise<number | null> {
   const nseSymbol = resolveNseSymbol(ticker);
-  const session = await getYahooSession();
-
-  if (session) {
-    try {
-      const url = `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(nseSymbol)}.NS?modules=summaryDetail,defaultKeyStatistics&crumb=${encodeURIComponent(session.crumb)}`;
-      const res = await fetch(url, {
-        headers: { ...BROWSER_HEADERS, Cookie: session.cookies },
-        signal: AbortSignal.timeout(12000),
-      });
-      if (res.ok) {
-        const json = await res.json();
-        const result = json?.quoteSummary?.result?.[0];
-        const raw =
-          result?.summaryDetail?.marketCap?.raw ?? result?.price?.marketCap?.raw;
-        if (typeof raw === 'number' && raw > 0) {
-          return Math.round(raw / 1e7);
-        }
-        const shares = result?.defaultKeyStatistics?.sharesOutstanding?.raw;
-        const price = result?.summaryDetail?.previousClose?.raw ?? result?.price?.regularMarketPrice?.raw;
-        if (typeof shares === 'number' && typeof price === 'number' && shares > 0 && price > 0) {
-          return Math.round((shares * price) / 1e7);
-        }
-      }
-    } catch {
-      /* fall through */
+  const result = await fetchYahooQuoteSummary(nseSymbol, 'summaryDetail,defaultKeyStatistics,price');
+  if (result) {
+    const summaryDetail = result.summaryDetail as Record<string, { raw?: number }> | undefined;
+    const priceMod = result.price as Record<string, { raw?: number }> | undefined;
+    const stats = result.defaultKeyStatistics as Record<string, { raw?: number }> | undefined;
+    const raw = summaryDetail?.marketCap?.raw ?? priceMod?.marketCap?.raw;
+    if (typeof raw === 'number' && raw > 0) {
+      return Math.round(raw / 1e7);
     }
-  }
-
-  try {
-    const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(nseSymbol)}.NS?modules=summaryDetail,price`;
-    const res = await fetch(url, { headers: BROWSER_HEADERS, signal: AbortSignal.timeout(10000) });
-    if (res.ok) {
-      const json = await res.json();
-      const raw =
-        json?.quoteSummary?.result?.[0]?.summaryDetail?.marketCap?.raw ??
-        json?.quoteSummary?.result?.[0]?.price?.marketCap?.raw;
-      if (typeof raw === 'number' && raw > 0) return Math.round(raw / 1e7);
+    const shares = stats?.sharesOutstanding?.raw;
+    const price = summaryDetail?.previousClose?.raw ?? priceMod?.regularMarketPrice?.raw;
+    if (typeof shares === 'number' && typeof price === 'number' && shares > 0 && price > 0) {
+      return Math.round((shares * price) / 1e7);
     }
-  } catch {
-    /* fall through */
   }
 
   const price = await fetchChartPrice(nseSymbol);
@@ -157,7 +106,7 @@ export async function fetchMarketCapCrBatch(
 ): Promise<Map<string, number | null>> {
   const unique = [...new Set(tickers.map((t) => t.toUpperCase()))];
   const out = new Map<string, number | null>();
-  await getYahooSession();
+  await getYahooFinanceSession();
   for (const ticker of unique) {
     out.set(ticker, await fetchMarketCapCr(ticker));
     if (BATCH_DELAY_MS > 0) {

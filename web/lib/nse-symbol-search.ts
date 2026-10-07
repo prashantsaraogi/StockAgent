@@ -2,7 +2,7 @@
  * Search NSE-listed equities outside StockBook (Yahoo Finance search API).
  */
 
-import { fetchLiveNseCmp } from './nse-cmp';
+import { fetchLiveNseCmp, resolveNseSymbol } from './nse-cmp';
 
 export interface NseSearchResult {
   ticker: string;
@@ -103,15 +103,16 @@ export async function validateNseTicker(ticker: string): Promise<NseSearchResult
   const upper = ticker.trim().toUpperCase();
   if (!/^[A-Z][A-Z0-9&.-]{0,19}$/.test(upper)) return null;
 
-  const quote = await fetchLiveNseCmp(upper);
+  const nseSymbol = resolveNseSymbol(upper);
+  const quote = await fetchLiveNseCmp(nseSymbol, upper);
   if (!quote?.price) return null;
 
-  const names = await searchNseSymbols(upper, 3);
-  const match = names.find((n) => n.ticker === upper);
+  const names = await searchNseSymbols(nseSymbol, 3);
+  const match = names.find((n) => n.ticker === nseSymbol);
 
   return {
-    ticker: upper,
-    company: match?.company ?? upper,
+    ticker: nseSymbol,
+    company: match?.company ?? quote.nseSymbol,
     sector: match?.sector ?? 'NSE Listed',
     exchange: 'NSE',
   };

@@ -131,8 +131,10 @@ function buildPeRow(analysis: StockCalculatorFullResult): ScorecardRow {
     currentValue =
       pe.avg10yPe != null
         ? `TTM **${pe.ttmPe.toFixed(1)}×** · 10Y avg **${pe.avg10yPe.toFixed(1)}×**`
-        : `TTM **${pe.ttmPe.toFixed(1)}×**`;
+        : `TTM **${pe.ttmPe.toFixed(1)}×** (${pe.cmpSource})`;
     if (pe.cmp != null) currentValue += ` · CMP **₹${Math.round(pe.cmp).toLocaleString('en-IN')}**`;
+  } else if (pe.cmp != null) {
+    currentValue = `CMP **₹${Math.round(pe.cmp).toLocaleString('en-IN')}** (${pe.cmpSource}) · TTM P/E **not available** — add StockBook PARAMETERS or retry later`;
   }
 
   return { check: 'P/E', tone, currentValue, headline, bullets: bullets.slice(0, 3) };
@@ -197,6 +199,9 @@ function buildMarginRow(analysis: StockCalculatorFullResult): ScorecardRow {
     }
   } else if (m.partD?.changePp != null) {
     currentValue = `Latest quarter margin Δ **${m.partD.changePp >= 0 ? '+' : ''}${m.partD.changePp.toFixed(1)} pp**`;
+  } else if (/no margin file/i.test(m.dataSource)) {
+    currentValue =
+      'No **MARGIN_** / **PARAMETERS** file — margins need StockBook data (not from Yahoo)';
   }
 
   return { check: 'Margin', tone, currentValue, headline, bullets: bullets.slice(0, 3) };

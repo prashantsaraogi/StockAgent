@@ -9,6 +9,7 @@ import { STOCK_QUICK_QUESTIONS } from '@/lib/stock-question-types';
 import { sanitizeUserFacingAnswer } from '@/lib/investor-report-format';
 import {
   clearStockChatThread,
+  isGlobalAskAgentThread,
   loadStockChatThread,
   persistStockChatThread,
   stockChatThreadKey,
@@ -60,7 +61,7 @@ export function ChatPanel({
   const [generalInput, setGeneralInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingHint, setLoadingHint] = useState('');
-  const [hydrating, setHydrating] = useState(Boolean(threadKey));
+  const [hydrating, setHydrating] = useState(threadKey != null);
   const sessionIdRef = useRef('web-session-pending');
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -86,7 +87,45 @@ export function ChatPanel({
 
     async function hydrate() {
       setHydrating(true);
+      const globalThread = isGlobalAskAgentThread(threadKey);
       const local = loadStockChatThread(threadKey!);
+
+      const params = new URLSearchParams();
+      if (context?.ticker) params.set('ticker', context.ticker);
+      else if (context?.stockName) params.set('stockName', context.stockName);
+      else if (globalThread) params.set('scope', 'user');
+
+      let serverMessages: StockChatMessage[] | null = null;
+      let serverSessionId: string | undefined;
+
+      try {
+        const res = await fetch(`/api/chat/history?${params.toString()}`);
+        const data = await res.json();
+        if (data.ok && Array.isArray(data.messages) && data.messages.length > 0) {
+          serverMessages = data.messages as StockChatMessage[];
+          serverSessionId = data.sessionId;
+        }
+      } catch {
+        /* offline — fall back to local only */
+      }
+
+      if (globalThread && serverMessages?.length) {
+        const useServer =
+          !local?.messages.length ||
+          serverMessages.length > local.messages.length ||
+          (serverSessionId != null && local.sessionId !== serverSessionId);
+        if (useServer) {
+          sessionIdRef.current = serverSessionId ?? createSessionId();
+          if (!cancelled) setMessages(serverMessages);
+          persistStockChatThread(threadKey!, {
+            sessionId: sessionIdRef.current,
+            messages: serverMessages,
+          });
+          if (!cancelled) setHydrating(false);
+          return;
+        }
+      }
+
       if (local?.messages.length) {
         sessionIdRef.current = local.sessionId;
         if (!cancelled) setMessages(local.messages);
@@ -94,29 +133,18 @@ export function ChatPanel({
         return;
       }
 
-      const params = new URLSearchParams();
-      if (context?.ticker) params.set('ticker', context.ticker);
-      else if (context?.stockName) params.set('stockName', context.stockName);
-
-      try {
-        const res = await fetch(`/api/chat/history?${params.toString()}`);
-        const data = await res.json();
-        if (cancelled) return;
-        if (data.ok && Array.isArray(data.messages) && data.messages.length > 0) {
-          sessionIdRef.current = data.sessionId ?? createSessionId();
-          setMessages(data.messages);
-          persistStockChatThread(threadKey!, {
-            sessionId: sessionIdRef.current,
-            messages: data.messages,
-          });
-        } else {
-          sessionIdRef.current = createSessionId();
-        }
-      } catch {
-        if (!cancelled) sessionIdRef.current = createSessionId();
-      } finally {
-        if (!cancelled) setHydrating(false);
+      if (serverMessages?.length) {
+        sessionIdRef.current = serverSessionId ?? createSessionId();
+        if (!cancelled) setMessages(serverMessages);
+        persistStockChatThread(threadKey!, {
+          sessionId: sessionIdRef.current,
+          messages: serverMessages,
+        });
+      } else {
+        sessionIdRef.current = createSessionId();
       }
+
+      if (!cancelled) setHydrating(false);
     }
 
     void hydrate();
@@ -257,7 +285,10 @@ export function ChatPanel({
 
   function clearThread() {
     if (!threadKey) return;
-    if (!window.confirm('Clear this stock’s conversation on this device? (Analysis Log entries stay.)')) {
+    const label = isGlobalAskAgentThread(threadKey)
+      ? 'Clear this device’s Ask Agent thread? (Your Analysis Log on the server stays.)'
+      : 'Clear this stock’s conversation on this device? (Analysis Log entries stay.)';
+    if (!window.confirm(label)) {
       return;
     }
     clearStockChatThread(threadKey);
@@ -295,7 +326,16 @@ export function ChatPanel({
       {threadKey && messages.length > 0 && (
         <div className="chat-thread-toolbar">
           <span className="muted small">
-            {messages.length} message{messages.length === 1 ? '' : 's'} · saved for this stock
+            {messages.length} message{messages.length === 1 ? '' : 's'} ·{' '}
+            {isGlobalAskAgentThread(threadKey)
+              ? 'saved to your account'
+              : 'saved for this stock'}
+            {isGlobalAskAgentThread(threadKey) && (
+              <>
+                {' '}
+                · <Link href="/journal/analysis">Analysis Log</Link>
+              </>
+            )}
           </span>
           <button type="button" className="link-btn small" onClick={clearThread}>
             Clear

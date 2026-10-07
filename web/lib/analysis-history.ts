@@ -374,6 +374,17 @@ export async function listAnalysisRecordsForStock(
   return filtered.slice(0, limit);
 }
 
+/** Recent Ask Agent Q&A for this user (newest first) — used to restore /chat thread. */
+export async function listRecentAnalysisRecords(
+  tenantId: string,
+  opts: { limit?: number } = {},
+  ctx?: AnalysisLogReadContext
+): Promise<AnalysisRecord[]> {
+  const limit = Math.min(Math.max(opts.limit ?? 24, 1), 60);
+  const all = await listAnalysisRecords(tenantId, ctx);
+  return all.slice(0, limit);
+}
+
 /** Flatten analysis log entries to chat messages (oldest first). */
 export function analysisRecordsToChatMessages(records: AnalysisRecord[]): StockChatMessage[] {
   const chronological = [...records].reverse();

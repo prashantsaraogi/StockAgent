@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth';
 import {
   analysisRecordsToChatMessages,
   listAnalysisRecordsForStock,
+  listRecentAnalysisRecords,
 } from '@/lib/analysis-history';
 import { createSessionId } from '@/lib/session-id';
 
@@ -14,23 +15,34 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
+  const scope = searchParams.get('scope');
   const ticker = searchParams.get('ticker') ?? undefined;
   const stockName = searchParams.get('stockName') ?? undefined;
-  const limit = Math.min(Number(searchParams.get('limit') ?? 12) || 12, 30);
+  const defaultLimit = scope === 'user' ? 24 : 12;
+  const limit = Math.min(Number(searchParams.get('limit') ?? defaultLimit) || defaultLimit, 60);
 
-  if (!ticker && !stockName) {
-    return NextResponse.json({ ok: false, error: 'ticker or stockName required' }, { status: 400 });
+  const readCtx = { userId: session.userId, authMode: session.authMode };
+
+  let records;
+  if (scope === 'user') {
+    records = await listRecentAnalysisRecords(session.tenantId, { limit }, readCtx);
+  } else {
+    if (!ticker && !stockName) {
+      return NextResponse.json(
+        { ok: false, error: 'ticker, stockName, or scope=user required' },
+        { status: 400 }
+      );
+    }
+    records = await listAnalysisRecordsForStock(
+      session.tenantId,
+      {
+        ticker,
+        stockName,
+        limit,
+      },
+      readCtx
+    );
   }
-
-  const records = await listAnalysisRecordsForStock(
-    session.tenantId,
-    {
-      ticker,
-      stockName,
-      limit,
-    },
-    { userId: session.userId, authMode: session.authMode }
-  );
 
   const messages = analysisRecordsToChatMessages(records);
   const sessionId =

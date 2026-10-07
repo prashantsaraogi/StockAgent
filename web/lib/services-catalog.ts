@@ -664,7 +664,7 @@ Run Stock Analysis → PEG tab to verify scorecard + 100-pt total.`,
         categoryId: 'stock-calculator',
         title: 'Ask Agent — stock search & general Q&A',
         description:
-          '`/chat` has **Stock search** (pick name → investment view) and **General question** (summary-first answer). User-facing text only.',
+          '`/chat` has **Stock search** and **General question** modes. Each Q&A saves to **Analysis Log**; the page restores your last ~24 exchanges per login (browser + server).',
         cadence: 'on-demand',
         actionType: 'link',
         href: '/chat',

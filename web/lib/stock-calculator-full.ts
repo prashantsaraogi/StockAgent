@@ -70,6 +70,9 @@ function peVerdictFromScorecard(sc: PeScorecardResult | null, pe: PeEvaluationRe
   if (pe.premiumTo10yPct != null && pe.premiumTo10yPct <= 0) {
     return '🟢 At or below 10Y average P/E';
   }
+  if (pe.ttmPe != null) {
+    return `🟡 Live TTM P/E **${pe.ttmPe.toFixed(1)}×** (${pe.cmpSource}) — add PARAMETERS for 10Y avg`;
+  }
   return '🟡 PARAMETERS read — add purchase price for full scorecard';
 }
 

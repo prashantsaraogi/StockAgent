@@ -32,6 +32,12 @@ export const NSE_SYMBOL_ALIASES: NseSymbolAlias[] = [
     aliases: ['maruti', 'maruti suzuki', 'suzuki maruti', 'msil'],
   },
   {
+    ticker: 'PFIZER',
+    company: 'Pfizer Limited',
+    sector: 'Pharma',
+    aliases: ['pfizer', 'pfizer ltd', 'pfizer limited', 'pfe'],
+  },
+  {
     ticker: 'NUVAMA',
     company: 'Nuvama Wealth Management Limited',
     sector: 'Asset Management',

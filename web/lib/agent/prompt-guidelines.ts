@@ -418,7 +418,7 @@ No sell-to-rotate.`,
         id: 'ask-agent-stock-search',
         title: 'Ask Agent — Stock search tab',
         description:
-          'Web `/chat` → **Stock search**: pick ticker → investment view (user-facing summary only).',
+          'Web `/chat` → **Stock search**: pick ticker → investment view (user-facing summary only). Thread restores from your account + Analysis Log.',
         prompt: `Web Ask Agent — Stock search mode — {TICKER}
 
 Full investor view (same engine as Stock Analysis → Basic): one-line, your position, valuation, what to do — no internal framework headings.`,
@@ -430,7 +430,7 @@ Full investor view (same engine as Stock Analysis → Basic): one-line, your pos
         id: 'ask-agent-general-query',
         title: 'Ask Agent — General question tab',
         description:
-          'Web `/chat` → **General question**: portfolio, sector, news, compare — summary-first answer.',
+          'Web `/chat` → **General question**: portfolio, sector, news, compare — summary-first answer. Saved per user; `/chat` reloads recent Q&A.',
         prompt: `Web Ask Agent — General question mode
 
 User question: {QUERY}

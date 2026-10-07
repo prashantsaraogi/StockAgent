@@ -29,6 +29,8 @@ const NSE_SYMBOL_ALIASES: Record<string, string> = {
   GUJGAS: 'GUJENERGY',
   LTIM: 'LTM',
   RMCL: 'RAJMET',
+  /** US ticker shorthand → NSE Pfizer Ltd */
+  PFE: 'PFIZER',
 };
 
 const CACHE_TTL_MS = Number(process.env.CMP_CACHE_TTL_MS ?? 5 * 60 * 1000);
@@ -180,27 +182,8 @@ async function fetchYahooFundamentals(
   nseSymbol: string
 ): Promise<{ trailingPe: number | null; trailingEps: number | null }> {
   try {
-    const symbol = `${encodeURIComponent(nseSymbol)}.NS`;
-    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
-    const res = await fetch(url, {
-      headers: { ...BROWSER_HEADERS },
-      signal: AbortSignal.timeout(12000),
-    });
-    if (!res.ok) return { trailingPe: null, trailingEps: null };
-
-    const json = (await res.json()) as {
-      quoteResponse?: { result?: Array<Record<string, unknown>> };
-    };
-    const q = json.quoteResponse?.result?.[0];
-    if (!q) return { trailingPe: null, trailingEps: null };
-
-    const trailingEps = pickPositiveNum(q.epsTrailingTwelveMonths, q.trailingEps);
-    let trailingPe = pickPositiveNum(q.trailingPE, q.forwardPE);
-    const price = pickPositiveNum(q.regularMarketPrice);
-    if (trailingPe == null && price != null && trailingEps != null) {
-      trailingPe = Math.round((price / trailingEps) * 10) / 10;
-    }
-    return { trailingPe, trailingEps };
+    const { fetchYahooTrailingPeMetrics } = await import('./yahoo-finance-session');
+    return await fetchYahooTrailingPeMetrics(nseSymbol);
   } catch {
     return { trailingPe: null, trailingEps: null };
   }

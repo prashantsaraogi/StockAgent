@@ -24,21 +24,28 @@ export interface StockChatThread {
 
 const STORAGE_PREFIX = 'my-agent-stock-thread:v1:';
 
+/** Browser + server backup key for /chat (all modes, per logged-in user). */
+export const GLOBAL_ASK_AGENT_THREAD_KEY = '__ask-agent-user__';
+
 export type StockChatScope = {
   ticker?: string;
   sector?: string;
   stockName?: string;
 };
 
-/** Stable key for this stock's sidebar thread (null = global /chat — no persist). */
+/** Stable key for Ask Agent thread (per stock in sidebar, or user-level on /chat). */
 export function stockChatThreadKey(scope: StockChatScope | undefined): string | null {
-  if (!scope) return null;
-  if (scope.ticker?.trim()) return scope.ticker.trim().toUpperCase();
-  if (scope.stockName?.trim() && scope.sector?.trim()) {
+  if (scope?.ticker?.trim()) return scope.ticker.trim().toUpperCase();
+  if (scope?.stockName?.trim() && scope.sector?.trim()) {
     return `${scope.sector.trim()}::${scope.stockName.trim()}`;
   }
-  if (scope.stockName?.trim()) return scope.stockName.trim();
+  if (scope?.stockName?.trim()) return scope.stockName.trim();
+  if (scope === undefined) return GLOBAL_ASK_AGENT_THREAD_KEY;
   return null;
+}
+
+export function isGlobalAskAgentThread(threadKey: string | null): boolean {
+  return threadKey === GLOBAL_ASK_AGENT_THREAD_KEY;
 }
 
 function storageKey(threadKey: string): string {
