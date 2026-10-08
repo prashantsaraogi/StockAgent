@@ -11,8 +11,13 @@ import { buildBusinessQualityVsRisksMarkdown } from './investor-evidenced-readin
 import { getBundledParametersMd } from './load-bundled-stockbook';
 import { parseHistoricalGrowthTab } from './stock-calculator-tabs';
 import { label10yPe, resolve10yPeReference } from './pe-history-reference';
+import {
+  buildPeerSignalMatrix,
+  SECTOR_PEER_LIST,
+  type PeerSignal,
+} from './peer-comparison-signals';
 
-type Signal = '🟢' | '🟡' | '🔴' | '—';
+type Signal = PeerSignal;
 
 interface FundRow {
   parameter: string;
@@ -20,27 +25,6 @@ interface FundRow {
   status: Signal;
   interpretation: string;
 }
-
-const SECTOR_PEERS: Record<string, { ticker: string; label: string }[]> = {
-  IT: [
-    { ticker: 'TCS', label: 'TCS' },
-    { ticker: 'INFY', label: 'Infosys' },
-    { ticker: 'HCLTECH', label: 'HCLTech' },
-    { ticker: 'WIPRO', label: 'Wipro' },
-  ],
-  Pharma: [
-    { ticker: 'SUNPHARMA', label: 'Sun Pharma' },
-    { ticker: 'DRREDDY', label: "Dr Reddy's" },
-    { ticker: 'CIPLA', label: 'Cipla' },
-    { ticker: 'LUPIN', label: 'Lupin' },
-  ],
-  'Banking and Finance': [
-    { ticker: 'HDFCBANK', label: 'HDFC Bank' },
-    { ticker: 'ICICIBANK', label: 'ICICI Bank' },
-    { ticker: 'KOTAKBANK', label: 'Kotak' },
-    { ticker: 'AXISBANK', label: 'Axis Bank' },
-  ],
-};
 
 function signalFromScore10(score: number): Signal {
   if (score >= 7) return '🟢';
@@ -210,14 +194,14 @@ ${lines.join('\n')}`;
 function peerTable(
   sector: string,
   subjectTicker: string,
-  subjectSignals: Record<string, Signal>
+  peerMatrix: Map<string, Record<string, Signal>>
 ): string | null {
   const norm =
-    Object.keys(SECTOR_PEERS).find((k) => sector.toLowerCase().includes(k.toLowerCase())) ??
+    Object.keys(SECTOR_PEER_LIST).find((k) => sector.toLowerCase().includes(k.toLowerCase())) ??
     (sector.toLowerCase().includes('it') ? 'IT' : null);
-  if (!norm || !SECTOR_PEERS[norm]) return null;
+  if (!norm || !SECTOR_PEER_LIST[norm]) return null;
 
-  const peers = SECTOR_PEERS[norm];
+  const peers = SECTOR_PEER_LIST[norm];
   const factors = [
     { key: 'scale', label: 'Scale' },
     { key: 'margin', label: 'Operating margin' },
@@ -234,16 +218,15 @@ function peerTable(
 
   const body = factors.map((f) => {
     const cells = peers.map((p) => {
-      if (p.ticker === subjectTicker.toUpperCase()) {
-        const s = subjectSignals[f.key] ?? '🟡';
-        return f.key === 'quality' ? `**${s}**` : s;
-      }
-      return '—';
+      const row = peerMatrix.get(p.ticker.toUpperCase());
+      const s = row?.[f.key] ?? '🟡';
+      const isSubject = p.ticker.toUpperCase() === subjectTicker.toUpperCase();
+      return f.key === 'quality' && isSubject ? `**${s}**` : s;
     });
     return `| ${f.label} | ${cells.join(' | ')} |`;
   });
 
-  return `${header}\n${sep}\n${body.join('\n')}\n\n*Peer columns for other names: refresh \`${norm}\` sector comparative rank in StockBook — only **${subjectTicker}** column is model-filled today.*`;
+  return `${header}\n${sep}\n${body.join('\n')}\n\n*Peer signals: live run for **${subjectTicker}**; peers from StockBook PARAMETERS + sector comparative rank (FACT/HYPOTHESIS scores → 🟢/🟡/🔴).*`;
 }
 
 function sectionBlock(title: string, signal: Signal, bullets: string[], verdict?: string): string {
@@ -294,7 +277,8 @@ export function buildInvestmentAnalysisReport(parts: InvestorReportParts): strin
     quality: signalFromScore10(bqScore),
   };
 
-  const peerBlock = peerTable(analysis.sector, analysis.ticker, peerSignals);
+  const peerMatrix = buildPeerSignalMatrix(analysis.sector, analysis.ticker, peerSignals);
+  const peerBlock = peerTable(analysis.sector, analysis.ticker, peerMatrix);
 
   const histPeRef = resolve10yPeReference(pe);
   const valSignal =
