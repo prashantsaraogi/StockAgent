@@ -3901,6 +3901,46 @@ td.gain-neg {
   margin-top: 1.5rem;
 }
 
+.industry-clusters-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.industry-sector-group {
+  padding: 1rem 1.1rem 1.15rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 8px);
+  background: color-mix(in srgb, var(--card, #fff) 92%, var(--accent, #2563eb) 8%);
+}
+
+.industry-sector-group-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.industry-sector-group-title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.industry-sector-group-intro {
+  margin: 0 0 0.75rem;
+}
+
+.industry-sector-group-grid {
+  margin-top: 0.5rem;
+}
+
+.industry-sector-group-best strong {
+  color: inherit;
+}
+
 .sector-score-link-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

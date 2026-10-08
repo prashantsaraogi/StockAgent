@@ -300,7 +300,8 @@ Merge same-day summary.md · update TICKER-INDEX.`,
   {
     id: 'industry',
     label: 'Industry & sector outlook',
-    description: '6-parameter sector scores, cap-tier universe, and comparative ranks.',
+    description:
+      'Industry Growth clusters: **Healthcare & Medical** (hospitals · pharma · CDMO), **Banking & Finance** (overview + banks/NBFC/insurance/AMC), **Technology**, **Industrials**, **Consumer/Auto**, **Energy** — each with sub-sector scorecards.',
     services: [
       {
         id: 'refresh-all-sector-scores',

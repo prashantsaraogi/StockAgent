@@ -6,6 +6,8 @@
 **Status:** **6-parameter score filled** (AI research · Sep 2026)  
 **Scope:** Max Healthcare · Medanta · Fortis Healthcare · Manipal Health
 
+**Industry Growth cluster:** Healthcare & Medical — hospitals sub-lens (with `pharma-sector-outlook.md` · `specialty-pharma-cdmo-sector-outlook.md`).
+
 Cross-ref: `healthcare-comparative-rank.md` · room-rent cap policy · L10 sector lens · Max 35× conviction cap
 
 ---

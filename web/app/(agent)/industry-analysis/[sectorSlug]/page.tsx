@@ -4,6 +4,7 @@ import { readRepoMarkdown } from '@/lib/content';
 import { parseCapTierUniverseFromMarkdown } from '@/lib/sector-cap-universe-parser';
 import { parseMcapLastRefreshed } from '@/lib/sector-mcap-refresh';
 import { parseSectorScoreFromMarkdown } from '@/lib/sector-score-parser';
+import { industryDetailBackNavigation } from '@/lib/industry-sector-groups';
 import { outlookPathFromSlug, sectorLabelFromSlug } from '@/lib/sector-slugs';
 import { SectorCapTierPanel } from '@/components/SectorCapTierPanel';
 import { SectorScorePanel } from '@/components/SectorScorePanel';
@@ -25,10 +26,12 @@ export default async function SectorDetailPage({ params }: Props) {
   const capUniverse = parseCapTierUniverseFromMarkdown(content);
   const mcapLastRefreshed = parseMcapLastRefreshed(content);
 
+  const { href: backHref, label: backLabel } = industryDetailBackNavigation(sectorSlug);
+
   return (
     <div className="page page-prose">
-      <Link href="/industry-analysis" className="back-link">
-        ← Industry Growth
+      <Link href={backHref} className="back-link">
+        {backLabel}
       </Link>
       <header className="page-header">
         <h1>{title}</h1>

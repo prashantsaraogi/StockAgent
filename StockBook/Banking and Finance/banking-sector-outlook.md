@@ -8,6 +8,8 @@
 
 Cross-ref: `banking-finance-comparative-rank.md` · `government-banks-comparative-rank.md` · `fraud-detection-analysis` · RBI credit fortnightly
 
+**Industry Growth sub-lenses (web):** `banks-sector-outlook.md` · `nbfc-sector-outlook.md` · `insurance-sector-outlook.md` · `amc-sector-outlook.md`
+
 ---
 
 ## Sector score — 6 parameters

@@ -196,6 +196,21 @@ Never use dividend yield on CMP as primary metric for existing holders.`,
     description: 'Dynamic capital allocation — surplus only, not sell-to-rotate.',
     prompts: [
       {
+        id: 'industry-growth-clusters',
+        title: 'Industry Growth — cluster map (web)',
+        description:
+          'Web `/industry-analysis` groups outlooks: Healthcare & Medical · Banking & Finance · Technology · Industrials · Consumer/Auto · Energy.',
+        prompt: `Industry Growth cluster refresh — web \`/industry-analysis\`.
+
+Groups live in \`web/lib/industry-sector-groups.ts\`. Each card = one \`*-sector-outlook.md\` (6-parameter score + cap tiers).
+Healthcare & Medical: hospitals (\`healthcare\`) · pharma · specialty CDMO.
+Banking & Finance: overview + banks / NBFC / insurance / AMC.
+
+When adding a new StockBook sector outlook, register slug in \`SECTOR_OUTLOOK_PATHS\` and assign to a cluster (or standalone).`,
+        channel: 'web',
+        framework: ['SECTOR-OUTLOOK-FRAMEWORK'],
+      },
+      {
         id: 'sector-rank',
         title: 'Sector surplus band today',
         description: 'Module E + ground reality — which sectors get 0% vs 25–30% surplus.',

@@ -6,6 +6,8 @@
 **Status:** **6-parameter score filled** (AI research · Sep 2026)  
 **Scope:** Sun Pharmaceutical · Lupin · Dr Reddy's · Cipla · Glenmark
 
+**Industry Growth cluster:** Healthcare & Medical — pharma sub-lens (with hospitals · CDMO).
+
 Cross-ref: `pharma-comparative-rank.md` · US pricing · FDA pipeline
 
 ---
