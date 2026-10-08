@@ -3,6 +3,7 @@
  */
 
 import type { StockCalculatorFullResult } from './stock-calculator-full';
+import { label10yPe, resolve10yPeReference } from './pe-history-reference';
 import type { DisciplineRule } from './investor-discipline-web';
 function formatCagrGapPp(gap: number | null): string {
   if (gap == null) return 'n/a';
@@ -104,16 +105,17 @@ function buildPeRow(analysis: StockCalculatorFullResult): ScorecardRow {
   const headline = stripEmojiPrefix(analysis.overview.peVerdict);
   const tone = classifyScorecardTone(headline, 'P/E');
   const pe = analysis.peParameters;
+  const histPe = resolve10yPeReference(pe);
   const bullets: string[] = [];
 
-  if (pe.ttmPe != null && pe.avg10yPe != null) {
-    const cheap = pe.ttmPe < pe.avg10yPe * 0.85;
-    const rich = pe.ttmPe > pe.avg10yPe * 1.1;
+  if (pe.ttmPe != null && histPe.value != null) {
+    const cheap = pe.ttmPe < histPe.value * 0.85;
+    const rich = pe.ttmPe > histPe.value * 1.1;
     bullets.push(
-      `TTM **${pe.ttmPe.toFixed(1)}×** vs 10Y avg **${pe.avg10yPe.toFixed(1)}×** (${pe.cmpSource}).`
+      `TTM **${pe.ttmPe.toFixed(1)}×** vs ${label10yPe(histPe.kind)} **${histPe.value.toFixed(1)}×** (${pe.cmpSource}).`
     );
     if (cheap) bullets.push('Trailing multiple **below** long-run average — cheap vs **history** (not automatic buy).');
-    else if (rich) bullets.push('Trading **above** typical 10Y P/E — need earnings path to justify.');
+    else if (rich) bullets.push(`Trading **above** typical ${label10yPe(histPe.kind)} — need earnings path to justify.`);
     else bullets.push('Near historical P/E band — valuation is **neutral** vs own past.');
   }
   if (headline.toLowerCase().includes('purchase price')) {
@@ -129,8 +131,8 @@ function buildPeRow(analysis: StockCalculatorFullResult): ScorecardRow {
   let currentValue = '—';
   if (pe.ttmPe != null) {
     currentValue =
-      pe.avg10yPe != null
-        ? `TTM **${pe.ttmPe.toFixed(1)}×** · 10Y avg **${pe.avg10yPe.toFixed(1)}×**`
+      histPe.value != null
+        ? `TTM **${pe.ttmPe.toFixed(1)}×** · ${label10yPe(histPe.kind)} **${histPe.value.toFixed(1)}×**`
         : `TTM **${pe.ttmPe.toFixed(1)}×** (${pe.cmpSource})`;
     if (pe.cmp != null) currentValue += ` · CMP **₹${Math.round(pe.cmp).toLocaleString('en-IN')}**`;
   } else if (pe.cmp != null) {

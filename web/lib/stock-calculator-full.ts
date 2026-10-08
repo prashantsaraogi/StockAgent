@@ -15,6 +15,7 @@ import {
   type BasicFrameworkReport,
 } from './basic-analysis-report';
 import type { LotPersistenceContext } from './holding-lots';
+import { label10yPe, resolve10yPeReference } from './pe-history-reference';
 
 export interface StockCalculatorFullInputs {
   peBasis: PeBasis;
@@ -64,14 +65,15 @@ function parsePurchaseDate(value: string | null | undefined): string | null {
 
 function peVerdictFromScorecard(sc: PeScorecardResult | null, pe: PeEvaluationResult): string {
   if (sc) return sc.freshVerdict;
+  const hist = label10yPe(resolve10yPeReference(pe).kind);
   if (pe.premiumTo10yPct != null && pe.premiumTo10yPct > 10) {
-    return '🟡 Above 10Y average P/E — confirm with PCCL';
+    return `🟡 Above ${hist} — confirm with PCCL`;
   }
   if (pe.premiumTo10yPct != null && pe.premiumTo10yPct <= 0) {
-    return '🟢 At or below 10Y average P/E';
+    return `🟢 At or below ${hist}`;
   }
   if (pe.ttmPe != null) {
-    return `🟡 Live TTM P/E **${pe.ttmPe.toFixed(1)}×** (${pe.cmpSource}) — add PARAMETERS for 10Y avg`;
+    return `🟡 Live TTM P/E **${pe.ttmPe.toFixed(1)}×** (${pe.cmpSource}) — add PARAMETERS for 10Y history`;
   }
   return '🟡 PARAMETERS read — add purchase price for full scorecard';
 }

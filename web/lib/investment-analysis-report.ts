@@ -10,6 +10,7 @@ import { buildInvestorScorecardMarkdown } from './investor-scorecard';
 import { buildBusinessQualityVsRisksMarkdown } from './investor-evidenced-readings';
 import { getBundledParametersMd } from './load-bundled-stockbook';
 import { parseHistoricalGrowthTab } from './stock-calculator-tabs';
+import { label10yPe, resolve10yPeReference } from './pe-history-reference';
 
 type Signal = '🟢' | '🟡' | '🔴' | '—';
 
@@ -83,15 +84,29 @@ function buildFundamentalRows(
   const ebitda = analysis.margin.partB?.rows?.find((r) => /ebitda/i.test(r.metric));
   const rows: FundRow[] = [];
 
+  const histPe = resolve10yPeReference(pe);
+
   if (pe.ttmPe != null) {
     rows.push({
       parameter: 'TTM P/E @ CMP',
       value: `**${pe.ttmPe.toFixed(1)}×**`,
-      status: signalFromPeVsAvg(pe.ttmPe, pe.avg10yPe),
+      status: signalFromPeVsAvg(pe.ttmPe, histPe.value),
       interpretation:
-        pe.avg10yPe != null
-          ? `vs 10Y avg **${pe.avg10yPe.toFixed(1)}×** (${pe.cmpSource})`
+        histPe.value != null
+          ? `vs ${label10yPe(histPe.kind)} **${histPe.value.toFixed(1)}×** (${pe.cmpSource})`
           : 'Live quote — add PARAMETERS for 10Y history',
+    });
+  }
+
+  if (histPe.kind === 'median' && histPe.value != null) {
+    rows.push({
+      parameter: label10yPe('median'),
+      value: `**${histPe.value.toFixed(1)}×**`,
+      status: '🟡',
+      interpretation:
+        pe.avg10yPe != null && Math.abs(pe.avg10yPe - histPe.value) > 0.5
+          ? `10Y mean **${pe.avg10yPe.toFixed(1)}×** for comparison — median from FY history / StockBook`
+          : 'From FY P/E history or StockBook (excl. FY2020–21 when table present)',
     });
   }
 
@@ -281,10 +296,11 @@ export function buildInvestmentAnalysisReport(parts: InvestorReportParts): strin
 
   const peerBlock = peerTable(analysis.sector, analysis.ticker, peerSignals);
 
+  const histPeRef = resolve10yPeReference(pe);
   const valSignal =
     premiumPccl != null && premiumPccl <= 0
       ? '🟢'
-      : pe.ttmPe != null && pe.avg10yPe != null && pe.ttmPe < pe.avg10yPe * 0.95
+      : pe.ttmPe != null && histPeRef.value != null && pe.ttmPe < histPeRef.value * 0.95
         ? '🟢'
         : '🟡 **Needs price check**';
 
@@ -523,7 +539,8 @@ ${evidenceBlock}
 |--------|------:|
 | CMP | ${cmp != null ? formatInr(cmp) : '—'} |
 | TTM P/E | ${pe.ttmPe != null ? `${pe.ttmPe.toFixed(1)}×` : '—'} |
-| 10Y avg P/E | ${pe.avg10yPe != null ? `${pe.avg10yPe.toFixed(1)}×` : '—'} |
+| ${label10yPe(histPeRef.kind)} | ${histPeRef.value != null ? `${histPeRef.value.toFixed(1)}×` : '—'} |
+${histPeRef.kind === 'median' && pe.avg10yPe != null ? `| 10Y avg P/E (mean) | ${pe.avg10yPe.toFixed(1)}× |` : ''}
 | PCCL (rational) | ${pcclBase != null ? formatInr(pcclBase) : '—'} |
 | Applied PCCL | ${pcclApplied != null ? formatInr(pcclApplied) : '—'} |
 

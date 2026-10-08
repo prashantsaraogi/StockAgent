@@ -19,6 +19,7 @@ import {
   type CalculatorTabAnalysis,
 } from './stock-calculator-tabs';
 import { getBundledParametersMd } from './load-bundled-stockbook';
+import { parseMedian10yPeFromMd } from './pe-history-reference';
 
 export type PeBasis = 'ttm' | 'forward';
 
@@ -45,6 +46,8 @@ export interface PeSnapshot {
   ttmPe: number | null;
   forwardPe: number | null;
   avg10yPe: number | null;
+  /** From FY P/E history or explicit StockBook median line when available. */
+  median10yPe: number | null;
   forwardFairPe: number | null;
   normalizedEps: number | null;
   framework5yFairPrice: number | null;
@@ -105,6 +108,7 @@ export function parseParametersMetrics(md: string): Omit<
     ttmPe: null,
     forwardPe: null,
     avg10yPe: null,
+    median10yPe: null,
     forwardFairPe: null,
     normalizedEps: null,
     framework5yFairPrice: null,
@@ -117,6 +121,7 @@ export function parseParametersMetrics(md: string): Omit<
   const peLine = md.match(/\|\s*\*\*P\/E\*\*[^\n]+\|/i)?.[0] ?? '';
   const avgPeInRow = peLine.match(/\|\s*\*\*([\d.]+)x\*\*/i);
   if (avgPeInRow) out.avg10yPe = parseNum(avgPeInRow[1]);
+  out.median10yPe = parseMedian10yPeFromMd(md);
 
   const todayPeInRow = peLine.match(
     /\|\s*[\d.]+\s*x\s*\|\s*[\d.]+\s*x\s*\|\s*\*\*([\d.]+)x\*\*/i
@@ -320,6 +325,7 @@ export async function runStockCalculator(
         ttmPe: null,
         forwardPe: null,
         avg10yPe: null,
+        median10yPe: null,
         forwardFairPe: null,
         normalizedEps: null,
         framework5yFairPrice: null,

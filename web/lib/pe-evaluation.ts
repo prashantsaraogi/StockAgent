@@ -11,6 +11,7 @@ import {
   type HistoricalGrowthTab,
 } from './stock-calculator-tabs';
 import { stockbookPath } from './navigation';
+import { parseMedian10yPeFromMd, resolve10yPeReference } from './pe-history-reference';
 
 export interface PeEvaluationResult {
   ticker: string;
@@ -27,6 +28,7 @@ export interface PeEvaluationResult {
   ttmPe: number | null;
   forwardPe: number | null;
   avg10yPe: number | null;
+  median10yPe: number | null;
   forwardFairPe: number | null;
   normalizedEps: number | null;
   framework5yFairPrice: number | null;
@@ -50,15 +52,26 @@ export async function loadPeEvaluation(
   const parameters = await readStockTabContent(sector, stockName, 'parameters', tenantId);
   const md = parameters?.content ?? getBundledParametersMd(resolved.ticker) ?? null;
 
+  let detailMd: string | null = null;
+  if (!md || !parseMedian10yPeFromMd(md)) {
+    const detail = await readStockTabContent(sector, stockName, 'detail', tenantId);
+    detailMd = detail?.content ?? null;
+  }
+
   const metrics = md ? parseParametersMetrics(md) : {
     ttmPe: null,
     forwardPe: null,
     avg10yPe: null,
+    median10yPe: null,
     forwardFairPe: null,
     normalizedEps: null,
     framework5yFairPrice: null,
     parametersDate: null,
   };
+
+  if (!metrics.median10yPe && detailMd) {
+    metrics.median10yPe = parseMedian10yPeFromMd(detailMd);
+  }
 
   let cmp: number | null = null;
   let cmpSource = 'Unavailable';
@@ -94,9 +107,10 @@ export async function loadPeEvaluation(
     }
   }
 
+  const histRef = resolve10yPeReference(metrics);
   const premiumTo10yPct =
-    metrics.ttmPe != null && metrics.avg10yPe != null && metrics.avg10yPe > 0
-      ? ((metrics.ttmPe - metrics.avg10yPe) / metrics.avg10yPe) * 100
+    metrics.ttmPe != null && histRef.value != null && histRef.value > 0
+      ? ((metrics.ttmPe - histRef.value) / histRef.value) * 100
       : null;
 
   const sectorSlug = sector.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -116,6 +130,7 @@ export async function loadPeEvaluation(
     ttmPe: metrics.ttmPe,
     forwardPe: metrics.forwardPe,
     avg10yPe: metrics.avg10yPe,
+    median10yPe: metrics.median10yPe,
     forwardFairPe: metrics.forwardFairPe,
     normalizedEps: metrics.normalizedEps,
     framework5yFairPrice: metrics.framework5yFairPrice,
