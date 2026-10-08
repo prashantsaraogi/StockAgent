@@ -117,7 +117,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
         prompt: `Refresh quarterly results for {TICKER} — analysis date = today.
 
 1. Live-search latest quarter results + management commentary (BSE/NSE filings)
-2. Update StockBook: summary-analysis.md · EARNINGS_QUALITY_{TICKER}.md (**Part A** 5Y table + section D quarterly) · MARGIN_{TICKER}.md (Part A margins + Part C drivers) · PARAMETERS_{TICKER}.md (TTM EPS, margins, Today @ CMP P/E)
+2. Update StockBook: summary-analysis.md · BUSINESS_QUALITY_{TICKER}.md (7 pillars + scorecard summary) · EARNINGS_QUALITY_{TICKER}.md (Part A + section D) · MARGIN_{TICKER}.md (Part A + Part C) · PARAMETERS_{TICKER}.md (TTM EPS, margins, Today @ CMP P/E)
 3. Re-run PCCL if normalized EPS changed · update faq.md Q&A
 4. Label FACT vs MANAGEMENT CLAIM · state quarter (e.g. Q2 FY27)
 

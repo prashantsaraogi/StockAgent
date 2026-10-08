@@ -1,4 +1,5 @@
 import {
+  BUSINESS_QUALITY_MD_BY_TICKER,
   EARNINGS_QUALITY_MD_BY_TICKER,
   MARGIN_MD_BY_TICKER,
   PARAMETERS_MD_BY_TICKER,
@@ -26,5 +27,11 @@ export function getBundledMarginMd(ticker: string): string | null {
 export function getBundledEarningsQualityMd(ticker: string): string | null {
   const key = ticker.toUpperCase();
   const md = EARNINGS_QUALITY_MD_BY_TICKER[key as keyof typeof EARNINGS_QUALITY_MD_BY_TICKER];
+  return md ?? null;
+}
+
+export function getBundledBusinessQualityMd(ticker: string): string | null {
+  const key = ticker.toUpperCase();
+  const md = BUSINESS_QUALITY_MD_BY_TICKER[key as keyof typeof BUSINESS_QUALITY_MD_BY_TICKER];
   return md ?? null;
 }

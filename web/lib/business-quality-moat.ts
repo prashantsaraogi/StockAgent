@@ -10,8 +10,13 @@ import { getRepoRoot } from './framework-paths';
 import { getStockbookByTicker } from './stockbook-index';
 import { resolveStock } from './stock-search';
 import { fetchLiveNseCmp } from './nse-cmp';
-import { parseFrameworkQualityMetrics } from './stock-calculator-framework';
+import { extractParametersMasterCells, parseFrameworkQualityMetrics } from './stock-calculator-framework';
 import { stockbookPath } from './navigation';
+import {
+  getBundledBusinessQualityMd,
+  getBundledParametersMd,
+  getBundledPegMd,
+} from './load-bundled-stockbook';
 
 export type EvidenceType = 'FACT' | 'MANAGEMENT CLAIM' | 'HYPOTHESIS' | 'OUR ASSUMPTION' | 'UNVERIFIED';
 export type MoatSignal = '🟢' | '🟡' | '🔴' | '—';
@@ -144,7 +149,69 @@ async function readBusinessQualityFile(
       /* next */
     }
   }
+  const bundled = getBundledBusinessQualityMd(ticker);
+  if (bundled) {
+    return { content: bundled, filename: `BUSINESS_QUALITY_${ticker.toUpperCase()}.md` };
+  }
   return null;
+}
+
+function ratingToSignal(rating: string): MoatSignal {
+  if (/very strong|strong|excellent|dominant|#1/i.test(rating)) return '🟢';
+  if (/weak|poor|fail/i.test(rating)) return '🔴';
+  if (/moderate|monitor|mixed|catching/i.test(rating)) return '🟡';
+  return '🟡';
+}
+
+function parseDetailMoatTable(detailMd: string | null): MoatFactor[] {
+  if (!detailMd) return [];
+  const section = detailMd.match(/## 2\.[^\n]*Business quality[\s\S]*?(?=\n## \d+\.|\n---\n|$)/i)?.[0] ?? '';
+  const factors: MoatFactor[] = [];
+  for (const line of section.split('\n')) {
+    if (!line.trim().startsWith('|') || /Moat source|Rating|---/i.test(line)) continue;
+    const cells = line
+      .split('|')
+      .map((c) => c.trim())
+      .filter(Boolean);
+    if (cells.length < 3) continue;
+    const label = cells[0].replace(/\*\*/g, '').trim();
+    const assessment = cells[1].replace(/\*\*/g, '').trim();
+    const rating = cells[2].replace(/\*\*/g, '').trim();
+    factors.push({
+      id: `detail_${label.toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
+      label,
+      assessment: assessment || rating,
+      signal: ratingToSignal(rating),
+      evidence: 'FACT',
+    });
+  }
+  return factors;
+}
+
+function parsePegBusinessQualityScore10(ticker: string): number | null {
+  const peg = getBundledPegMd(ticker);
+  if (!peg) return null;
+  const m = peg.match(/\|\s*\*\*businessQualityScore10\*\*\s*\|\s*(\d+(?:\.\d+)?)/i);
+  return m ? parseFloat(m[1]) : null;
+}
+
+function pillarFromFactors(
+  def: (typeof PILLAR_DEFS)[number],
+  factors: MoatFactor[],
+  headline?: string
+): MoatPillar {
+  const scores = factors.map((f) => signalToScore(f.signal)).filter((s) => s > 0);
+  const score10 =
+    scores.length > 0 ? Math.round(avg(scores) * 10) / 10 : null;
+  return {
+    id: def.id,
+    number: def.number,
+    title: def.title,
+    score10,
+    signal: score10 != null ? scoreToSignal(score10) : '—',
+    headline: headline ?? factors[0]?.assessment ?? 'Partial — PARAMETERS / detail-analysis',
+    factors,
+  };
 }
 
 function extractSection(md: string, re: RegExp): string {
@@ -288,16 +355,138 @@ function enrichFromParameters(pillars: MoatPillar[], parametersMd: string | null
   }
 }
 
-function buildFallbackPillars(parametersMd: string | null, summaryMd: string | null): MoatPillar[] {
-  return PILLAR_DEFS.map((def) => ({
-    id: def.id,
-    number: def.number,
-    title: def.title,
-    score10: null,
-    signal: '—' as MoatSignal,
-    headline: 'Add BUSINESS_QUALITY file for full scorecard',
-    factors: [],
-  }));
+function buildFallbackPillars(
+  parametersMd: string | null,
+  detailMd: string | null,
+  quality: ReturnType<typeof parseFrameworkQualityMetrics>,
+  ticker: string
+): MoatPillar[] {
+  const moatRows = parseDetailMoatTable(detailMd);
+  const params = parametersMd ?? '';
+
+  const volCell = extractParametersMasterCells(params, 'Volume growth (2W)');
+  const volToday = volCell.today ?? volCell.avg10y;
+  const roeCell = extractParametersMasterCells(params, 'ROE');
+  const ebitdaCell = extractParametersMasterCells(params, 'EBITDA margin');
+  const netCashRead =
+    params.match(/\|\s*\*\*Net cash \/ debt\*\*[^\n]+\|[^\n]+\|[^\n]+\|[^\n]+\|[^\n]+\|[^\n]+\|[^\n]+\|\s*([^|]+)\|/i)?.[1]?.trim() ??
+    'Net cash';
+
+  const marketFactors: MoatFactor[] = [];
+  if (volToday) {
+    marketFactors.push({
+      id: 'param_volume',
+      label: 'Volume growth (2W)',
+      assessment: volToday,
+      signal: /2\d%|1[5-9]%|\+/.test(volToday) ? '🟢' : '🟡',
+      evidence: 'FACT',
+    });
+  }
+  const leader = moatRows.find((f) => /#1|volume|leader/i.test(f.label));
+  if (leader) marketFactors.push(leader);
+
+  const moatFactors = moatRows.filter(
+    (f) => !/#1|volume|leader/i.test(f.label) && !/EV|VIDA|Premium|Harley/i.test(f.label)
+  );
+
+  const pricingFactors: MoatFactor[] = [];
+  if (ebitdaCell.today || ebitdaCell.read) {
+    pricingFactors.push({
+      id: 'param_ebitda',
+      label: 'EBITDA margin vs 10Y',
+      assessment: `${ebitdaCell.today ?? '—'} vs avg ${ebitdaCell.avg10y ?? '—'} — ${ebitdaCell.read ?? ''}`.trim(),
+      signal: ebitdaCell.read?.toLowerCase().includes('weak') ? '🟡' : '🟢',
+      evidence: 'FACT',
+    });
+  }
+
+  const runwayFactors: MoatFactor[] = [];
+  const evRow = moatRows.find((f) => /EV|VIDA/i.test(f.label));
+  if (evRow) runwayFactors.push(evRow);
+  if (volToday) {
+    runwayFactors.push({
+      id: 'industry_volume',
+      label: 'Industry / company volume pulse',
+      assessment: volToday,
+      signal: '🟢',
+      evidence: 'FACT',
+    });
+  }
+
+  const capitalFactors: MoatFactor[] = [];
+  if (quality.roePct != null) {
+    capitalFactors.push({
+      id: 'param_roe',
+      label: 'ROE',
+      assessment: quality.roeDisplay,
+      signal: quality.roePct >= 15 ? '🟢' : quality.roePct >= 12 ? '🟡' : '🔴',
+      evidence: 'FACT',
+    });
+  }
+  capitalFactors.push({
+    id: 'param_balance_sheet',
+    label: 'Balance sheet',
+    assessment: netCashRead.replace(/\*\*/g, ''),
+    signal: /net cash|fortress|safe/i.test(netCashRead) ? '🟢' : '🟡',
+    evidence: 'FACT',
+  });
+
+  const mgmtSection = detailMd?.match(/## 5\.[^\n]*Management[\s\S]*?(?=\n## \d+\.|\n---\n|$)/i)?.[0] ?? '';
+  const mgmtText = mgmtSection.replace(/^#+\s[^\n]+\n?/m, '').trim().slice(0, 220);
+  const managementFactors: MoatFactor[] = mgmtText
+    ? [
+        {
+          id: 'detail_management',
+          label: 'Management & governance',
+          assessment: mgmtText,
+          signal: /no fraud|moderate\+|strong/i.test(mgmtText) ? '🟢' : '🟡',
+          evidence: 'FACT',
+        },
+      ]
+    : [];
+
+  const reinvestFactors: MoatFactor[] = moatRows
+    .filter((f) => /EV|VIDA|Premium|Harley/i.test(f.label))
+    .map((f) => ({ ...f, id: `reinv_${f.id}` }));
+
+  const impliedCagr = params.match(/\*\*Implied 5Y price CAGR\*\*[^\n]+\|[^\n]+\|[^\n]+\|[^\n]+\|\s*\*\*\+?([\d.]+)\s*%\*\*/i)?.[1];
+  if (impliedCagr) {
+    reinvestFactors.push({
+      id: 'param_implied_cagr',
+      label: 'Forward 5Y implied CAGR (base)',
+      assessment: `+${impliedCagr}% — PARAMETERS Part 2`,
+      signal: parseFloat(impliedCagr) >= 12 ? '🟢' : '🟡',
+      evidence: 'OUR ASSUMPTION',
+    });
+  }
+
+  const pegScore = parsePegBusinessQualityScore10(ticker);
+  const byId: Record<string, MoatFactor[]> = {
+    market_position: marketFactors,
+    competitive_advantage: moatFactors.length ? moatFactors : marketFactors.slice(0, 2),
+    pricing_power: pricingFactors,
+    industry_runway: runwayFactors,
+    capital_efficiency: capitalFactors,
+    management_quality: managementFactors,
+    reinvestment_runway: reinvestFactors,
+  };
+
+  return PILLAR_DEFS.map((def) => {
+    const factors = byId[def.id] ?? [];
+    if (factors.length === 0 && pegScore != null) {
+      const proxy = Math.round(pegScore * 10) / 10;
+      return {
+        id: def.id,
+        number: def.number,
+        title: def.title,
+        score10: proxy,
+        signal: scoreToSignal(proxy),
+        headline: `PEG businessQualityScore10 proxy (${proxy}/10) — add BUSINESS_QUALITY file for pillar detail`,
+        factors: [],
+      };
+    }
+    return pillarFromFactors(def, factors);
+  });
 }
 
 function computeScore(pillars: MoatPillar[], fileScore: number | null): number {
@@ -343,13 +532,15 @@ export async function runBusinessQualityAnalysis(
   const bqFile = await readBusinessQualityFile(sector, stockName, resolved.ticker, input.tenantId);
   const parameters = await readStockTabContent(sector, stockName, 'parameters', input.tenantId);
   const detail = await readStockTabContent(sector, stockName, 'detail', input.tenantId);
-  const summary = await readStockTabContent(sector, stockName, 'summary', input.tenantId);
 
   const bqMd = bqFile?.content ?? '';
-  const parametersMd = parameters?.content ?? null;
-  const quality = parseFrameworkQualityMetrics(parametersMd, detail?.content ?? null);
+  const parametersMd = parameters?.content ?? getBundledParametersMd(resolved.ticker);
+  const detailMd = detail?.content ?? null;
+  const quality = parseFrameworkQualityMetrics(parametersMd, detailMd);
 
-  let pillars = bqMd ? buildPillarsFromFile(bqMd) : buildFallbackPillars(parametersMd, summary?.content ?? null);
+  let pillars = bqMd
+    ? buildPillarsFromFile(bqMd)
+    : buildFallbackPillars(parametersMd, detailMd, quality, resolved.ticker);
   enrichFromParameters(pillars, parametersMd, quality);
 
   // Recompute pillar scores from factors if missing
@@ -361,11 +552,19 @@ export async function runBusinessQualityAnalysis(
     return { ...p, score10, signal: scoreToSignal(score10) };
   });
 
-  const fileScore = bqMd ? parseOverallScore(bqMd) : null;
+  const fileScore = bqMd
+    ? parseOverallScore(bqMd)
+    : parsePegBusinessQualityScore10(resolved.ticker);
   const businessQualityScore10 = computeScore(pillars, fileScore);
   const ceilingNote = bqMd ? parseCeilingNote(bqMd) : null;
   const fileVerdict = bqMd ? parseVerdict(bqMd) : null;
-  const highlights = bqMd ? parseHighlights(bqMd) : [];
+  const highlights = bqMd
+    ? parseHighlights(bqMd)
+    : parseDetailMoatTable(detailMd).slice(0, 6).map((f) => ({
+        factor: f.label,
+        assessment: f.assessment,
+        signal: f.signal,
+      }));
   const notTenReasons = buildNotTenReasons(pillars, ceilingNote);
 
   let cmp: number | null = null;

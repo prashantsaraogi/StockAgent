@@ -110,7 +110,7 @@ StockBook/[Sector]/[Stock]/BUSINESS_QUALITY_[TICKER].md
 
 Sections: **Overall score** · **Pillars 1–7** (factor tables) · **Scorecard summary** · **Ceiling note**
 
-Engine also reads `PARAMETERS_*.md` (ROE, market share), `detail-analysis.md`, `summary-analysis.md` for partial fallback.
+Engine reads `PARAMETERS_*.md` (ROE, volume, EBITDA, net cash), `detail-analysis.md` (§2 moat table, §5 management), and `PEG_*.md` (`businessQualityScore10`) when no dedicated file exists. Full seven-pillar scores require `BUSINESS_QUALITY_[TICKER].md` (bundled at web build like MARGIN / EARNINGS_QUALITY).
 
 ---
 
