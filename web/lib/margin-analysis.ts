@@ -11,7 +11,16 @@ import { getStockbookByTicker } from './stockbook-index';
 import { resolveStock } from './stock-search';
 import { fetchLiveNseCmp } from './nse-cmp';
 import { stockbookPath } from './navigation';
-import { parseFrameworkQualityMetrics, parseRiskFactor } from './stock-calculator-framework';
+import {
+  extractParametersMasterCells,
+  parseFrameworkQualityMetrics,
+  parseRiskFactor,
+} from './stock-calculator-framework';
+import {
+  getBundledEarningsQualityMd,
+  getBundledMarginMd,
+  getBundledParametersMd,
+} from './load-bundled-stockbook';
 
 export type EvidenceType = 'FACT' | 'MANAGEMENT CLAIM' | 'HYPOTHESIS' | 'OUR ASSUMPTION' | 'UNVERIFIED';
 export type MarginSignal = '🟢' | '🟡' | '🔴' | '—';
@@ -165,21 +174,11 @@ function toneFromVerdict(v: string): QualityTone {
 }
 
 function extractAvgColumn(md: string, paramName: string): string | null {
-  const re = new RegExp(
-    `\\|\\s*\\*\\*${paramName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^|]*\\*\\*[\\s\\S]*?\\|\\s*[^|]+\\|\\s*\\*\\*([^|*]+?)\\*\\*\\s*\\|\\s*[^|]+\\|`,
-    'i'
-  );
-  const m = md.match(re);
-  return m?.[1]?.trim() ?? null;
+  return extractParametersMasterCells(md, paramName).avg10y;
 }
 
 function extractReadColumn(md: string, paramName: string): string | null {
-  const re = new RegExp(
-    `\\|\\s*\\*\\*${paramName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^|]*\\*\\*[\\s\\S]*?\\|\\s*[^|]+\\|\\s*[^|]+\\|\\s*[^|]+\\|\\s*[^|]+\\|\\s*[^|]+\\|\\s*([^|]+?)\\s*\\|`,
-    'i'
-  );
-  const m = md.match(re);
-  return m?.[1]?.replace(/\*\*/g, '').trim() ?? null;
+  return extractParametersMasterCells(md, paramName).read;
 }
 
 async function readMarginFile(
@@ -205,6 +204,10 @@ async function readMarginFile(
     } catch {
       /* next */
     }
+  }
+  const bundled = getBundledMarginMd(ticker);
+  if (bundled) {
+    return { content: bundled, filename: `MARGIN_${ticker.toUpperCase()}.md` };
   }
   return null;
 }
@@ -232,7 +235,7 @@ async function readEarningsQualityFile(
       /* next */
     }
   }
-  return null;
+  return getBundledEarningsQualityMd(ticker);
 }
 
 function parsePartAFromMarkdown(md: string): MarginYearRow[] {
@@ -544,11 +547,12 @@ export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<
 
   const marginFile = await readMarginFile(sector, stockName, resolved.ticker, input.tenantId);
   const parameters = await readStockTabContent(sector, stockName, 'parameters', input.tenantId);
+  const parametersMd =
+    parameters?.content ?? getBundledParametersMd(resolved.ticker);
   const external = await readStockTabContent(sector, stockName, 'external-risk', input.tenantId);
   const eqMd = await readEarningsQualityFile(sector, stockName, resolved.ticker, input.tenantId);
 
   const marginMd = marginFile?.content ?? '';
-  const parametersMd = parameters?.content ?? null;
   const quality = parseFrameworkQualityMetrics(parametersMd, null);
   const externalRisk = parseRiskFactor(external?.content ?? null, 'external-negative-risk.md');
 

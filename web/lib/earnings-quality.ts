@@ -18,6 +18,7 @@ import {
   parseRiskFactor,
   type FrameworkQualityMetrics,
 } from './stock-calculator-framework';
+import { getBundledEarningsQualityMd, getBundledParametersMd } from './load-bundled-stockbook';
 
 export type EvidenceType = 'FACT' | 'MANAGEMENT CLAIM' | 'HYPOTHESIS' | 'OUR ASSUMPTION' | 'UNVERIFIED';
 export type TrendSignal = 'improving' | 'stable' | 'deteriorating' | 'unknown';
@@ -155,6 +156,10 @@ async function readEarningsQualityFile(
     } catch {
       /* next dir */
     }
+  }
+  const bundled = getBundledEarningsQualityMd(ticker);
+  if (bundled) {
+    return { content: bundled, filename: `EARNINGS_QUALITY_${ticker.toUpperCase()}.md` };
   }
   return null;
 }
@@ -484,7 +489,7 @@ export async function runEarningsQualityAnalysis(
   const detail = await readStockTabContent(sector, stockName, 'detail', input.tenantId);
 
   const eqMd = eqFile?.content ?? '';
-  const parametersMd = parameters?.content ?? null;
+  const parametersMd = parameters?.content ?? getBundledParametersMd(resolved.ticker);
   const internal = await readStockTabContent(sector, stockName, 'internal-risk', input.tenantId);
   const external = await readStockTabContent(sector, stockName, 'external-risk', input.tenantId);
   const quality = parseFrameworkQualityMetrics(parametersMd, detail?.content ?? null);

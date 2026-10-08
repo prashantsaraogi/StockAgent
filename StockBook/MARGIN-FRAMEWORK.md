@@ -29,7 +29,9 @@ P/E and revenue growth alone miss **margin quality**: a stock can grow sales 20%
 
 ### Part B — Today vs history (PARAMETERS lens)
 
-Reads `PARAMETERS_[TICKER].md` master table **Today @ CMP** vs **10Y avg (normal)**:
+Reads `PARAMETERS_[TICKER].md` master table **Today @ CMP** vs **10Y avg (normal)** (row layout: What · Link · 10Y avg normal · 10Y incl COVID · **Today** · vs · Read):
+
+**Required StockBook files for full tab:** `MARGIN_[TICKER].md` (Part A + Part C) and `EARNINGS_QUALITY_[TICKER].md` (section **D** quarterly table). Bundled at web build for production.
 
 | Metric | Use |
 |--------|-----|

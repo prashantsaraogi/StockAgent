@@ -50,13 +50,30 @@ function parseNum(s: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+/** Master table row: Parameter | What | Link | 10Y avg (normal) | 10Y incl COVID | Today @ CMP | vs | Read */
+export function extractParametersMasterCells(
+  md: string,
+  paramName: string
+): { avg10y: string | null; today: string | null; read: string | null } {
+  const escaped = paramName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const rowRe = new RegExp(`\\|\\s*\\*\\*${escaped}[^|]*\\*\\*([^\\n]+)`, 'i');
+  const tail = md.match(rowRe)?.[1];
+  if (!tail) return { avg10y: null, today: null, read: null };
+  const cells = tail
+    .split('|')
+    .map((c) => c.trim())
+    .filter((c) => c.length > 0);
+  if (cells.length < 5) return { avg10y: null, today: null, read: null };
+  const clean = (s: string | undefined) => s?.replace(/\*\*/g, '').trim() ?? null;
+  return {
+    avg10y: clean(cells[2]),
+    today: clean(cells[4]),
+    read: clean(cells[6] ?? cells[cells.length - 1]),
+  };
+}
+
 function extractTodayColumn(md: string, paramName: string): string | null {
-  const re = new RegExp(
-    `\\|\\s*\\*\\*${paramName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^|]*\\*\\*[\\s\\S]*?\\|\\s*[^|]+\\|\\s*[^|]+\\|\\s*[^|]+\\|\\s*\\*\\*([^|*]+?)\\*\\*\\s*\\|`,
-    'i'
-  );
-  const m = md.match(re);
-  return m?.[1]?.trim() ?? null;
+  return extractParametersMasterCells(md, paramName).today;
 }
 
 function parsePercentDisplay(raw: string | null): { pct: number | null; display: string } {
@@ -85,12 +102,7 @@ function parseRatioDisplay(raw: string | null): { ratio: number | null; display:
 }
 
 function extractReadColumn(md: string, paramName: string): string | null {
-  const re = new RegExp(
-    `\\|\\s*\\*\\*${paramName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^|]*\\*\\*[\\s\\S]*?\\|\\s*[^|]+\\|\\s*[^|]+\\|\\s*[^|]+\\|\\s*[^|]+\\|\\s*[^|]+\\|\\s*([^|]+?)\\s*\\|`,
-    'i'
-  );
-  const m = md.match(re);
-  return m?.[1]?.replace(/\*\*/g, '').trim() ?? null;
+  return extractParametersMasterCells(md, paramName).read;
 }
 
 export function parseBaseEpsCagrFromText(md: string): {

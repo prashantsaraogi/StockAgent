@@ -634,7 +634,7 @@ Label ASSUMPTION on R and G. Run PE Evaluation tab to verify scorecard.`,
 **Part A:** 5Y table — Gross, EBITDA, EBIT, Net %, YoY Δ pp, signal per FY
 **Part B:** Confirm PARAMETERS Today @ CMP vs 10Y avg EBITDA margin
 **Part C:** Drivers (RM/oil, mix, discounting, operating leverage) + pass-through verdict
-**Part D:** Sync EARNINGS_QUALITY section D margin row (8 quarters)
+**Part D:** Sync EARNINGS_QUALITY section D margin row (8 quarters). Hero/Maruti templates: `MARGIN_*` + `EARNINGS_QUALITY_*` bundled at build.
 
 Live-search latest quarter if results published. Label FACT vs ASSUMPTION.
 Run Stock Analysis → Margin tab to verify.`,
