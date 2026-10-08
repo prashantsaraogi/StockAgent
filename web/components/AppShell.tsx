@@ -46,9 +46,7 @@ export function AppShell({ email, tenantId, authMode, children }: AppShellProps)
       <nav className="main-nav" aria-label="Main">
         {MAIN_NAV.map((item) => {
           let active = pathname === item.href;
-          if (!active && item.href === '/chat') {
-            active = pathname === '/chat';
-          } else if (!active && item.href === '/resources') {
+          if (!active && item.href === '/resources') {
             active = isResourcesSectionPath(pathname);
           } else if (!active && item.href === '/stock-calculator') {
             active = pathname.startsWith('/stock-calculator');

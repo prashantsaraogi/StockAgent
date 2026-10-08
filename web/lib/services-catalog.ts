@@ -664,23 +664,11 @@ Note infra FCF lens for EPC names (L&T) vs consumer (Hero, ITC).
 Run Stock Analysis → PEG tab to verify scorecard + 100-pt total.`,
       },
       {
-        id: 'ask-agent-stock',
-        categoryId: 'stock-calculator',
-        title: 'Ask Agent — stock search only',
-        description:
-          '`/chat` **Stock search** returns an **Investment Analysis Report** (scorecard, peers, quality/growth/profitability blocks, dashboard, action framework) plus Factor lens and module scorecard. History saved per user in **Analysis Log**.',
-        cadence: 'on-demand',
-        actionType: 'link',
-        href: '/chat',
-        hrefLabel: 'Ask Agent',
-        channel: 'web',
-      },
-      {
         id: 'stock-calculator-full',
         categoryId: 'stock-calculator',
         title: 'Analyze stock — basic or advanced (6 modules)',
         description:
-          'Stock Analysis home: **Basic** = stock name only → **Investment Analysis Report** (same layout as Ask Agent) + 6 modules. **Advanced** = custom P/E + CAGR.',
+          'Stock Analysis home: **Basic** = stock name only → **Investment Analysis Report** (scorecard, peers, dashboard, action framework) + Factor lens + 6 modules. **Advanced** = custom P/E + CAGR. Runs saved under **History**.',
         cadence: 'on-demand',
         actionType: 'link',
         href: '/stock-calculator',

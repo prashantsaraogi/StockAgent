@@ -161,8 +161,8 @@ function ServiceCard({
             >
               {copiedId === service.id ? 'Copied ✓' : 'Copy prompt'}
             </button>
-            <Link href="/chat" className="btn-ghost service-chat-link">
-              Ask Agent →
+            <Link href="/stock-calculator" className="btn-ghost service-chat-link">
+              Stock Analysis →
             </Link>
           </>
         )}
@@ -525,7 +525,7 @@ export function ServicesPanel({ initialStatus }: ServicesPanelProps) {
           <Link href="/industry-analysis">Industry Growth</Link>
           <Link href="/journal/news">Daily News</Link>
           <Link href="/journal/analysis">Analysis Log</Link>
-          <Link href="/chat">Ask Agent</Link>
+          <Link href="/stock-calculator">Stock Analysis</Link>
         </div>
       </section>
     </div>

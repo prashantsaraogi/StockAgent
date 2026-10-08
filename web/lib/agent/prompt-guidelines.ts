@@ -415,22 +415,22 @@ No sell-to-rotate.`,
         placeholders: ['{AMOUNT}'],
       },
       {
-        id: 'ask-agent-stock-search',
-        title: 'Ask Agent — stock search (web)',
+        id: 'stock-analysis-basic-web',
+        title: 'Stock Analysis — Basic (web)',
         description:
-          'Web `/chat` only — pick ticker → **Investment Analysis Report** (fundamental scorecard, peer matrix when sector mapped, dashboard, action framework) + Factor lens + scorecard. Thread restores from Analysis Log.',
-        prompt: `Web Ask Agent — Stock search mode — {TICKER}
+          '**Stock Analysis → Analyze → Basic** — enter ticker → **Investment Analysis Report** (fundamental scorecard, peer matrix when sector mapped, dashboard, action framework) + Factor lens + module scorecard. Saved in **History**.',
+        prompt: `Web Stock Analysis — Basic mode — {TICKER}
 
-Returns **Investment Analysis Report** markdown (sections 1–3, 🚦 dashboard, investor action table) from Stock Calculator + StockBook + live quote — same engine as Stock Analysis → Basic.`,
+Run from /stock-calculator (Basic). Returns **Investment Analysis Report** markdown from Stock Calculator + StockBook + live quote.`,
         channel: 'web',
         framework: ['buy-decision-workflow', 'personal-discipline', 'PCCL'],
         placeholders: ['{TICKER}'],
       },
       {
         id: 'ask-agent-general-query',
-        title: 'Portfolio / sector question (Cursor — not web /chat)',
+        title: 'Portfolio / sector question (Cursor)',
         description:
-          'Open-ended portfolio, sector rank, or news — use **Cursor** or **Prompt library** copy-paste. Web Ask Agent is **stock search only**.',
+          'Open-ended portfolio, sector rank, or news — use **Cursor** or **Prompt library** copy-paste. Per-ticker reports use **Stock Analysis → Basic** on web.',
         prompt: `Portfolio or sector question (Cursor) — {QUERY}
 
 Summary-first answer; cite StockBook, News, holdings.md, buy-decision-workflow.`,

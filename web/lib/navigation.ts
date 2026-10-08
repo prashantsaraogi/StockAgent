@@ -64,7 +64,6 @@ export const MAIN_NAV = [
   { href: '/stock-calculator', label: STOCK_ANALYSIS_TITLE, icon: '⊕' },
   { href: '/industry-analysis', label: 'Industry Growth', icon: '◫' },
   { href: '/resources', label: RESOURCES_HUB_TITLE, icon: '▦' },
-  { href: '/chat', label: 'Ask Agent', icon: '◉' },
 ] as const;
 
 /** StockBook file tabs — matches StockBook/AGENT-RULES.md read order + report */

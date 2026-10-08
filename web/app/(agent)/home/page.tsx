@@ -29,10 +29,10 @@ export default async function HomePage() {
           </Link>
         </section>
         <section className="card">
-          <h3>Ask Agent</h3>
-          <p className="muted small">Stock search — investment view per ticker.</p>
-          <Link href="/chat" className="card-link">
-            Start chat →
+          <h3>Stock Analysis</h3>
+          <p className="muted small">Basic or advanced — investment report and six modules.</p>
+          <Link href="/stock-calculator" className="card-link">
+            Analyze a stock →
           </Link>
         </section>
         <section className="card">
