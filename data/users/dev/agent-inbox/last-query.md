@@ -1,6 +1,6 @@
 # Web Ask Agent — News run
 
-**Updated:** 2026-10-07T04:10:31.815Z
+**Updated:** 2026-10-08T02:56:24.880Z
 
 ## Question
 
@@ -12,7 +12,7 @@ Run news for today — partial IST window to now. Stock-wise loop all holdings �
 
 Applied **News/AGENT-RULES.md** + **SEARCH-WORKFLOW.md** — daily summary write (not generic chat).
 
-1. Parsed target date: **2026-10-07**
+1. Parsed target date: **2026-10-08**
 2. Loaded portfolio (3 holdings) for stock-wise impact table
 3. Wrote framework `summary.md` to repo News archive
 4. Web News tab updated — browse Year → Month → Date
@@ -21,8 +21,8 @@ Applied **News/AGENT-RULES.md** + **SEARCH-WORKFLOW.md** — daily summary write
 
 ## Context used
 
-- **News date:** 2026-10-07
-- **File:** `News/2026-10/2026-10-07/summary.md`
+- **News date:** 2026-10-08
+- **File:** `News/2026-10/2026-10-08/summary.md`
 - **Prior summary same date:** No — created new
 - **Mode:** framework-local (local template — add Gemini key for full synthesis)
 
@@ -36,7 +36,7 @@ Applied **News/AGENT-RULES.md** + **SEARCH-WORKFLOW.md** — daily summary write
 
 ## View in app
 
-Open **[News → 2026-10-07](/journal/news/2026/10/07)** or the **News** tab (September 10 → 7).
+Open **[News → 2026-10-08](/journal/news/2026/10/08)** or the **News** tab (September 10 → 8).
 
 ---
 

@@ -418,10 +418,10 @@ No sell-to-rotate.`,
         id: 'ask-agent-stock-search',
         title: 'Ask Agent — stock search (web)',
         description:
-          'Web `/chat` only — pick ticker → investment view (**Factor lens** + scorecard). No free-form chat. Thread restores from Analysis Log.',
+          'Web `/chat` only — pick ticker → **Investment Analysis Report** (fundamental scorecard, peer matrix when sector mapped, dashboard, action framework) + Factor lens + scorecard. Thread restores from Analysis Log.',
         prompt: `Web Ask Agent — Stock search mode — {TICKER}
 
-Full investor view (same engine as Stock Analysis → Basic): one-line, your position, valuation, what to do — no internal framework headings.`,
+Returns **Investment Analysis Report** markdown (sections 1–3, 🚦 dashboard, investor action table) from Stock Calculator + StockBook + live quote — same engine as Stock Analysis → Basic.`,
         channel: 'web',
         framework: ['buy-decision-workflow', 'personal-discipline', 'PCCL'],
         placeholders: ['{TICKER}'],

@@ -1,7 +1,7 @@
 # ITC - Holding CAGR
 
 **Ticker:** ITC (NSE)  
-**CMP:** **Rs 263.9** | **CMP date:** 2026-10-07 | **Source:** Yahoo Finance NSE (.NS) - proxy for NSE last price  
+**CMP:** **Rs 265.7** | **CMP date:** 2026-10-08 | **Source:** Yahoo Finance NSE (.NS) - proxy for NSE last price  
 **Last calculated:** 2026-08-28
 
 Cross-ref: `CAGR-FRAMEWORK.md` | `.cursor/portfolio/holdings.md` | `summary-analysis.md`
@@ -24,7 +24,7 @@ Cross-ref: `CAGR-FRAMEWORK.md` | `.cursor/portfolio/holdings.md` | `summary-anal
 |--------|------:|
 | Total qty | 3,000 |
 | Total cost (Rs) | 1,073,820 |
-| Market value @ CMP (Rs) | 791.7.7.7.7.7.7.25.9.45.9.45.55.55.55.55.55.5.55 |
+| Market value @ CMP (Rs) | 797.1.7.7.7.7.7.7.25.9.45.9.45.55.55.55.55.55.5.55 |
 | Blended simple return % | **-99.9%** |
 | Cost-weighted CAGR % | **-18.57%** |
 
