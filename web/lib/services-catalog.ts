@@ -114,14 +114,16 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
         actionType: 'prompt',
         channel: 'both',
         estimatedDuration: '5–15 min per stock',
-        prompt: `Refresh quarterly results for {TICKER} — analysis date = today.
-
-1. Live-search latest quarter results + management commentary (BSE/NSE filings)
-2. Update StockBook: summary-analysis.md · BUSINESS_QUALITY_{TICKER}.md (7 pillars + scorecard summary) · EARNINGS_QUALITY_{TICKER}.md (Part A + section D) · MARGIN_{TICKER}.md (Part A + Part C) · PARAMETERS_{TICKER}.md (TTM EPS, margins, Today @ CMP P/E)
-3. Re-run PCCL if normalized EPS changed · update faq.md Q&A
-4. Label FACT vs MANAGEMENT CLAIM · state quarter (e.g. Q2 FY27)
-
-If multiple tickers flagged by scan — do highest-weight holdings first.`,
+        prompt: [
+          'Refresh quarterly results for {TICKER} — analysis date = today.',
+          '',
+          '1. Live-search latest quarter results + management commentary (BSE/NSE filings)',
+          '2. Update StockBook: summary-analysis.md · BUSINESS_QUALITY · EARNINGS_QUALITY · MARGIN · PARAMETERS files for {TICKER} (7 pillars, Part A/D, Part A/C, TTM EPS/margins)',
+          '3. Re-run PCCL if normalized EPS changed · update faq.md Q&A',
+          '4. Label FACT vs MANAGEMENT CLAIM · state quarter (e.g. Q2 FY27)',
+          '',
+          'If multiple tickers flagged by scan — do highest-weight holdings first.',
+        ].join('\n'),
       },
       {
         id: 'refresh-broker-single',
@@ -629,15 +631,17 @@ Label ASSUMPTION on R and G. Run PE Evaluation tab to verify scorecard.`,
         href: '/stock-calculator/margin',
         hrefLabel: 'Margin Analysis tab',
         estimatedDuration: '10–15 min per stock',
-        prompt: `Refresh Margin Analysis for {TICKER} — StockBook/MARGIN-FRAMEWORK.md.
-
-**Part A:** 5Y table — Gross, EBITDA, EBIT, Net %, YoY Δ pp, signal per FY
-**Part B:** Confirm PARAMETERS Today @ CMP vs 10Y avg EBITDA margin
-**Part C:** Drivers (RM/oil, mix, discounting, operating leverage) + pass-through verdict
-**Part D:** Sync EARNINGS_QUALITY section D margin row (8 quarters). Hero/Maruti templates: MARGIN_{TICKER}.md + EARNINGS_QUALITY_{TICKER}.md (bundled at build).
-
-Live-search latest quarter if results published. Label FACT vs ASSUMPTION.
-Run Stock Analysis → Margin tab to verify.`,
+        prompt: [
+          'Refresh Margin Analysis for {TICKER} — StockBook/MARGIN-FRAMEWORK.md.',
+          '',
+          '**Part A:** 5Y table — Gross, EBITDA, EBIT, Net %, YoY Δ pp, signal per FY',
+          '**Part B:** Confirm PARAMETERS Today @ CMP vs 10Y avg EBITDA margin',
+          '**Part C:** Drivers (RM/oil, mix, discounting, operating leverage) + pass-through verdict',
+          '**Part D:** Sync earnings-quality section D margin row (8 quarters). Add StockBook margin + earnings-quality files for the ticker (Hero/Maruti are reference templates; bundled at build).',
+          '',
+          'Live-search latest quarter if results published. Label FACT vs ASSUMPTION.',
+          'Run Stock Analysis → Margin tab to verify.',
+        ].join('\n'),
       },
       {
         id: 'refresh-peg-evaluation',
