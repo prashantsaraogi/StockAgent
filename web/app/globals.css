@@ -4,9 +4,11 @@
   --bg: #0f1419;
   --surface: #1a2332;
   --surface2: #243044;
+  --card: #1a2332;
+  --card-elevated: #243044;
   --border: #2d3a4f;
   --text: #e8edf4;
-  --muted: #8b9cb3;
+  --muted: #9aaec6;
   --accent: #3b82f6;
   --accent-dim: #2563eb33;
   --ok: #22c55e;
@@ -837,9 +839,9 @@ button.stock-quick-q:disabled {
 }
 
 .chat-mode-tabs button.active {
-  background: var(--card, #fff);
-  color: var(--text, inherit);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  background: var(--card-elevated);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .chat-input-stack {
@@ -3912,7 +3914,9 @@ td.gain-neg {
   padding: 1rem 1.1rem 1.15rem;
   border: 1px solid var(--border);
   border-radius: var(--radius, 8px);
-  background: color-mix(in srgb, var(--card, #fff) 92%, var(--accent, #2563eb) 8%);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .industry-sector-group-head {
@@ -3926,11 +3930,19 @@ td.gain-neg {
 
 .industry-sector-group-title {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .industry-sector-group-intro {
   margin: 0 0 0.75rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.industry-sector-group-best {
+  color: var(--muted);
 }
 
 .industry-sector-group-grid {
@@ -3938,7 +3950,7 @@ td.gain-neg {
 }
 
 .industry-sector-group-best strong {
-  color: inherit;
+  color: var(--text);
 }
 
 .sector-score-link-grid {
@@ -3956,14 +3968,15 @@ td.gain-neg {
   border: 1px solid var(--border);
   border-radius: var(--radius, 8px);
   text-decoration: none;
-  color: inherit;
-  background: var(--card, #fff);
-  transition: border-color 0.15s, box-shadow 0.15s;
+  color: var(--text);
+  background: var(--card-elevated);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
 
 .sector-score-link-card:hover {
   border-color: var(--accent);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  text-decoration: none;
 }
 
 .sector-score-link-head {
@@ -3973,9 +3986,15 @@ td.gain-neg {
   gap: 0.5rem;
 }
 
+.sector-score-link-head strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
 .sector-score-link-total {
   font-size: 1.25rem;
   font-weight: 700;
+  color: var(--text);
 }
 
 .sector-score-mini-bars {
@@ -4029,30 +4048,30 @@ td.gain-neg {
 .sector-score-total-high,
 .sector-score-total-strong,
 .sector-score-total-attractive {
-  border-color: rgba(34, 197, 94, 0.4);
-  background: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.45);
+  background: color-mix(in srgb, var(--card-elevated) 78%, rgba(34, 197, 94, 0.35));
 }
 
 .sector-score-total-mid,
 .sector-score-total-selective {
-  border-color: rgba(234, 179, 8, 0.4);
-  background: rgba(234, 179, 8, 0.08);
+  border-color: rgba(234, 179, 8, 0.45);
+  background: color-mix(in srgb, var(--card-elevated) 78%, rgba(234, 179, 8, 0.28));
 }
 
 .sector-score-total-low,
 .sector-score-total-neutral {
-  border-color: rgba(249, 115, 22, 0.4);
-  background: rgba(249, 115, 22, 0.08);
+  border-color: rgba(249, 115, 22, 0.45);
+  background: color-mix(in srgb, var(--card-elevated) 78%, rgba(249, 115, 22, 0.28));
 }
 
 .sector-score-total-avoid {
-  border-color: rgba(239, 68, 68, 0.35);
-  background: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.4);
+  background: color-mix(in srgb, var(--card-elevated) 78%, rgba(239, 68, 68, 0.25));
 }
 
 .sector-score-total-pending {
   border-color: var(--border);
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--card-elevated);
 }
 
 .sector-score-view-label {
@@ -4066,6 +4085,7 @@ td.gain-neg {
   margin: 0;
   font-size: 0.8rem;
   font-weight: 500;
+  color: var(--muted);
 }
 
 .sector-score-link-denom {
@@ -4084,6 +4104,14 @@ td.gain-neg {
   margin-bottom: 0.75rem;
 }
 
+.sector-outlook-head-row h2 {
+  color: var(--text);
+}
+
+.sector-outlook-section .sector-score-legend {
+  color: var(--text);
+}
+
 .sector-score-legend {
   flex-shrink: 0;
 }
@@ -4091,6 +4119,7 @@ td.gain-neg {
 .sector-legend-table {
   font-size: 0.8rem;
   margin: 0;
+  color: var(--text);
 }
 
 .sector-legend-table th,
