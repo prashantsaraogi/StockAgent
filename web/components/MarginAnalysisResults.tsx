@@ -101,6 +101,13 @@ export function MarginAnalysisResults({ data, recordId, savedAt }: MarginAnalysi
           </div>
         </div>
 
+        {data.liveMetricsSource && (
+          <p className="muted small mg-external-note">
+            Live margins: {data.liveMetricsSource} — label UNVERIFIED vs annual report until StockBook
+            PARAMETERS Block B / MARGIN file updated.
+          </p>
+        )}
+
         {data.externalRiskNote && (
           <p className="muted small mg-external-note">{data.externalRiskNote}</p>
         )}

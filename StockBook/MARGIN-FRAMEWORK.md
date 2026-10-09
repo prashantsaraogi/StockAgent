@@ -42,6 +42,21 @@ Derivation order when `MARGIN_[TICKER].md` is missing:
 
 Preferred StockBook files for FACT rows: `MARGIN_[TICKER].md` (Part A + Part C) and `EARNINGS_QUALITY_[TICKER].md` (section **D**). Bundled at web build for production.
 
+### Live web fallback (PARAMETERS Block B empty or missing file)
+
+When StockBook has no EBITDA / ROE / OEY rows, the engine **pulls live data** (same stack as CMP):
+
+| Source | Data | Use in tab |
+|--------|------|------------|
+| **Yahoo Finance** `{TICKER}.NS` quoteSummary | TTM EBITDA / net / gross / operating margins, ROE, ROA | Part B today column |
+| **Yahoo** `incomeStatementHistory` | Up to 5 annual P&L lines | Part A 5Y table + 5Y avg as 10Y proxy |
+| **Yahoo** EPS TTM ÷ live CMP | Owner earnings yield | Part B when margins module empty |
+| **NSE** | CMP only (via `nse-cmp.ts`) | Price context — not margin lines |
+
+Label live rows **FACT (Yahoo)** vs StockBook **FACT (AR)**. Moneycontrol / Trendlyne are **agent manual** deep-fill sources — not scraped in MVP (Yahoo covers most NSE names).
+
+Agent should still refresh `PARAMETERS` Block B from annual report after live pull.
+
 | Metric | Use |
 |--------|-----|
 | EBITDA margin | Primary operating lens |

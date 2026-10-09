@@ -10,6 +10,12 @@ import { getRepoRoot } from './framework-paths';
 import { getStockbookByTicker } from './stockbook-index';
 import { resolveStock } from './stock-search';
 import { fetchLiveNseCmp } from './nse-cmp';
+import {
+  fetchExternalMarginMetrics,
+  partBNeedsExternal,
+  type ExternalMarginMetrics,
+} from './margin-external-metrics';
+import { fetchYahooTrailingPeMetrics } from './yahoo-finance-session';
 import { stockbookPath } from './navigation';
 import {
   extractParametersMasterCells,
@@ -127,6 +133,8 @@ export interface MarginAnalysisResult {
   overallTone: QualityTone;
   summaryLines: string[];
   externalRiskNote: string | null;
+  /** Set when Part B / Part A use Yahoo (or EPS-derived OEY) because PARAMETERS Block B is empty. */
+  liveMetricsSource: string | null;
 }
 
 export interface RunMarginAnalysisInput {
@@ -307,6 +315,118 @@ function collectParametersMetrics(
   }
 
   return { rows, primaryLabel, primaryDeltaPp };
+}
+
+function marginRowFromExternal(
+  metric: string,
+  today: number | null,
+  avg: number | null,
+  lowerIsBetter = false
+): MarginVsHistoryRow {
+  const deltaPp =
+    today != null && avg != null ? Math.round((today - avg) * 10) / 10 : null;
+  const effectiveDelta = lowerIsBetter && deltaPp != null ? -deltaPp : deltaPp;
+  let signal: MarginSignal = '🟡';
+  if (effectiveDelta != null) {
+    if (effectiveDelta >= 1) signal = '🟢';
+    else if (effectiveDelta <= -3) signal = '🔴';
+    else if (effectiveDelta <= -1) signal = '🟡';
+    else signal = '🟢';
+  } else if (today != null) signal = '🟡';
+
+  return {
+    metric,
+    todayPct: today,
+    avg10yPct: avg,
+    deltaPp,
+    read:
+      avg != null
+        ? 'Yahoo Finance · 5Y annual avg proxy for 10Y normal'
+        : 'Yahoo Finance TTM · NSE .NS',
+    signal,
+  };
+}
+
+function recomputePartBPrimary(
+  rows: MarginVsHistoryRow[],
+  sector: string,
+  fallbackLabel: string
+): { primaryLabel: string; primaryDeltaPp: number | null } {
+  const primary =
+    rows.find((r) => r.metric === 'EBITDA margin' && r.todayPct != null) ??
+    rows.find((r) => r.metric === 'ROE' && r.todayPct != null && isFinancialSector(sector)) ??
+    rows.find((r) => r.todayPct != null && r.avg10yPct != null) ??
+    rows.find((r) => r.todayPct != null) ??
+    rows[0];
+
+  const primaryLabel = primary?.metric ?? fallbackLabel;
+  let primaryDeltaPp = primary?.deltaPp ?? null;
+  const lower = primaryLabel.includes('P/E');
+  if (lower && primaryDeltaPp != null) primaryDeltaPp = -primaryDeltaPp;
+  return { primaryLabel, primaryDeltaPp };
+}
+
+function mergeExternalMarginPartB(
+  partB: MarginVsHistoryPart,
+  ext: ExternalMarginMetrics,
+  sector: string
+): MarginVsHistoryPart {
+  const existingLabels = new Set(
+    partB.rows.filter((r) => r.todayPct != null || r.avg10yPct != null).map((r) => r.metric)
+  );
+  const added: MarginVsHistoryRow[] = [];
+  const add = (label: string, today: number | null, avg: number | null, lower = false) => {
+    if (today == null && avg == null) return;
+    if (existingLabels.has(label)) return;
+    added.push(marginRowFromExternal(label, today, avg, lower));
+    existingLabels.add(label);
+  };
+
+  if (isFinancialSector(sector)) {
+    add('ROE', ext.ttm.roePct, null);
+    add('ROA', ext.ttm.roaPct, null);
+  }
+  add('EBITDA margin', ext.ttm.ebitdaMarginPct, ext.avg5yEbitdaPct);
+  add('Net margin', ext.ttm.netMarginPct, ext.avg5yNetPct);
+  add('Gross margin', ext.ttm.grossMarginPct, null);
+  add('Operating margin', ext.ttm.operatingMarginPct, null);
+  if (!isFinancialSector(sector)) {
+    add('ROE', ext.ttm.roePct, null);
+  }
+
+  const rows = [
+    ...partB.rows.filter((r) => r.todayPct != null || r.avg10yPct != null),
+    ...added,
+  ];
+  if (rows.length === 0) return partB;
+
+  const { primaryLabel, primaryDeltaPp } = recomputePartBPrimary(
+    rows,
+    sector,
+    partB.primaryMetricLabel
+  );
+
+  let verdict: string;
+  if (primaryDeltaPp == null) {
+    verdict = `🟡 Mixed — ${primaryLabel} live (Yahoo) — no 10Y avg on web source`;
+  } else if (primaryDeltaPp <= -3) {
+    verdict = `🔴 Warning — ${primaryLabel} below 5Y Yahoo avg`;
+  } else if (primaryDeltaPp <= -1) {
+    verdict = '🟡 Mixed — compressed vs Yahoo 5Y avg';
+  } else if (primaryDeltaPp >= 1) {
+    verdict = `🟢 Healthy — ${primaryLabel} above Yahoo 5Y avg`;
+  } else {
+    verdict = '🟡 In line — near Yahoo 5Y average';
+  }
+
+  return {
+    title: 'Part B — Today vs history (PARAMETERS + Yahoo live)',
+    rows,
+    primaryMetricLabel: primaryLabel,
+    primaryDeltaPp,
+    verdict,
+    tone: toneFromVerdict(verdict),
+  };
 }
 
 function marginYearsFromEarningsQuality(eqMd: string): MarginYearRow[] {
@@ -627,8 +747,11 @@ function buildPartA(
   parametersEbitda: number | null,
   primaryMetricLabel: string
 ): MarginHistoryPart {
-  const synthesized = years.some((y) => y.evidence === 'OUR ASSUMPTION' && y.note?.includes('PARAMETERS'));
-  let dataComplete = years.length >= 4 && !synthesized;
+  const fromYahoo = years.some((y) => y.note?.includes('Yahoo incomeStatementHistory'));
+  const synthesized = years.some(
+    (y) => y.evidence === 'OUR ASSUMPTION' && y.note?.includes('PARAMETERS')
+  );
+  let dataComplete = years.length >= 4 && (!synthesized || fromYahoo);
   const ebitdaSeries = years.map((y) => y.ebitdaPct).filter((v): v is number => v != null);
 
   let avgEbitdaPct: number | null = null;
@@ -648,7 +771,9 @@ function buildPartA(
   const hasRed = years.some((y) => y.signal === '🔴');
   let verdict: string;
   if (years.length === 0) {
-    verdict = '🟡 Mixed — no margin history; PARAMETERS fallback failed';
+    verdict = '🟡 Mixed — no margin history; add MARGIN file or refresh live Yahoo pull';
+  } else if (fromYahoo) {
+    verdict = '🟡 Mixed — 5Y margin path from Yahoo annual filings (verify vs AR)';
   } else if (synthesized) {
     verdict = '🟡 Mixed — synthesized 5Y path from PARAMETERS (replace with FACT in MARGIN file)';
   } else if (trendDirection === 'deteriorating' || hasRed) {
@@ -810,6 +935,21 @@ function combineVerdict(
   return '🟢 Healthy — margins aligned with history and drivers supportive';
 }
 
+function partAYearsWillNeedYahoo(marginMd: string, eqMd: string | null): boolean {
+  const fromMargin = parsePartAFromMarkdown(marginMd);
+  if (
+    fromMargin.length >= 3 &&
+    fromMargin.some((y) => y.ebitdaPct != null && y.ebitdaPct <= 45)
+  ) {
+    return false;
+  }
+  if (eqMd) {
+    const fromEq = marginYearsFromEarningsQuality(eqMd).filter((y) => y.ebitdaPct != null);
+    if (fromEq.length >= 3) return false;
+  }
+  return true;
+}
+
 export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<MarginAnalysisResult | null> {
   const resolved = await resolveStock(input.ticker.trim());
   if (!resolved) return null;
@@ -848,7 +988,49 @@ export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<
     }
   }
 
-  const partB = buildPartB(parametersMd, quality, sector);
+  let liveMetricsSource: string | null = null;
+  let partB = buildPartB(parametersMd, quality, sector);
+  let externalMargin: ExternalMarginMetrics | null = null;
+
+  if (partBNeedsExternal(partB.rows)) {
+    externalMargin = await fetchExternalMarginMetrics(
+      resolved.ticker,
+      isFinancialSector(sector)
+    );
+    if (externalMargin) {
+      partB = mergeExternalMarginPartB(partB, externalMargin, sector);
+      liveMetricsSource = 'Yahoo Finance (quoteSummary · NSE .NS)';
+    } else if (cmp != null && cmp > 0) {
+      const pe = await fetchYahooTrailingPeMetrics(resolved.ticker);
+      if (pe.trailingEps != null && pe.trailingEps > 0) {
+        const oey = Math.round((pe.trailingEps / cmp) * 1000) / 10;
+        const rows = [
+          ...partB.rows.filter((r) => r.todayPct != null || r.avg10yPct != null),
+          marginRowFromExternal('Owner earnings yield', oey, null),
+        ];
+        const { primaryLabel, primaryDeltaPp } = recomputePartBPrimary(
+          rows,
+          sector,
+          'Owner earnings yield'
+        );
+        partB = {
+          ...partB,
+          rows,
+          primaryMetricLabel: primaryLabel,
+          primaryDeltaPp,
+          title: 'Part B — Today vs history (PARAMETERS + Yahoo live)',
+          verdict: `🟡 Mixed — owner earnings yield ${oey}% from Yahoo EPS ÷ CMP (PARAMETERS Block B empty)`,
+          tone: toneFromVerdict('🟡 Mixed'),
+        };
+        liveMetricsSource = 'Yahoo Finance (EPS TTM ÷ live CMP)';
+      }
+    }
+  } else if (partAYearsWillNeedYahoo(marginMd, eqMd)) {
+    externalMargin = await fetchExternalMarginMetrics(
+      resolved.ticker,
+      isFinancialSector(sector)
+    );
+  }
 
   let partAYears = parsePartAFromMarkdown(marginMd);
   const marginYearsValid =
@@ -858,6 +1040,14 @@ export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<
   }
   if (partAYears.length === 0 && eqMd) {
     partAYears = marginYearsFromEarningsQuality(eqMd).filter((y) => y.ebitdaPct != null);
+  }
+  if (
+    partAYears.length === 0 &&
+    externalMargin != null &&
+    externalMargin.historyYears.length >= 3
+  ) {
+    partAYears = externalMargin.historyYears;
+    if (!liveMetricsSource) liveMetricsSource = 'Yahoo Finance (annual income history)';
   }
   if (partAYears.length === 0) {
     const primaryRow = partB.rows.find((r) => r.metric === partB.primaryMetricLabel) ?? partB.rows[0];
@@ -938,11 +1128,13 @@ export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<
     analyzedAt: new Date().toISOString(),
     coreQuestion:
       'Are operating margins structurally healthy, improving with scale, and defensible vs history?',
-    dataSource: marginFile
-      ? marginFile.filename
-      : parameters?.filename
-        ? `${parameters.filename} (partial — add MARGIN_${resolved.ticker}.md)`
-        : 'No margin file',
+    dataSource: liveMetricsSource
+      ? `${liveMetricsSource}${marginFile ? ` · ${marginFile.filename}` : parameters?.filename ? ` · ${parameters.filename}` : ''}`
+      : marginFile
+        ? marginFile.filename
+        : parameters?.filename
+          ? `${parameters.filename} (partial — add MARGIN_${resolved.ticker}.md)`
+          : 'StockBook PARAMETERS pending — live pull when Yahoo available',
     marginFile: marginFile?.filename ?? null,
     parametersFile: parameters?.filename ?? null,
     stockbookUrl: stockbookPath(sector, stockName, 'parameters'),
@@ -955,5 +1147,6 @@ export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<
     overallTone: toneFromVerdict(overallVerdict),
     summaryLines,
     externalRiskNote,
+    liveMetricsSource,
   };
 }

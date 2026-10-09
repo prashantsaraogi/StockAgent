@@ -74,7 +74,7 @@ export async function fetchYahooQuoteSummary(
   }
 }
 
-function rawNum(field: unknown): number | null {
+export function rawNum(field: unknown): number | null {
   if (field == null) return null;
   if (typeof field === 'number' && Number.isFinite(field) && field > 0) return field;
   if (typeof field === 'object' && field !== null && 'raw' in field) {

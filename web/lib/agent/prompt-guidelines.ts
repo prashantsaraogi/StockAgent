@@ -643,7 +643,7 @@ StockBook/PE-EVALUATION-FRAMEWORK.md Part D.`,
         prompt: `{TICKER} — full Margin Analysis per MARGIN-FRAMEWORK.md (Parts A–D must not be blank in web tab).
 
 Part A: 5Y Gross/EBITDA/EBIT/Net margins + signals (or net margin from EQ Part A)
-Part B: Today @ CMP vs 10Y normal — EBITDA margin; NBFC/banks use ROE/ROA/owner earnings yield/P/E when Block B pending
+Part B: Today @ CMP vs 10Y normal — EBITDA margin; NBFC/banks use ROE/ROA/owner earnings yield/P/E when Block B pending. Web tab auto-fills from Yahoo (.NS) when PARAMETERS empty — deep-fill Block B from AR/Moneycontrol after.
 Part C: Drivers + pass-through test (oil/RM, mix, NIM/credit cost)
 Part D: 8-quarter margin trend from EARNINGS_QUALITY section D
 
