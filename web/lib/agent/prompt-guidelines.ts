@@ -570,7 +570,8 @@ Modules: Framework report (Basic) · CAGR · PE · Earnings Quality · Margin ·
         prompt: `Earnings Quality Part A + Part B for {TICKER} — EARNINGS-QUALITY-FRAMEWORK.md v1.1.
 
 **Part A:** Last 5 FY — Revenue, PAT, EPS, EPS YoY, CFO/PAT, quality signal. Write ## Part A table.
-**Part B inputs:** PARAMETERS EPS CAGR · internal-negative-risk.md · external-negative-risk.md.
+**Part B inputs:** PARAMETERS Part 2 `EPS CAGR (5Y)` base (batch rows may be non-bold) · internal/external risk files.
+Web tab must show 5Y EPS CAGR from PARAMETERS when Part A table missing — synthesize rear-view EPS path.
 Current-year external overlay (e.g. oil price for auto) — full haircut FY27, taper outer years.
 
 Also refresh section D quarterly · cross-check revenue↑ profit↓.

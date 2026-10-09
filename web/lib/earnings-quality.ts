@@ -19,6 +19,8 @@ import {
   type FrameworkQualityMetrics,
 } from './stock-calculator-framework';
 import { getBundledEarningsQualityMd, getBundledParametersMd } from './load-bundled-stockbook';
+import { parseParametersEpsCagrBasePct } from './parameters-assumptions';
+import { parseParametersMetrics } from './stock-calculator-engine';
 
 export type EvidenceType = 'FACT' | 'MANAGEMENT CLAIM' | 'HYPOTHESIS' | 'OUR ASSUMPTION' | 'UNVERIFIED';
 export type TrendSignal = 'improving' | 'stable' | 'deteriorating' | 'unknown';
@@ -453,8 +455,16 @@ function enrichFromParameters(
     }
   };
 
-  if (quality.baseEpsCagrPct != null) {
-    fill(growth, 'eps_cagr', quality.baseEpsCagrRange ?? `${quality.baseEpsCagrPct}%`, quality.baseEpsCagrPct);
+  let epsCagrPct = quality.baseEpsCagrPct;
+  if (epsCagrPct == null && parametersMd) {
+    epsCagrPct = parseParametersEpsCagrBasePct(parametersMd);
+  }
+  if (epsCagrPct != null) {
+    const label =
+      quality.baseEpsCagrRange ?? `${epsCagrPct}% (PARAMETERS base)`;
+    fill(growth, 'eps_cagr', label, epsCagrPct, 'OUR ASSUMPTION');
+    fill(growth, 'pat_cagr', label, epsCagrPct, 'OUR ASSUMPTION');
+    fill(growth, 'rev_cagr_5y', label, epsCagrPct, 'OUR ASSUMPTION');
   }
   if (quality.ebitdaMarginPct != null) {
     fill(profitability, 'ebitda_margin', quality.ebitdaDisplay, quality.ebitdaMarginPct);
@@ -560,18 +570,23 @@ export async function runEarningsQualityAnalysis(
   if (quarterly.length > 0 && quarterly[quarterly.length - 1].eps != null) {
     latestEps = quarterly[quarterly.length - 1].eps;
   }
-  if (latestEps == null && parametersMd && cmp != null) {
-    const peMatch = parametersMd.match(/\|\s*\*\*P\/E\*\*[^\n]+\|\s*\*\*([\d.]+)x\*\*/i);
-    if (peMatch) {
-      const pe = parseFloat(peMatch[1]);
-      if (pe > 0) latestEps = cmp / pe;
+  if (latestEps == null && parametersMd) {
+    const paramMetrics = parseParametersMetrics(parametersMd);
+    if (paramMetrics.normalizedEps != null && paramMetrics.normalizedEps > 0) {
+      latestEps = paramMetrics.normalizedEps;
+    } else if (cmp != null) {
+      const pe = paramMetrics.ttmPe;
+      if (pe != null && pe > 0) latestEps = cmp / pe;
     }
   }
 
   const partA = buildPartA({
     eqMd,
     latestEps,
-    epsCagr5y: growth.find((g) => g.id === 'eps_cagr')?.numeric ?? quality.baseEpsCagrPct,
+    epsCagr5y:
+      growth.find((g) => g.id === 'eps_cagr')?.numeric ??
+      quality.baseEpsCagrPct ??
+      parseParametersEpsCagrBasePct(parametersMd),
     patCagr5y: growth.find((g) => g.id === 'pat_cagr')?.numeric ?? null,
     revCagr5y: growth.find((g) => g.id === 'rev_cagr_5y')?.numeric ?? null,
     cfoPatRatio: cfoPatMetric?.numeric ?? null,

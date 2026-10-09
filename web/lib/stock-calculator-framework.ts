@@ -1,5 +1,7 @@
 /** Framework-derived quality metrics + risk scoring for Stock Calculator. */
 
+import { parseParametersEpsCagrBasePct } from './parameters-assumptions';
+
 export type RiskLevel = 'L1' | 'L2' | 'L3' | 'L1-L2' | 'L2-L3' | 'none';
 
 export interface FrameworkQualityMetrics {
@@ -181,12 +183,10 @@ export function parseFrameworkQualityMetrics(
   let baseEpsCagrPct: number | null = null;
   let baseEpsCagrRange: string | null = null;
 
-  const epsCagrRow = md.match(
-    /\|\s*\*\*EPS CAGR \(5Y\)\*\*[\s\S]*?\|\s*[\d.]+\s*%\s*\|\s*\*\*([\d.]+)\s*%\*\*/i
-  );
-  if (epsCagrRow) {
-    baseEpsCagrPct = parseFloat(epsCagrRow[1]);
-    baseEpsCagrRange = `${epsCagrRow[1]}% (base)`;
+  const epsCagrFromParams = parseParametersEpsCagrBasePct(md);
+  if (epsCagrFromParams != null) {
+    baseEpsCagrPct = epsCagrFromParams;
+    baseEpsCagrRange = `${epsCagrFromParams}% (PARAMETERS base)`;
   }
 
   if (baseEpsCagrPct == null && riskMd) {

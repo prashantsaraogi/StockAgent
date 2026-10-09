@@ -29,7 +29,9 @@ P/E tells you price relative to earnings. It does **not** tell you whether those
 
 **Summary row:** EPS CAGR (5Y), PAT CAGR, Revenue CAGR, cash-quality note.
 
-If the Part A table is missing, the engine **back-calculates** five EPS points from latest EPS + PARAMETERS EPS CAGR (labelled OUR ASSUMPTION).
+If the Part A table is missing, the engine **back-calculates** five EPS points from latest EPS + **PARAMETERS Part 2** `EPS CAGR (5Y)` base (batch files use plain row labels — web parser reads assumptions table + horizon line). Labelled **OUR ASSUMPTION** until `EARNINGS_QUALITY_[TICKER].md` Part A is filled with FACT rows.
+
+**Web rule:** Earnings Quality tab must not leave **5Y EPS CAGR** blank when PARAMETERS Part 2 exists — same base CAGR feeds Part B forward path.
 
 ### Part B — Five-year forward (risk-adjusted EPS path)
 
