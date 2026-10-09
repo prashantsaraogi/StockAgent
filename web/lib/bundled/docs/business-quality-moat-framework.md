@@ -110,7 +110,7 @@ StockBook/[Sector]/[Stock]/BUSINESS_QUALITY_[TICKER].md
 
 Sections: **Overall score** · **Pillars 1–7** (factor tables) · **Scorecard summary** · **Ceiling note**
 
-Engine also reads `PARAMETERS_*.md` (ROE, market share), `detail-analysis.md`, `summary-analysis.md` for partial fallback.
+Engine reads `PARAMETERS_*.md`, `detail-analysis.md`, `PEG_*.md` for merge fallback. **Mandatory:** Stock Calculator shows **7/7 pillar scores** (PARAMETERS → sector baseline → PEG anchor); agent should replace OUR ASSUMPTION rows with FACT in `BUSINESS_QUALITY_[TICKER].md`.
 
 ---
 

@@ -10,7 +10,11 @@ import { getRepoRoot } from './framework-paths';
 import { getStockbookByTicker } from './stockbook-index';
 import { resolveStock } from './stock-search';
 import { fetchLiveNseCmp } from './nse-cmp';
-import { extractParametersMasterCells, parseFrameworkQualityMetrics } from './stock-calculator-framework';
+import {
+  extractParametersMasterCells,
+  parseFrameworkQualityMetrics,
+  type FrameworkQualityMetrics,
+} from './stock-calculator-framework';
 import { stockbookPath } from './navigation';
 import {
   getBundledBusinessQualityMd,
@@ -165,7 +169,10 @@ function ratingToSignal(rating: string): MoatSignal {
 
 function parseDetailMoatTable(detailMd: string | null): MoatFactor[] {
   if (!detailMd) return [];
-  const section = detailMd.match(/## 2\.[^\n]*Business quality[\s\S]*?(?=\n## \d+\.|\n---\n|$)/i)?.[0] ?? '';
+  const section =
+    detailMd.match(/## 2\.[^\n]*Business quality[\s\S]*?(?=\n## \d+\.|\n---\n|$)/i)?.[0] ??
+    detailMd.match(/## 2\.[^\n]*moat[\s\S]*?(?=\n## \d+\.|\n---\n|$)/i)?.[0] ??
+    '';
   const factors: MoatFactor[] = [];
   for (const line of section.split('\n')) {
     if (!line.trim().startsWith('|') || /Moat source|Rating|---/i.test(line)) continue;
@@ -195,23 +202,205 @@ function parsePegBusinessQualityScore10(ticker: string): number | null {
   return m ? parseFloat(m[1]) : null;
 }
 
+function pillarHeadlineFromFactors(factors: MoatFactor[], explicit?: string): string {
+  if (explicit && !/^partial\s*—/i.test(explicit) && explicit !== '—') return explicit;
+  const parts = factors.map((f) => f.assessment).filter((a) => a && a !== '—');
+  if (parts.length > 0) return parts.join(' · ').slice(0, 160);
+  return 'Derived from PARAMETERS / sector baseline (OUR ASSUMPTION) — deepen in BUSINESS_QUALITY file';
+}
+
 function pillarFromFactors(
   def: (typeof PILLAR_DEFS)[number],
   factors: MoatFactor[],
   headline?: string
 ): MoatPillar {
-  const scores = factors.map((f) => signalToScore(f.signal)).filter((s) => s > 0);
+  const scores = factors.map((f) => signalToScore(f.signal));
   const score10 =
     scores.length > 0 ? Math.round(avg(scores) * 10) / 10 : null;
+  const hl = pillarHeadlineFromFactors(factors, headline);
   return {
     id: def.id,
     number: def.number,
     title: def.title,
     score10,
     signal: score10 != null ? scoreToSignal(score10) : '—',
-    headline: headline ?? factors[0]?.assessment ?? 'Partial — PARAMETERS / detail-analysis',
+    headline: hl,
     factors,
   };
+}
+
+function clampScore(n: number): number {
+  return Math.min(10, Math.max(3, Math.round(n * 10) / 10));
+}
+
+function tryMasterParam(
+  params: string,
+  labels: string[]
+): { avg10y: string | null; today: string | null; read: string | null; label: string } | null {
+  for (const label of labels) {
+    const cells = extractParametersMasterCells(params, label);
+    if (cells.today && !/unverified|pending|\*pending/i.test(cells.today)) {
+      return { ...cells, label };
+    }
+  }
+  return null;
+}
+
+interface PegMoatFields {
+  businessQualityScore10: number | null;
+  revenueGrowthPct: number | null;
+  rocePct: number | null;
+  debtEquity: number | null;
+}
+
+function parsePegMoatFields(ticker: string): PegMoatFields {
+  const peg = getBundledPegMd(ticker);
+  if (!peg) {
+    return { businessQualityScore10: null, revenueGrowthPct: null, rocePct: null, debtEquity: null };
+  }
+  const num = (key: string) => {
+    const m = peg.match(new RegExp(`\\|\\s*\\*\\*${key}\\*\\*\\s*\\|\\s*([\\d.]+)`, 'i'));
+    return m ? parseFloat(m[1]) : null;
+  };
+  return {
+    businessQualityScore10: parsePegBusinessQualityScore10(ticker),
+    revenueGrowthPct: num('revenueGrowthPct'),
+    rocePct: num('rocePct'),
+    debtEquity: num('debtEquity'),
+  };
+}
+
+/** Pillar score offset vs overall businessQualityScore10 when only PEG anchor exists. */
+const PILLAR_SCORE_DELTA: Record<string, number> = {
+  market_position: 0,
+  competitive_advantage: 0,
+  pricing_power: -1,
+  industry_runway: -0.5,
+  capital_efficiency: 0.5,
+  management_quality: 0,
+  reinvestment_runway: -0.5,
+};
+
+function sectorPillarBaselines(sector: string): Partial<Record<string, { score10: number; headline: string }>> {
+  const s = sector.toLowerCase();
+  if (/oil|gas|omc|energy/.test(s)) {
+    return {
+      market_position: { score10: 7, headline: 'Large E&P / O&G franchise — scale + reserves (OUR ASSUMPTION)' },
+      competitive_advantage: { score10: 6, headline: 'Cost curve + PSU scale; weak pricing moat (OUR ASSUMPTION)' },
+      pricing_power: { score10: 4, headline: 'Commodity / regulated pricing — taker not maker (OUR ASSUMPTION)' },
+      industry_runway: { score10: 5, headline: 'Energy transition + cyclical capex — monitor (OUR ASSUMPTION)' },
+      management_quality: { score10: 6, headline: 'PSU governance — search filings on refresh (OUR ASSUMPTION)' },
+      reinvestment_runway: { score10: 5, headline: 'Capex-heavy E&P; returns tied to oil cycle (OUR ASSUMPTION)' },
+    };
+  }
+  if (/bank|finance|nbfc|insurance|amc/.test(s)) {
+    return {
+      market_position: { score10: 7, headline: 'Deposit / AUM scale — sector rank from peer table (OUR ASSUMPTION)' },
+      competitive_advantage: { score10: 7, headline: 'Branch / trust / regulation — verify vs peers (OUR ASSUMPTION)' },
+      pricing_power: { score10: 6, headline: 'NIM / fee power — RBI cycle sensitive (OUR ASSUMPTION)' },
+      industry_runway: { score10: 7, headline: 'Credit / financialisation tailwind India (OUR ASSUMPTION)' },
+      management_quality: { score10: 6, headline: 'Governance search mandatory for banks (OUR ASSUMPTION)' },
+      reinvestment_runway: { score10: 6, headline: 'Organic book growth reinvestment (OUR ASSUMPTION)' },
+    };
+  }
+  if (/auto|mobility|2w|4w/.test(s)) {
+    return {
+      industry_runway: { score10: 7, headline: 'Under-penetration + replacement — EV transition risk (OUR ASSUMPTION)' },
+      pricing_power: { score10: 6, headline: 'Competitive PV / 2W pricing — margin discipline (OUR ASSUMPTION)' },
+    };
+  }
+  if (/pharma|healthcare|hospital/.test(s)) {
+    return {
+      industry_runway: { score10: 8, headline: 'Healthcare demand + export / bed growth (OUR ASSUMPTION)' },
+      competitive_advantage: { score10: 7, headline: 'R&D / compliance / brand — fill from detail §2 (OUR ASSUMPTION)' },
+    };
+  }
+  if (/it |technology|software/.test(s)) {
+    return {
+      competitive_advantage: { score10: 6, headline: 'Talent scale; AI structural threat — §19 (OUR ASSUMPTION)' },
+      industry_runway: { score10: 6, headline: 'Digital spend vs AI disruption — dynamic (OUR ASSUMPTION)' },
+    };
+  }
+  return {};
+}
+
+function mergePillars(primary: MoatPillar[], derived: MoatPillar[]): MoatPillar[] {
+  return PILLAR_DEFS.map((def) => {
+    const p = primary.find((x) => x.id === def.id)!;
+    const d = derived.find((x) => x.id === def.id)!;
+    const pWeak =
+      p.score10 == null ||
+      /^partial\s*—/i.test(p.headline) ||
+      p.headline.includes('add BUSINESS_QUALITY');
+    if (!pWeak && p.score10 != null) {
+      return {
+        ...p,
+        factors: p.factors.length > 0 ? p.factors : d.factors,
+      };
+    }
+    if (d.score10 != null || d.factors.length > 0) {
+      return {
+        ...d,
+        score10: d.score10 ?? p.score10,
+        signal: d.score10 != null ? scoreToSignal(d.score10) : p.signal,
+        headline: d.headline !== p.headline && !/^partial/i.test(d.headline) ? d.headline : p.headline,
+        factors: d.factors.length > 0 ? d.factors : p.factors,
+      };
+    }
+    return p;
+  });
+}
+
+function ensureEveryPillarScored(
+  pillars: MoatPillar[],
+  anchorScore: number | null,
+  sector: string
+): MoatPillar[] {
+  const baselines = sectorPillarBaselines(sector);
+  return pillars.map((p) => {
+    if (p.score10 != null) {
+      return {
+        ...p,
+        signal: p.signal === '—' ? scoreToSignal(p.score10) : p.signal,
+      };
+    }
+    const fromFactors = p.factors.map((f) => signalToScore(f.signal));
+    if (fromFactors.length > 0) {
+      const score10 = clampScore(avg(fromFactors));
+      return {
+        ...p,
+        score10,
+        signal: scoreToSignal(score10),
+        headline: pillarHeadlineFromFactors(p.factors, p.headline),
+      };
+    }
+    const base = baselines[p.id];
+    let score10 = base?.score10 ?? 5.5;
+    if (anchorScore != null) {
+      score10 = clampScore(anchorScore + (PILLAR_SCORE_DELTA[p.id] ?? 0));
+    }
+    const headline =
+      base?.headline ??
+      `Framework proxy ${score10}/10 vs anchor ${anchorScore ?? '—'} — add BUSINESS_QUALITY file for pillar detail`;
+    return {
+      ...p,
+      score10,
+      signal: scoreToSignal(score10),
+      headline,
+      factors:
+        p.factors.length > 0
+          ? p.factors
+          : [
+              {
+                id: `${p.id}_baseline`,
+                label: 'PARAMETERS / sector baseline',
+                assessment: headline,
+                signal: scoreToSignal(score10),
+                evidence: 'OUR ASSUMPTION' as EvidenceType,
+              },
+            ],
+    };
+  });
 }
 
 function extractSection(md: string, re: RegExp): string {
@@ -355,47 +544,71 @@ function enrichFromParameters(pillars: MoatPillar[], parametersMd: string | null
   }
 }
 
-function buildFallbackPillars(
+function buildParameterDerivedPillars(
   parametersMd: string | null,
   detailMd: string | null,
-  quality: ReturnType<typeof parseFrameworkQualityMetrics>,
-  ticker: string
+  quality: FrameworkQualityMetrics,
+  ticker: string,
+  sector: string
 ): MoatPillar[] {
   const moatRows = parseDetailMoatTable(detailMd);
   const params = parametersMd ?? '';
+  const peg = parsePegMoatFields(ticker);
 
-  const volCell = extractParametersMasterCells(params, 'Volume growth (2W)');
-  const volToday = volCell.today ?? volCell.avg10y;
-  const roeCell = extractParametersMasterCells(params, 'ROE');
-  const ebitdaCell = extractParametersMasterCells(params, 'EBITDA margin');
-  const netCashRead =
-    params.match(/\|\s*\*\*Net cash \/ debt\*\*[^\n]+\|[^\n]+\|[^\n]+\|[^\n]+\|[^\n]+\|[^\n]+\|[^\n]+\|\s*([^|]+)\|/i)?.[1]?.trim() ??
-    'Net cash';
+  const volRow = tryMasterParam(params, [
+    'Volume growth (2W)',
+    'Volume growth',
+    'Revenue growth',
+    'Market share',
+  ]);
+  const volToday = volRow?.today ?? volRow?.avg10y ?? null;
+  const ebitdaRow = tryMasterParam(params, ['EBITDA margin', 'Operating margin', 'Net margin']);
+  const roeRow = tryMasterParam(params, ['ROE', 'ROE (cycle)', 'ROCE']);
 
   const marketFactors: MoatFactor[] = [];
-  if (volToday) {
+  if (volRow) {
     marketFactors.push({
-      id: 'param_volume',
-      label: 'Volume growth (2W)',
-      assessment: volToday,
-      signal: /2\d%|1[5-9]%|\+/.test(volToday) ? '🟢' : '🟡',
+      id: 'param_market_pulse',
+      label: volRow.label,
+      assessment: `${volRow.today}${volRow.read ? ` — ${volRow.read}` : ''}`,
+      signal: /2\d%|1[5-9]%|strong|above|leader|#1/i.test(`${volRow.today} ${volRow.read ?? ''}`)
+        ? '🟢'
+        : '🟡',
       evidence: 'FACT',
     });
   }
-  const leader = moatRows.find((f) => /#1|volume|leader/i.test(f.label));
+  if (peg.revenueGrowthPct != null) {
+    marketFactors.push({
+      id: 'peg_rev_growth',
+      label: 'Revenue growth (PEG)',
+      assessment: `${peg.revenueGrowthPct}% YoY proxy`,
+      signal: peg.revenueGrowthPct >= 12 ? '🟢' : peg.revenueGrowthPct >= 6 ? '🟡' : '🔴',
+      evidence: 'FACT',
+    });
+  }
+  const leader = moatRows.find((f) => /#1|volume|leader|share/i.test(f.label));
   if (leader) marketFactors.push(leader);
 
   const moatFactors = moatRows.filter(
-    (f) => !/#1|volume|leader/i.test(f.label) && !/EV|VIDA|Premium|Harley/i.test(f.label)
+    (f) => !/#1|volume|leader|share/i.test(f.label) && !/EV|VIDA|Premium|Harley/i.test(f.label)
   );
 
   const pricingFactors: MoatFactor[] = [];
-  if (ebitdaCell.today || ebitdaCell.read) {
+  if (ebitdaRow?.today || quality.ebitdaDisplay !== '—') {
+    const today = ebitdaRow?.today ?? quality.ebitdaDisplay;
+    const read = ebitdaRow?.read ?? quality.ebitdaRead ?? '';
     pricingFactors.push({
       id: 'param_ebitda',
       label: 'EBITDA margin vs 10Y',
-      assessment: `${ebitdaCell.today ?? '—'} vs avg ${ebitdaCell.avg10y ?? '—'} — ${ebitdaCell.read ?? ''}`.trim(),
-      signal: ebitdaCell.read?.toLowerCase().includes('weak') ? '🟡' : '🟢',
+      assessment: `${today} vs avg ${ebitdaRow?.avg10y ?? '—'}${read ? ` — ${read}` : ''}`.trim(),
+      signal:
+        quality.ebitdaMarginPct != null && quality.ebitdaMarginPct >= 15
+          ? '🟢'
+          : /weak|compress|watch/i.test(read)
+            ? '🟡'
+            : quality.ebitdaMarginPct != null
+              ? '🟡'
+              : '🟡',
       evidence: 'FACT',
     });
   }
@@ -412,6 +625,23 @@ function buildFallbackPillars(
       evidence: 'FACT',
     });
   }
+  if (quality.baseEpsCagrPct != null) {
+    runwayFactors.push({
+      id: 'param_eps_cagr',
+      label: 'Forward EPS CAGR (base)',
+      assessment: `${quality.baseEpsCagrPct}% — PARAMETERS Part 2`,
+      signal: quality.baseEpsCagrPct >= 10 ? '🟢' : quality.baseEpsCagrPct >= 5 ? '🟡' : '🔴',
+      evidence: 'OUR ASSUMPTION',
+    });
+  } else if (quality.impliedPriceCagrPct != null) {
+    runwayFactors.push({
+      id: 'param_implied_cagr_runway',
+      label: 'Implied 5Y price CAGR (base)',
+      assessment: `${quality.impliedPriceCagrPct}% — PARAMETERS Part 2`,
+      signal: quality.impliedPriceCagrPct >= 12 ? '🟢' : '🟡',
+      evidence: 'OUR ASSUMPTION',
+    });
+  }
 
   const capitalFactors: MoatFactor[] = [];
   if (quality.roePct != null) {
@@ -422,28 +652,72 @@ function buildFallbackPillars(
       signal: quality.roePct >= 15 ? '🟢' : quality.roePct >= 12 ? '🟡' : '🔴',
       evidence: 'FACT',
     });
+  } else if (roeRow?.today) {
+    capitalFactors.push({
+      id: 'param_roe_row',
+      label: roeRow.label,
+      assessment: `${roeRow.today}${roeRow.read ? ` — ${roeRow.read}` : ''}`,
+      signal: /strong|pass|2\d%|1[5-9]/i.test(`${roeRow.today} ${roeRow.read ?? ''}`) ? '🟢' : '🟡',
+      evidence: 'FACT',
+    });
   }
-  capitalFactors.push({
-    id: 'param_balance_sheet',
-    label: 'Balance sheet',
-    assessment: netCashRead.replace(/\*\*/g, ''),
-    signal: /net cash|fortress|safe/i.test(netCashRead) ? '🟢' : '🟡',
-    evidence: 'FACT',
-  });
+  if (peg.rocePct != null) {
+    capitalFactors.push({
+      id: 'peg_roce',
+      label: 'ROCE (PEG)',
+      assessment: `${peg.rocePct}%`,
+      signal: peg.rocePct >= 18 ? '🟢' : peg.rocePct >= 12 ? '🟡' : '🔴',
+      evidence: 'FACT',
+    });
+  }
+  if (quality.cashFlowDisplay && quality.cashFlowDisplay !== '—') {
+    capitalFactors.push({
+      id: 'param_balance_sheet',
+      label: 'Balance sheet / cash',
+      assessment: quality.cashFlowDisplay,
+      signal: /net cash|fortress|positive/i.test(quality.cashFlowDisplay)
+        ? '🟢'
+        : /debt|lever/i.test(quality.cashFlowDisplay)
+          ? '🔴'
+          : '🟡',
+      evidence: 'FACT',
+    });
+  } else if (peg.debtEquity != null) {
+    capitalFactors.push({
+      id: 'peg_de',
+      label: 'Debt / equity (PEG)',
+      assessment: `${peg.debtEquity}×`,
+      signal: peg.debtEquity <= 0.3 ? '🟢' : peg.debtEquity <= 1 ? '🟡' : '🔴',
+      evidence: 'FACT',
+    });
+  }
 
-  const mgmtSection = detailMd?.match(/## 5\.[^\n]*Management[\s\S]*?(?=\n## \d+\.|\n---\n|$)/i)?.[0] ?? '';
+  const mgmtSection =
+    detailMd?.match(/## 5\.[^\n]*Management[\s\S]*?(?=\n## \d+\.|\n---\n|$)/i)?.[0] ??
+    detailMd?.match(/## 5\.[^\n]*Governance[\s\S]*?(?=\n## \d+\.|\n---\n|$)/i)?.[0] ??
+    '';
   const mgmtText = mgmtSection.replace(/^#+\s[^\n]+\n?/m, '').trim().slice(0, 220);
-  const managementFactors: MoatFactor[] = mgmtText
-    ? [
-        {
-          id: 'detail_management',
-          label: 'Management & governance',
-          assessment: mgmtText,
-          signal: /no fraud|moderate\+|strong/i.test(mgmtText) ? '🟢' : '🟡',
-          evidence: 'FACT',
-        },
-      ]
-    : [];
+  const franchiseNote =
+    detailMd?.match(/## 1\.[^\n]*Business snapshot[\s\S]*?\|[^\n]*Franchise[^\n]+\|[^\n]+\|([^|\n]+)/i)?.[1]?.trim() ??
+    '';
+  const managementFactors: MoatFactor[] = [];
+  if (mgmtText) {
+    managementFactors.push({
+      id: 'detail_management',
+      label: 'Management & governance',
+      assessment: mgmtText,
+      signal: /no fraud|moderate\+|strong|clean/i.test(mgmtText) ? '🟢' : '🟡',
+      evidence: 'FACT',
+    });
+  } else if (franchiseNote && !/assess moat|refresh|search/i.test(franchiseNote)) {
+    managementFactors.push({
+      id: 'detail_franchise',
+      label: 'Franchise note',
+      assessment: franchiseNote,
+      signal: '🟡',
+      evidence: 'FACT',
+    });
+  }
 
   const reinvestFactors: MoatFactor[] = moatRows
     .filter((f) => /EV|VIDA|Premium|Harley/i.test(f.label))
@@ -460,10 +734,10 @@ function buildFallbackPillars(
     });
   }
 
-  const pegScore = parsePegBusinessQualityScore10(ticker);
+  const pegScore = peg.businessQualityScore10;
   const byId: Record<string, MoatFactor[]> = {
     market_position: marketFactors,
-    competitive_advantage: moatFactors.length ? moatFactors : marketFactors.slice(0, 2),
+    competitive_advantage: moatFactors.length ? moatFactors : moatRows.length ? moatRows.slice(0, 3) : marketFactors.slice(0, 2),
     pricing_power: pricingFactors,
     industry_runway: runwayFactors,
     capital_efficiency: capitalFactors,
@@ -471,18 +745,47 @@ function buildFallbackPillars(
     reinvestment_runway: reinvestFactors,
   };
 
+  const baselines = sectorPillarBaselines(sector);
   return PILLAR_DEFS.map((def) => {
     const factors = byId[def.id] ?? [];
     if (factors.length === 0 && pegScore != null) {
-      const proxy = Math.round(pegScore * 10) / 10;
+      const proxy = clampScore(pegScore + (PILLAR_SCORE_DELTA[def.id] ?? 0));
       return {
         id: def.id,
         number: def.number,
         title: def.title,
         score10: proxy,
         signal: scoreToSignal(proxy),
-        headline: `PEG businessQualityScore10 proxy (${proxy}/10) — add BUSINESS_QUALITY file for pillar detail`,
-        factors: [],
+        headline: `PEG anchor ${pegScore}/10 → pillar ${proxy}/10 — add BUSINESS_QUALITY file for factor rows`,
+        factors: [
+          {
+            id: `${def.id}_peg_proxy`,
+            label: 'PEG businessQualityScore10',
+            assessment: `Pillar proxy from bundled PEG (${pegScore}/10 overall)`,
+            signal: scoreToSignal(proxy),
+            evidence: 'OUR ASSUMPTION',
+          },
+        ],
+      };
+    }
+    if (factors.length === 0 && baselines[def.id]) {
+      const b = baselines[def.id]!;
+      return {
+        id: def.id,
+        number: def.number,
+        title: def.title,
+        score10: b.score10,
+        signal: scoreToSignal(b.score10),
+        headline: b.headline,
+        factors: [
+          {
+            id: `${def.id}_sector_baseline`,
+            label: 'Sector baseline',
+            assessment: b.headline,
+            signal: scoreToSignal(b.score10),
+            evidence: 'OUR ASSUMPTION',
+          },
+        ],
       };
     }
     return pillarFromFactors(def, factors);
@@ -538,24 +841,23 @@ export async function runBusinessQualityAnalysis(
   const detailMd = detail?.content ?? null;
   const quality = parseFrameworkQualityMetrics(parametersMd, detailMd);
 
-  let pillars = bqMd
-    ? buildPillarsFromFile(bqMd)
-    : buildFallbackPillars(parametersMd, detailMd, quality, resolved.ticker);
+  const derived = buildParameterDerivedPillars(
+    parametersMd,
+    detailMd,
+    quality,
+    resolved.ticker,
+    sector
+  );
+  let pillars = bqMd ? mergePillars(buildPillarsFromFile(bqMd), derived) : derived;
   enrichFromParameters(pillars, parametersMd, quality);
 
-  // Recompute pillar scores from factors if missing
-  pillars = pillars.map((p) => {
-    if (p.score10 != null) return p;
-    const scores = p.factors.map((f) => signalToScore(f.signal));
-    if (scores.length === 0) return p;
-    const score10 = Math.round(avg(scores) * 10) / 10;
-    return { ...p, score10, signal: scoreToSignal(score10) };
-  });
+  const fileScore = bqMd ? parseOverallScore(bqMd) : null;
+  const pegScore = parsePegBusinessQualityScore10(resolved.ticker);
+  const anchorScore = fileScore ?? pegScore ?? computeScore(derived, null);
+  pillars = ensureEveryPillarScored(pillars, anchorScore, sector);
 
-  const fileScore = bqMd
-    ? parseOverallScore(bqMd)
-    : parsePegBusinessQualityScore10(resolved.ticker);
-  const businessQualityScore10 = computeScore(pillars, fileScore);
+  const businessQualityScore10 =
+    fileScore != null ? Math.round(fileScore * 10) / 10 : computeScore(pillars, null);
   const ceilingNote = bqMd ? parseCeilingNote(bqMd) : null;
   const fileVerdict = bqMd ? parseVerdict(bqMd) : null;
   const highlights = bqMd

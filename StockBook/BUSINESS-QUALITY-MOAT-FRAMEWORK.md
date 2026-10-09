@@ -110,7 +110,16 @@ StockBook/[Sector]/[Stock]/BUSINESS_QUALITY_[TICKER].md
 
 Sections: **Overall score** · **Pillars 1–7** (factor tables) · **Scorecard summary** · **Ceiling note**
 
-Engine reads `PARAMETERS_*.md` (ROE, volume, EBITDA, net cash), `detail-analysis.md` (§2 moat table, §5 management), and `PEG_*.md` (`businessQualityScore10`) when no dedicated file exists. Full seven-pillar scores require `BUSINESS_QUALITY_[TICKER].md` (bundled at web build like MARGIN / EARNINGS_QUALITY).
+Engine reads `PARAMETERS_*.md` (ROE, volume, EBITDA, net cash / OEY), `detail-analysis.md` (§2 moat table, §5 management), and `PEG_*.md` (`businessQualityScore10`, ROCE, growth) when no dedicated file exists.
+
+**Mandatory UI rule:** Stock Calculator Tab 4 must show **7/7 pillar scores** — never blank `--/10`. Derivation order:
+
+1. `BUSINESS_QUALITY_[TICKER].md` scorecard + factor tables (preferred)
+2. Merge gaps from PARAMETERS master rows + detail §2 moat + PEG fields
+3. Sector baseline (O&G, banks, auto, pharma, IT) labeled **OUR ASSUMPTION**
+4. PEG `businessQualityScore10` pillar proxies (± pillar deltas) if still empty
+
+Overall score = file **Business Quality Score** when present; else **equal-weight average of seven pillars**. Agent write-back should replace assumptions with **FACT** rows in `BUSINESS_QUALITY_[TICKER].md` (bundled at web build like MARGIN / EARNINGS_QUALITY).
 
 ---
 

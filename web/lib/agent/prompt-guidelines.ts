@@ -570,7 +570,7 @@ Modules: Framework report (Basic) · CAGR · PE · Earnings Quality · Margin ·
         prompt: `Earnings Quality Part A + Part B for {TICKER} — EARNINGS-QUALITY-FRAMEWORK.md v1.1.
 
 **Part A:** Last 5 FY — Revenue, PAT, EPS, EPS YoY, CFO/PAT, quality signal. Write ## Part A table.
-**Part B inputs:** PARAMETERS Part 2 `EPS CAGR (5Y)` base (batch rows may be non-bold) · internal/external risk files.
+**Part B inputs:** PARAMETERS Part 2 EPS CAGR (5Y) base (batch rows may be non-bold) · internal/external risk files.
 Web tab must show 5Y EPS CAGR from PARAMETERS when Part A table missing — synthesize rear-view EPS path.
 Current-year external overlay (e.g. oil price for auto) — full haircut FY27, taper outer years.
 
@@ -605,6 +605,20 @@ Note L1/L2/L3 and haircut rationale · update News/TICKER-INDEX if material.
 Re-run Earnings Quality tab — check adjusted EPS growth FY27–FY31 table.`,
         channel: 'both',
         framework: ['EARNINGS-QUALITY-FRAMEWORK', 'dynamic-context-analysis'],
+        placeholders: ['{TICKER}'],
+      },
+      {
+        id: 'business-quality-seven-pillars',
+        title: 'Business Quality — seven-pillar scorecard (no blanks)',
+        description:
+          'Moat tab must show 7/7 pillar scores — PARAMETERS + detail §2 + PEG or full BUSINESS_QUALITY file.',
+        prompt: `{TICKER} — Business Quality & Moat per BUSINESS-QUALITY-MOAT-FRAMEWORK.md.
+
+Write/update StockBook/BUSINESS_QUALITY_{TICKER}.md: Overall score · Scorecard summary (all 7 pillars) · factor tables per pillar · ceiling note.
+Pull FACT rows from PARAMETERS (ROE, EBITDA margin, volume/share, net cash/OEY) and detail-analysis §2 moat + §5 management.
+Label sector proxies OUR ASSUMPTION until verified. Web tab must never show blank pillar scores — replace assumptions after deep-fill.`,
+        channel: 'both',
+        framework: ['BUSINESS-QUALITY-MOAT-FRAMEWORK', 'business-model-analysis', 'PARAMETERS'],
         placeholders: ['{TICKER}'],
       },
       {
