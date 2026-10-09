@@ -11,6 +11,7 @@ import { getStockbookByTicker } from './stockbook-index';
 import { resolveStock } from './stock-search';
 import { fetchLiveNseCmp } from './nse-cmp';
 import {
+  completeExternalMarginRows,
   fetchExternalMarginMetrics,
   partBNeedsExternal,
   type ExternalMarginMetrics,
@@ -371,33 +372,30 @@ function mergeExternalMarginPartB(
   ext: ExternalMarginMetrics,
   sector: string
 ): MarginVsHistoryPart {
-  const existingLabels = new Set(
-    partB.rows.filter((r) => r.todayPct != null || r.avg10yPct != null).map((r) => r.metric)
-  );
-  const added: MarginVsHistoryRow[] = [];
-  const add = (label: string, today: number | null, avg: number | null, lower = false) => {
+  const seed: MarginVsHistoryRow[] = [];
+  const push = (label: string, today: number | null, avg: number | null, lower = false) => {
     if (today == null && avg == null) return;
-    if (existingLabels.has(label)) return;
-    added.push(marginRowFromExternal(label, today, avg, lower));
-    existingLabels.add(label);
+    seed.push(marginRowFromExternal(label, today, avg, lower));
   };
 
   if (isFinancialSector(sector)) {
-    add('ROE', ext.ttm.roePct, null);
-    add('ROA', ext.ttm.roaPct, null);
+    push('ROE', ext.ttm.roePct, null);
+    push('ROA', ext.ttm.roaPct, null);
   }
-  add('EBITDA margin', ext.ttm.ebitdaMarginPct, ext.avg5yEbitdaPct);
-  add('Net margin', ext.ttm.netMarginPct, ext.avg5yNetPct);
-  add('Gross margin', ext.ttm.grossMarginPct, null);
-  add('Operating margin', ext.ttm.operatingMarginPct, null);
+  push('EBITDA margin', ext.ttm.ebitdaMarginPct, ext.avg5yEbitdaPct);
+  push('Net margin', ext.ttm.netMarginPct, ext.avg5yNetPct);
+  push('Gross margin', ext.ttm.grossMarginPct, ext.avg5yGrossPct);
+  push('Operating margin', ext.ttm.operatingMarginPct, ext.avg5yOperatingPct);
   if (!isFinancialSector(sector)) {
-    add('ROE', ext.ttm.roePct, null);
+    push('ROE', ext.ttm.roePct, null);
   }
 
-  const rows = [
-    ...partB.rows.filter((r) => r.todayPct != null || r.avg10yPct != null),
-    ...added,
-  ];
+  const paramRows = partB.rows.filter((r) => r.todayPct != null || r.avg10yPct != null);
+  const byMetric = new Map<string, MarginVsHistoryRow>();
+  for (const r of [...paramRows, ...seed]) {
+    byMetric.set(r.metric, r);
+  }
+  let rows = completeExternalMarginRows(Array.from(byMetric.values()), ext);
   if (rows.length === 0) return partB;
 
   const { primaryLabel, primaryDeltaPp } = recomputePartBPrimary(
@@ -580,6 +578,63 @@ function sectorMarginDrivers(sector: string, externalNote: string | null): Margi
     });
   }
   return drivers;
+}
+
+function enrichDriversWithLiveMetrics(
+  drivers: MarginDriverRow[],
+  partB: MarginVsHistoryPart,
+  partA: MarginHistoryPart
+): MarginDriverRow[] {
+  const net = partB.rows.find((r) => r.metric === 'Net margin');
+  const ebitda = partB.rows.find((r) => r.metric === 'EBITDA margin');
+  const primary = partB.rows.find((r) => r.metric === partB.primaryMetricLabel) ?? net ?? ebitda;
+  const trend =
+    partA.trendDirection === 'improving'
+      ? '5Y trend improving'
+      : partA.trendDirection === 'deteriorating'
+        ? '5Y trend compressing'
+        : partA.trendDirection === 'stable'
+          ? '5Y trend stable'
+          : '5Y trend unverified';
+
+  const snapshot =
+    primary?.todayPct != null && primary.avg10yPct != null && primary.deltaPp != null
+      ? `${primary.metric} ${primary.todayPct}% vs 5Y avg ${primary.avg10yPct}% (${primary.deltaPp > 0 ? '+' : ''}${primary.deltaPp} pp) · ${trend}`
+      : primary?.todayPct != null
+        ? `${primary.metric} ${primary.todayPct}% (Yahoo TTM) · ${trend}`
+        : null;
+
+  return drivers.map((d) => {
+    if (d.assessment?.trim()) {
+      return snapshot ? { ...d, assessment: `${d.assessment} · ${snapshot}` } : d;
+    }
+    return {
+      ...d,
+      assessment: snapshot ?? `${d.driver} — refresh from results / MARGIN Part C`,
+    };
+  });
+}
+
+function mergeQuarterlyRevenue(
+  quarters: QuarterlyMarginRow[],
+  external: ExternalMarginMetrics | null
+): QuarterlyMarginRow[] {
+  if (!external?.quarterly.length) return quarters;
+  if (quarters.length === 0) {
+    return external.quarterly.map((q) => ({
+      quarter: q.quarter,
+      revenue: q.revenue,
+      marginPct: q.marginPct,
+    }));
+  }
+  return quarters.map((q, i) => {
+    const extQ = external.quarterly[i] ?? external.quarterly[external.quarterly.length - 1];
+    return {
+      ...q,
+      revenue: q.revenue ?? extQ?.revenue ?? null,
+      marginPct: q.marginPct ?? extQ?.marginPct ?? null,
+    };
+  });
 }
 
 function synthesizeQuarterlyFromToday(
@@ -1032,6 +1087,16 @@ export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<
     );
   }
 
+  if (externalMargin && partB.rows.length > 0) {
+    const completedRows = completeExternalMarginRows(partB.rows, externalMargin);
+    const { primaryLabel, primaryDeltaPp } = recomputePartBPrimary(
+      completedRows,
+      sector,
+      partB.primaryMetricLabel
+    );
+    partB = { ...partB, rows: completedRows, primaryMetricLabel: primaryLabel, primaryDeltaPp };
+  }
+
   let partAYears = parsePartAFromMarkdown(marginMd);
   const marginYearsValid =
     partAYears.length >= 3 && partAYears.some((y) => y.ebitdaPct != null && y.ebitdaPct <= 45);
@@ -1079,6 +1144,7 @@ export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<
           ? '🔴 Pass-through weak — metric materially below 10Y norm'
           : '🟡 Monitor — sector driver template until MARGIN Part C filled with FACT';
   }
+  drivers = enrichDriversWithLiveMetrics(drivers, partB, partA);
   const partC = buildPartC(drivers, passThrough);
 
   let quarters = eqMd ? parseQuarterlyMargins(eqMd) : [];
@@ -1086,6 +1152,7 @@ export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<
     const primaryRow = partB.rows.find((r) => r.metric === partB.primaryMetricLabel) ?? partB.rows[0];
     quarters = synthesizeQuarterlyFromToday(primaryRow?.todayPct ?? partA.avgEbitdaPct, partB.primaryMetricLabel);
   }
+  quarters = mergeQuarterlyRevenue(quarters, externalMargin);
 
   let marginTrend: TrendSignal = 'unknown';
   let marginChangePp: number | null = null;

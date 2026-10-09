@@ -55,6 +55,15 @@ When StockBook has no EBITDA / ROE / OEY rows, the engine **pulls live data** (s
 
 Label live rows **FACT (Yahoo)** vs StockBook **FACT (AR)**. Moneycontrol / Trendlyne are **agent manual** deep-fill sources — not scraped in MVP (Yahoo covers most NSE names).
 
+**No dash rule (UI):** When Yahoo is used, the engine must fill:
+
+| Section | Columns never left blank when Yahoo has data |
+|---------|-----------------------------------------------|
+| Part A | Gross %, EBIT % (from grossProfit / operatingIncome / TTM backfill), EBITDA Δ (0 on first FY) |
+| Part B | Today, 10Y proxy avg, and Δ pp for EBITDA, Net, Gross, Operating (TTM + 5Y avg; TTM backfilled from latest annual if missing) |
+| Part C | Assessment text includes live margin snapshot (today vs 5Y avg) |
+| Part D | Revenue (₹ cr) from `earningsChart.quarterly` when available |
+
 Agent should still refresh `PARAMETERS` Block B from annual report after live pull.
 
 | Metric | Use |
