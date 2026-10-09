@@ -21,6 +21,11 @@ import {
 import { getBundledEarningsQualityMd, getBundledParametersMd } from './load-bundled-stockbook';
 import { parseParametersEpsCagrBasePct } from './parameters-assumptions';
 import { parseParametersMetrics } from './stock-calculator-engine';
+import {
+  earningsQualityNeedsExternal,
+  fetchExternalEarningsQualityMetrics,
+  type ExternalEarningsQualityMetrics,
+} from './earnings-quality-external';
 
 export type EvidenceType = 'FACT' | 'MANAGEMENT CLAIM' | 'HYPOTHESIS' | 'OUR ASSUMPTION' | 'UNVERIFIED';
 export type TrendSignal = 'improving' | 'stable' | 'deteriorating' | 'unknown';
@@ -88,6 +93,8 @@ export interface EarningsQualityResult {
   overallVerdict: string;
   overallTone: QualityTone;
   summaryLines: string[];
+  /** Set when Yahoo backfills Part A / growth when StockBook EQ file is missing. */
+  liveMetricsSource?: string | null;
 }
 
 export interface RunEarningsQualityInput {
@@ -363,11 +370,17 @@ function detectWarnings(
 function buildAnnualSignals(
   growth: EarningsQualityMetric[],
   profitability: EarningsQualityMetric[],
-  trends: QuarterlyTrendRow[]
+  trends: QuarterlyTrendRow[],
+  partA?: import('./earnings-quality-parts').EarningsQualityPartA
 ): { label: string; signal: '🟢' | '🟡' | '🔴' | '—' }[] {
-  const revCagr = growth.find((g) => g.id === 'rev_cagr_3y')?.numeric;
+  const revCagr =
+    growth.find((g) => g.id === 'rev_cagr_3y')?.numeric ??
+    growth.find((g) => g.id === 'rev_cagr_5y')?.numeric ??
+    partA?.revenueCagr5y ??
+    null;
   const vol = growth.find((g) => g.id === 'volume_growth')?.numeric;
-  const patCagr = growth.find((g) => g.id === 'pat_cagr')?.numeric;
+  const patCagr =
+    growth.find((g) => g.id === 'pat_cagr')?.numeric ?? partA?.patCagr5y ?? null;
   const roe = profitability.find((p) => p.id === 'roe')?.numeric;
 
   const sig = (n: number | null | undefined, good: number, warn: number): '🟢' | '🟡' | '🔴' | '—' => {
@@ -481,6 +494,56 @@ function enrichFromParameters(
     if (volMatch) {
       fill(growth, 'volume_growth', volMatch[1].trim(), parseNum(volMatch[1]));
     }
+    const uvgMatch = parametersMd.match(/\|\s*\*\*UVG[^|]*\*\*[^|\n]*\|\s*[^|]+\|\s*[^|]+\|\s*\*\*~?([\d.]+)%\*\*/i);
+    if (uvgMatch) {
+      fill(growth, 'volume_growth', `~${uvgMatch[1]}%`, parseNum(uvgMatch[1]));
+    }
+  }
+}
+
+function enrichFromExternal(
+  growth: EarningsQualityMetric[],
+  profitability: EarningsQualityMetric[],
+  cashQuality: EarningsQualityMetric[],
+  ext: ExternalEarningsQualityMetrics
+): void {
+  const fill = (
+    arr: EarningsQualityMetric[],
+    id: string,
+    value: string,
+    numeric: number | null,
+    evidence: EvidenceType = 'FACT'
+  ) => {
+    const row = arr.find((m) => m.id === id);
+    if (row && (row.value === '—' || row.numeric == null)) {
+      row.value = value;
+      row.numeric = numeric;
+      row.evidence = evidence;
+      row.note = ext.label;
+    }
+  };
+
+  if (ext.epsCagr5y != null) {
+    fill(growth, 'eps_cagr', `${ext.epsCagr5y}% (Yahoo 5Y)`, ext.epsCagr5y);
+  }
+  if (ext.patCagr5y != null) {
+    fill(growth, 'pat_cagr', `${ext.patCagr5y}% (Yahoo 5Y)`, ext.patCagr5y);
+  }
+  if (ext.revenueCagr5y != null) {
+    fill(growth, 'rev_cagr_5y', `${ext.revenueCagr5y}% (Yahoo 5Y)`, ext.revenueCagr5y);
+    fill(growth, 'rev_cagr_3y', `${ext.revenueCagr5y}% (Yahoo proxy)`, ext.revenueCagr5y);
+  }
+  if (ext.roePct != null) {
+    fill(profitability, 'roe', `${ext.roePct}%`, ext.roePct);
+  }
+  if (ext.cfoPatRatio != null) {
+    fill(
+      cashQuality,
+      'cfo_pat',
+      ext.cfoPatRatio.toFixed(2),
+      ext.cfoPatRatio,
+      ext.cfoPatRatio >= 0.8 ? 'FACT' : 'UNVERIFIED'
+    );
   }
 }
 
@@ -540,6 +603,16 @@ export async function runEarningsQualityAnalysis(
 
   enrichFromParameters(growth, profitability, cashQuality, quality, parametersMd);
 
+  let externalEq: ExternalEarningsQualityMetrics | null = null;
+  if (earningsQualityNeedsExternal(eqMd)) {
+    try {
+      externalEq = await fetchExternalEarningsQualityMetrics(resolved.ticker);
+      if (externalEq) enrichFromExternal(growth, profitability, cashQuality, externalEq);
+    } catch {
+      externalEq = null;
+    }
+  }
+
   let cmp: number | null = null;
   let cmpSource = 'Unavailable';
   try {
@@ -559,10 +632,10 @@ export async function runEarningsQualityAnalysis(
     }
   }
 
-  const quarterly = parseQuarterlySection(eqMd);
-  const quarterlyTrends = buildQuarterlyTrends(quarterly);
-  const warnings = detectWarnings(quarterly, quarterlyTrends);
-  const annualSignals = buildAnnualSignals(growth, profitability, quarterlyTrends);
+  let quarterly = parseQuarterlySection(eqMd);
+  if (quarterly.length < 2 && externalEq?.quarterly.length) {
+    quarterly = externalEq.quarterly;
+  }
 
   const cfoPatMetric = cashQuality.find((c) => c.id === 'cfo_pat');
 
@@ -579,6 +652,13 @@ export async function runEarningsQualityAnalysis(
       if (pe != null && pe > 0) latestEps = cmp / pe;
     }
   }
+  if (latestEps == null && externalEq?.latestEps != null) {
+    latestEps = externalEq.latestEps;
+  }
+  if (latestEps == null && cmp != null && parametersMd) {
+    const pe = parseParametersMetrics(parametersMd).ttmPe;
+    if (pe != null && pe > 0) latestEps = cmp / pe;
+  }
 
   const partA = buildPartA({
     eqMd,
@@ -586,11 +666,20 @@ export async function runEarningsQualityAnalysis(
     epsCagr5y:
       growth.find((g) => g.id === 'eps_cagr')?.numeric ??
       quality.baseEpsCagrPct ??
-      parseParametersEpsCagrBasePct(parametersMd),
-    patCagr5y: growth.find((g) => g.id === 'pat_cagr')?.numeric ?? null,
-    revCagr5y: growth.find((g) => g.id === 'rev_cagr_5y')?.numeric ?? null,
-    cfoPatRatio: cfoPatMetric?.numeric ?? null,
+      parseParametersEpsCagrBasePct(parametersMd) ??
+      externalEq?.epsCagr5y ??
+      null,
+    patCagr5y:
+      growth.find((g) => g.id === 'pat_cagr')?.numeric ?? externalEq?.patCagr5y ?? null,
+    revCagr5y:
+      growth.find((g) => g.id === 'rev_cagr_5y')?.numeric ?? externalEq?.revenueCagr5y ?? null,
+    cfoPatRatio: cfoPatMetric?.numeric ?? externalEq?.cfoPatRatio ?? null,
+    externalYears: externalEq?.annualYears,
   });
+
+  const quarterlyTrends = buildQuarterlyTrends(quarterly);
+  const warnings = detectWarnings(quarterly, quarterlyTrends);
+  const annualSignals = buildAnnualSignals(growth, profitability, quarterlyTrends, partA);
 
   const startingEps =
     latestEps ??
@@ -672,5 +761,6 @@ export async function runEarningsQualityAnalysis(
     overallVerdict: verdict,
     overallTone: toneFromVerdict(verdict),
     summaryLines,
+    liveMetricsSource: externalEq?.label ?? null,
   };
 }

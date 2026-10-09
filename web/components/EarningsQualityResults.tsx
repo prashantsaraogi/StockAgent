@@ -151,6 +151,13 @@ export function EarningsQualityResults({ data, recordId, savedAt }: EarningsQual
         {data.summaryLines.length > 0 && (
           <p className="muted small eq-summary-lines">{data.summaryLines.join(' · ')}</p>
         )}
+
+        {data.liveMetricsSource && (
+          <p className="muted small eq-live-metrics">
+            Live backfill: {data.liveMetricsSource} — add{' '}
+            <code>EARNINGS_QUALITY_{data.ticker}.md</code> Part A for FY-level FACT.
+          </p>
+        )}
       </section>
 
       {partA && (

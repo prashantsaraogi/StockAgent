@@ -191,9 +191,15 @@ export function buildPartA(input: {
   patCagr5y: number | null;
   revCagr5y: number | null;
   cfoPatRatio: number | null;
+  externalYears?: HistoricalYearRow[];
 }): EarningsQualityPartA {
   let years = parsePartAFromMarkdown(input.eqMd);
   let dataComplete = years.length >= 4;
+
+  if (years.length === 0 && input.externalYears && input.externalYears.length >= 2) {
+    years = input.externalYears.slice(-5);
+    dataComplete = years.length >= 4 && years.filter((y) => y.eps != null).length >= 3;
+  }
 
   if (years.length === 0) {
     years = synthesizePartAFromCagr(

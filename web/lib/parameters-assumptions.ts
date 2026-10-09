@@ -31,6 +31,16 @@ export function parseParametersEpsCagrBasePct(md: string | null | undefined): nu
     const n = parseFloat(horizonBold[1]);
     if (Number.isFinite(n)) return n;
   }
+  const horizonPctFirst = md.match(/\*\*([\d.]+)\s*%\*\*\s*EPS CAGR/i);
+  if (horizonPctFirst) {
+    const n = parseFloat(horizonPctFirst[1]);
+    if (Number.isFinite(n)) return n;
+  }
+  const horizonEmbedded = md.match(/EPS CAGR\s+\*\*([\d.]+)\s*%\*\*/i);
+  if (horizonEmbedded) {
+    const n = parseFloat(horizonEmbedded[1]);
+    if (Number.isFinite(n)) return n;
+  }
   const horizonPlain = md.match(/EPS CAGR\s+([\d.]+)\s*%/i);
   if (horizonPlain) {
     const n = parseFloat(horizonPlain[1]);

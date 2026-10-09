@@ -571,7 +571,7 @@ Modules: Framework report (Basic) · CAGR · PE · Earnings Quality · Margin ·
 
 **Part A:** Last 5 FY — Revenue, PAT, EPS, EPS YoY, CFO/PAT, quality signal. Write ## Part A table.
 **Part B inputs:** PARAMETERS Part 2 EPS CAGR (5Y) base (batch rows may be non-bold) · internal/external risk files.
-Web tab must show 5Y EPS CAGR from PARAMETERS when Part A table missing — synthesize rear-view EPS path.
+Web tab must show 5Y EPS CAGR from PARAMETERS + Yahoo income/cashflow when Part A table missing — synthesize or backfill rear-view EPS path (not blank).
 Current-year external overlay (e.g. oil price for auto) — full haircut FY27, taper outer years.
 
 Also refresh section D quarterly · cross-check revenue↑ profit↓.

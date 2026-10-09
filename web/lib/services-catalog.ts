@@ -560,7 +560,7 @@ Update dividend-fy26.json · regenerate portfolio-dividend-rank.md (YoC top 10 +
         categoryId: 'stock-calculator',
         title: 'Refresh Earnings Quality — Part A + Part B',
         description:
-          '5Y rear-view EPS table (Part A) + risk-adjusted forward path (Part B). Until Part A exists, web reads **PARAMETERS Part 2 EPS CAGR (5Y)** for 5Y EPS CAGR (not blank).',
+          '5Y rear-view EPS table (Part A) + risk-adjusted forward path (Part B). Until Part A exists, web backfills from **PARAMETERS Part 2 EPS CAGR (5Y)** + **Yahoo** income/cashflow history (5Y EPS CAGR, CFO/PAT, annual signals — not blank).',
         cadence: 'quarterly',
         actionType: 'prompt',
         channel: 'both',
