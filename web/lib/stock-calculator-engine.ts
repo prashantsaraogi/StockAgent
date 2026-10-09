@@ -134,32 +134,69 @@ export function parseParametersMetrics(md: string): Omit<
     else if (avgPeInRow) out.ttmPe = parseNum(avgPeInRow[1]);
   }
 
-  const fwdPeMatch = md.match(/\|\s*\*\*Forward P\/E\*\*[\s\S]*?\|\s*\*\*([\d.]+)x\*\*/i);
-  if (fwdPeMatch) out.forwardPe = parseNum(fwdPeMatch[1]);
+  const fwdLine = md.split('\n').find((l) => /\bForward P\/E\b/i.test(l) && l.trim().startsWith('|'));
+  if (fwdLine) {
+    const fwdPeCell =
+      fwdLine.match(/\*\*([\d.]+)\s*x\*\*/i) ??
+      fwdLine.match(/\|\s*([\d.]+)\s*x\s*\|/i);
+    if (fwdPeCell) out.forwardPe = parseNum(fwdPeCell[1]);
+  }
 
-  const fairPeMatch = md.match(
-    /\|\s*\*\*Forward fair P\/E\*\*[\s\S]*?\|\s*[\d.]+\s*x\s*\|\s*\*\*([\d.]+)x\*\*/i
+  const fairPeAssumption = md.match(
+    /\|\s*(?:\*\*)?Forward fair P\/E(?:\*\*)?[^|\n]*\|[^|\n]+\|\s*\*\*([\d.]+)\s*x\*\*/i
   );
-  if (fairPeMatch) out.forwardFairPe = parseNum(fairPeMatch[1]);
+  if (fairPeAssumption) out.forwardFairPe = parseNum(fairPeAssumption[1]);
 
   const normEpsMatch = md.match(
-    /\|\s*\*\*Normalized EPS[^\n]*\|\s*Rs\s*[\d.]+\s*\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i
+    /\|\s*(?:\*\*)?Normalized EPS[^\n]*(?:\*\*)?[^|\n]*\|\s*Rs\s*[\d.]+\s*\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i
   );
   if (normEpsMatch) {
     out.normalizedEps = parseNum(normEpsMatch[1]);
   } else {
-    const year0Eps = md.match(
-      /Normalized EPS \(Year 0\)[^\n]*\|\s*Rs\s*[\d.]+\s*\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i
-    );
+    const year0Line = md.split('\n').find((l) => /Normalized EPS \(Year 0\)/i.test(l));
+    const year0Eps = year0Line?.match(/\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i);
     if (year0Eps) out.normalizedEps = parseNum(year0Eps[1]);
   }
 
-  const fairPriceMatch = md.match(
-    /\|\s*\*\*5Y fair price \(base\)\*\*[\s\S]*?\|\s*Rs\s*[\d,]+\s*\|\s*Rs\s*[\d,]+\s*\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i
-  );
-  if (fairPriceMatch) out.framework5yFairPrice = parseNum(fairPriceMatch[1]);
+  const fairBlockLine = md.split('\n').find((l) => /5Y fair price \(base\)/i.test(l));
+  if (fairBlockLine) {
+    const blockFair = fairBlockLine.match(/\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i);
+    if (blockFair) out.framework5yFairPrice = parseNum(blockFair[1]);
+  }
+  if (out.framework5yFairPrice == null) {
+    const fairAssumption = md.match(
+      /\|\s*(?:\*\*)?5Y fair price(?:\*\*)?[^|\n]*\|[^|\n]+\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i
+    );
+    if (fairAssumption) out.framework5yFairPrice = parseNum(fairAssumption[1]);
+  }
+
+  if (out.framework5yFairPrice == null && out.forwardFairPe != null) {
+    const eps31 = md.match(
+      /\|\s*(?:\*\*)?EPS FY31(?:\*\*)?[^|\n]*\|[^|\n]+\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i
+    );
+    if (eps31) {
+      const eps = parseNum(eps31[1]);
+      if (eps) out.framework5yFairPrice = Math.round(eps * out.forwardFairPe);
+    }
+  }
 
   return out;
+}
+
+/** Fill forward P/E and 5Y fair when PARAMETERS rows use batch format or CMP moved. */
+export function enrichParametersPeMetrics(
+  metrics: Omit<PeSnapshot, 'cmp' | 'cmpSource'>,
+  cmp: number | null,
+  trailingEps: number | null
+): void {
+  if (metrics.normalizedEps == null && trailingEps != null && trailingEps > 0) {
+    metrics.normalizedEps = trailingEps;
+  }
+  if (cmp != null && cmp > 0 && metrics.normalizedEps != null && metrics.normalizedEps > 0) {
+    if (metrics.forwardPe == null) {
+      metrics.forwardPe = Math.round((cmp / metrics.normalizedEps) * 10) / 10;
+    }
+  }
 }
 
 /** Fill missing TTM/forward P/E from live quote + normalized EPS @ CMP. */

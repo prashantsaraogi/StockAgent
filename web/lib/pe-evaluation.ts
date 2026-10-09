@@ -2,7 +2,7 @@ import { readStockTabContent } from './content';
 import { getStockbookByTicker } from './stockbook-index';
 import { resolveStock } from './stock-search';
 import { fetchLiveNseCmp } from './nse-cmp';
-import { parseParametersMetrics } from './stock-calculator-engine';
+import { enrichParametersPeMetrics, parseParametersMetrics } from './stock-calculator-engine';
 import { getBundledParametersMd } from './load-bundled-stockbook';
 import {
   parseForwardGrowthTab,
@@ -106,6 +106,8 @@ export async function loadPeEvaluation(
       cmpSource = 'PARAMETERS file';
     }
   }
+
+  enrichParametersPeMetrics(metrics, cmp, trailingEps);
 
   const histRef = resolve10yPeReference(metrics);
   const premiumTo10yPct =

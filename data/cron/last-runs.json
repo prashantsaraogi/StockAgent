@@ -4,15 +4,15 @@
     "daily-market-pack": {
       "action": "daily-market-pack",
       "trigger": "cli",
-      "startedAt": "2026-10-08T02:56:21.601Z",
-      "finishedAt": "2026-10-08T02:56:24.888Z",
+      "startedAt": "2026-10-09T02:57:14.171Z",
+      "finishedAt": "2026-10-09T02:57:16.215Z",
       "ok": true,
       "summary": "3/3 steps OK",
       "steps": [
         {
           "action": "refresh-portfolio-cmp",
           "ok": true,
-          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-08",
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-09",
           "details": {
             "failed": [],
             "updated": 3
@@ -23,7 +23,7 @@
           "ok": true,
           "summary": "3/3 holdings may need Q3 FY27 results refresh",
           "details": {
-            "scannedAt": "2026-10-08",
+            "scannedAt": "2026-10-09",
             "expectedQuarter": "Q3 FY27",
             "items": [
               {
@@ -57,15 +57,78 @@
         {
           "action": "news-today",
           "ok": true,
-          "summary": "News summary written for 2026-10-08",
+          "summary": "News summary written for 2026-10-09",
           "details": {
-            "newsWebPath": "/journal/news/2026/10/08"
+            "newsWebPath": "/journal/news/2026/10/09"
           }
         }
       ]
     }
   },
   "history": [
+    {
+      "action": "daily-market-pack",
+      "trigger": "cli",
+      "startedAt": "2026-10-09T02:57:14.171Z",
+      "finishedAt": "2026-10-09T02:57:16.215Z",
+      "ok": true,
+      "summary": "3/3 steps OK",
+      "steps": [
+        {
+          "action": "refresh-portfolio-cmp",
+          "ok": true,
+          "summary": "CMP refreshed for 3/3 holdings · cache 2026-10-09",
+          "details": {
+            "failed": [],
+            "updated": 3
+          }
+        },
+        {
+          "action": "scan-quarter-results",
+          "ok": true,
+          "summary": "3/3 holdings may need Q3 FY27 results refresh",
+          "details": {
+            "scannedAt": "2026-10-09",
+            "expectedQuarter": "Q3 FY27",
+            "items": [
+              {
+                "ticker": "ITC",
+                "company": "ITC",
+                "lastMention": "Q3 FY26",
+                "expectedQuarter": "Q3 FY27",
+                "stale": true,
+                "reason": "No Q3 FY27 mention — last seen: Q3 FY26"
+              },
+              {
+                "ticker": "MARUTI",
+                "company": "Maruti Suzuki",
+                "lastMention": "Q1 FY27",
+                "expectedQuarter": "Q3 FY27",
+                "stale": true,
+                "reason": "No Q3 FY27 mention — last seen: Q1 FY27"
+              },
+              {
+                "ticker": "MAXHEALTH",
+                "company": "Max Healthcare",
+                "lastMention": "Q4 FY27",
+                "expectedQuarter": "Q3 FY27",
+                "stale": true,
+                "reason": "No Q3 FY27 mention — last seen: Q4 FY27"
+              }
+            ],
+            "staleCount": 3
+          }
+        },
+        {
+          "action": "news-today",
+          "ok": true,
+          "summary": "News summary written for 2026-10-09",
+          "details": {
+            "newsWebPath": "/journal/news/2026/10/09"
+          }
+        }
+      ]
+    },
     {
       "action": "daily-market-pack",
       "trigger": "cli",
@@ -1187,41 +1250,6 @@
           "summary": "News summary written for 2026-09-09",
           "details": {
             "newsWebPath": "/journal/news/2026/09/09"
-          }
-        }
-      ]
-    },
-    {
-      "action": "daily-market-pack",
-      "trigger": "services-ui",
-      "startedAt": "2026-09-08T09:29:19.626Z",
-      "finishedAt": "2026-09-08T09:29:45.718Z",
-      "ok": false,
-      "summary": "2/3 steps completed",
-      "steps": [
-        {
-          "action": "refresh-portfolio-cmp",
-          "ok": true,
-          "summary": "CMP refreshed for 50/51 holdings · cache 2026-09-08",
-          "details": {
-            "failed": [
-              "RAAJINFRA"
-            ],
-            "updated": 50
-          }
-        },
-        {
-          "action": "scan-quarter-results",
-          "ok": false,
-          "summary": "",
-          "error": "String.prototype.matchAll called with a non-global RegExp argument"
-        },
-        {
-          "action": "news-today",
-          "ok": true,
-          "summary": "News summary written for 2026-09-08",
-          "details": {
-            "newsWebPath": "/journal/news/2026/09/08"
           }
         }
       ]

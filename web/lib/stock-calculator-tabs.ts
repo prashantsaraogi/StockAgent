@@ -98,8 +98,9 @@ function extractQuickRead(md: string, label: string): string | null {
 }
 
 function extractAssumptionCell(md: string, label: string, column: 'base' | 'pessimistic' | 'optimistic'): string | null {
+  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const rowRe = new RegExp(
-    `\\|\\s*\\*\\*${label}[^|]*\\*\\*[^\\n]*\\|([^|]+)\\|([^|]+)\\|([^|]+)\\|`,
+    `\\|\\s*(?:\\*\\*)?${escaped}(?:\\*\\*)?[^\\n]*\\|([^|]+)\\|([^|]+)\\|([^|]+)\\|`,
     'i'
   );
   const m = md.match(rowRe);
@@ -164,9 +165,11 @@ export function parseForwardGrowthTab(parametersMd: string | null): ForwardGrowt
     /\|\s*\*\*Implied 5Y price CAGR\*\*[\s\S]*?\|\s*[^|]+\|\s*[^|]+\|\s*[^|]+\|\s*[^|]+\|\s*\*\*\+?([\d.]+\s*%)\*\*/i
   );
 
-  const fairPrice = md.match(
-    /\|\s*\*\*5Y fair price \(base\)\*\*[\s\S]*?\|\s*[^|]+\|\s*[^|]+\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i
-  );
+  const fairPrice =
+    md.match(
+      /\|[^|\n]*5Y fair price \(base\)[^\n]*\|\s*[^|]+\|\s*[^|]+\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i
+    ) ??
+    md.match(/\|\s*(?:\*\*)?5Y fair price(?:\*\*)?\s*\|[^|\n]+\|\s*\*\*Rs\s*([\d,]+(?:\.\d+)?)\*\*/i);
 
   const forwardPrem = md.match(
     /\|\s*\*\*Premium to forward IV\*\*[\s\S]*?\|\s*\*\*([^*]+?)\*\*/i

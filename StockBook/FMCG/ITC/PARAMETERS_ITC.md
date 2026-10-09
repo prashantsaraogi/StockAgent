@@ -1,6 +1,6 @@
 ﻿# ITC - Stock Parameters
 
-**Ticker:** ITC | **CMP:** Rs 265.7 (2026-10-08)
+**Ticker:** ITC | **CMP:** Rs 255 (2026-10-09)
 **Part 1:** FY2016-FY2025 (10Y rear-view) | **Part 2:** FY2027-FY2031 (5Y forward)
 
 > **Batch-generated** - Part 1 from 10Y P/E; Part 2 skeleton from sector EPS CAGR + fair P/E. Deep-fill Blocks B/C + forward thesis from annual report. Hand-built: HDFCBANK, MAXHEALTH, HINDUNILVR.
@@ -26,7 +26,7 @@
 | Parameter | What it measures | Link to stock price | 10Y avg (normal) | 10Y avg (incl. COVID) | **Today @ CMP** | **vs normal avg** | **Read** |
 |-----------|------------------|---------------------|------------------|----------------------|-----------------|-------------------|----------|
 | **Owner Earnings Yield** | EPS / price (Buffett) | **Higher = cheaper** | **3.8%** | 3.8% | **5.9%** | +55% | **Cheap** on yield |
-| **P/E** | Price / EPS | **Higher = pays more per Rs profit** | **26x** | 26x | **16.8x** | -35% | **Cheap** vs 10Y |
+| **P/E** | Price / EPS | **Higher = pays more per Rs profit** | **26x** | 26x | **16.1x** | -35% | **Cheap** vs 10Y |
 | **Intrinsic Value (@22x EPS)** | Normal fair value anchor | Price below IV = margin | **-** | - | **Rs 348** | - | Premium to IV **-23%** |
 | **Premium to IV (%)** | (Price - IV) / IV | **Negative = below fair value** | *Pending full pull* | *Pending* | **-23%** | - | From TTM EPS x 22 |
 | **Graham Number** | sqrt(22.5 x EPS x BVPS) | Max Graham fair price | *Pending* | *Pending* | *Pending* | - | Needs BVPS from AR |

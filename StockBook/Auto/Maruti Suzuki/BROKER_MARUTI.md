@@ -1,6 +1,6 @@
 # Maruti Suzuki - Broker Target Prices
 
-**Ticker:** MARUTI (NSE) | **CMP:** Rs 11,450 (2026-10-08) | **CMP date:** 2026-10-08  
+**Ticker:** MARUTI (NSE) | **CMP:** Rs 11,228 (2026-10-09) | **CMP date:** 2026-10-09  
 **Trendlyne consensus:** Rs 16983 (upside 26.96%) | 11 analysts  
 **As of:** 2026-08-29 | **Horizon:** ~12-month broker targets (typical)
 
@@ -12,13 +12,13 @@ Cross-ref: `BROKER-TARGET-FRAMEWORK.md` | `summary-analysis.md` | `.cursor/portf
 
 | Broker | Date | Reco | Target (Rs) | Upside % | Source |
 |--------|------|------|------------:|---------:|--------|
-| Geojit BNP Paribas | 2025-11-14 | 17580 | 17,580 | +53.5% | Trendlyne |
-| Deven Choksey | 2026-04-29 | 17315 | 17,315 | +51.2% | Trendlyne |
-| Motilal Oswal | 2026-07-31 | 17064 | 17,064 | +49% | Trendlyne |
-| ICICI Securities | 2026-04-29 | 16750 | 16,750 | +46.3% | Trendlyne |
-| BOB Capital | 2026-04-29 | 16734 | 16,734 | +46.1% | Trendlyne |
-| ICICI Direct | 2026-04-29 | 16150 | 16,150 | +41% | Trendlyne |
-| Axis Direct | 2026-04-29 | 14620 | 14,620 | +27.7% | Trendlyne |
+| Geojit BNP Paribas | 2025-11-14 | 17580 | 17,580 | +56.6% | Trendlyne |
+| Deven Choksey | 2026-04-29 | 17315 | 17,315 | +54.2% | Trendlyne |
+| Motilal Oswal | 2026-07-31 | 17064 | 17,064 | +52% | Trendlyne |
+| ICICI Securities | 2026-04-29 | 16750 | 16,750 | +49.2% | Trendlyne |
+| BOB Capital | 2026-04-29 | 16734 | 16,734 | +49% | Trendlyne |
+| ICICI Direct | 2026-04-29 | 16150 | 16,150 | +43.8% | Trendlyne |
+| Axis Direct | 2026-04-29 | 14620 | 14,620 | +30.2% | Trendlyne |
 **Street avg (listed brokers):** â‚¹16602 | **Upside vs CMP:** 24.1% | **Brokers counted:** 7
 ---
 
