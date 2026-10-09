@@ -87,12 +87,12 @@ export function MarginAnalysisResults({ data, recordId, savedAt }: MarginAnalysi
               <span className="muted small">{data.cmpSource}</span>
             </div>
             <div className="pe-eval-metric">
-              <span className="pe-eval-label">EBITDA vs 10Y</span>
+              <span className="pe-eval-label">{data.partB.primaryMetricLabel} vs 10Y</span>
               <strong>{fmtPp(data.partB.primaryDeltaPp)}</strong>
               <span className="muted small">{data.partB.verdict.slice(0, 40)}</span>
             </div>
             <div className="pe-eval-metric">
-              <span className="pe-eval-label">5Y avg EBITDA</span>
+              <span className="pe-eval-label">5Y avg {data.partA.primaryMetricLabel}</span>
               <strong>{fmtPct(data.partA.avgEbitdaPct)}</strong>
               <span className={`eq-trend-badge ${trendClass(data.partA.trendDirection)}`}>
                 {data.partA.trendLabel}
@@ -128,10 +128,7 @@ export function MarginAnalysisResults({ data, recordId, savedAt }: MarginAnalysi
         </div>
 
         {data.partA.years.length === 0 ? (
-          <p className="muted">
-            No 5Y margin history. Add <code>## Part A — Five-year margin history</code> to{' '}
-            <code>MARGIN_{data.ticker}.md</code>.
-          </p>
+          <p className="muted">No 5Y margin history could be derived — refresh PARAMETERS and MARGIN file.</p>
         ) : (
           <>
             {!data.partA.dataComplete && (

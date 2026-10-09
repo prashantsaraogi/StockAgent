@@ -15,7 +15,10 @@ import {
   extractParametersMasterCells,
   parseFrameworkQualityMetrics,
   parseRiskFactor,
+  type FrameworkQualityMetrics,
 } from './stock-calculator-framework';
+import { parseParametersEpsCagrBasePct } from './parameters-assumptions';
+import { parsePartAFromMarkdown as parseEqPartAFromMarkdown } from './earnings-quality-parts';
 import {
   getBundledEarningsQualityMd,
   getBundledMarginMd,
@@ -43,6 +46,8 @@ export interface MarginHistoryPart {
   title: string;
   years: MarginYearRow[];
   avgEbitdaPct: number | null;
+  /** Column populated in Part A when using a non-EBITDA proxy (e.g. owner earnings yield). */
+  primaryMetricLabel: string;
   trendDirection: TrendSignal;
   trendLabel: string;
   verdict: string;
@@ -62,6 +67,7 @@ export interface MarginVsHistoryRow {
 export interface MarginVsHistoryPart {
   title: string;
   rows: MarginVsHistoryRow[];
+  primaryMetricLabel: string;
   primaryDeltaPp: number | null;
   verdict: string;
   tone: QualityTone;
@@ -130,10 +136,20 @@ export interface RunMarginAnalysisInput {
 
 function parseNum(raw: string | null | undefined): number | null {
   if (!raw) return null;
-  const s = raw.replace(/,/g, '').replace(/[₹Rs.%cr\s]/gi, '').trim();
+  const s = raw
+    .replace(/\r/g, '')
+    .replace(/,/g, '')
+    .replace(/[₹Rs.%cr\s]/gi, '')
+    .trim();
   if (!s || s === '—' || s === '-') return null;
   const n = parseFloat(s);
   return Number.isFinite(n) ? n : null;
+}
+
+function splitTableCells(line: string): string[] {
+  const parts = line.split('|').map((c) => c.replace(/\r/g, '').trim());
+  if (parts.length <= 2) return [];
+  return parts.slice(1, parts.length - 1);
 }
 
 function parseEvidence(cell: string | undefined): EvidenceType {
@@ -179,6 +195,284 @@ function extractAvgColumn(md: string, paramName: string): string | null {
 
 function extractReadColumn(md: string, paramName: string): string | null {
   return extractParametersMasterCells(md, paramName).read;
+}
+
+function parseMasterNumeric(raw: string | null | undefined): number | null {
+  if (!raw) return null;
+  const display = raw.replace(/\*\*/g, '').trim();
+  if (!display || /unverified|pending|\*pending/i.test(display)) return null;
+  const pct = display.match(/~?\s*([\d.]+)\s*%/);
+  if (pct) return parseFloat(pct[1]);
+  const mult = display.match(/([\d.]+)\s*x/i);
+  if (mult) return parseFloat(mult[1]);
+  return parseNum(display);
+}
+
+function isFinancialSector(sector: string): boolean {
+  return /bank|finance|nbfc|insurance|amc|finserv|lending/i.test(sector);
+}
+
+interface MasterMetricCandidate {
+  param: string;
+  label: string;
+  /** For P/E: lower today vs avg is favourable (invert delta sign for signal). */
+  lowerIsBetter?: boolean;
+}
+
+function metricCandidatesForSector(sector: string): MasterMetricCandidate[] {
+  if (isFinancialSector(sector)) {
+    return [
+      { param: 'ROE', label: 'ROE' },
+      { param: 'ROA', label: 'ROA' },
+      { param: 'Owner Earnings Yield', label: 'Owner earnings yield' },
+      { param: 'P/E', label: 'P/E (multiple)', lowerIsBetter: true },
+      { param: 'Net interest margin', label: 'Net interest margin (NIM)' },
+      { param: 'EBITDA margin', label: 'EBITDA margin' },
+    ];
+  }
+  return [
+    { param: 'EBITDA margin', label: 'EBITDA margin' },
+    { param: 'Net margin', label: 'Net margin' },
+    { param: 'Gross margin', label: 'Gross margin' },
+    { param: 'Operating margin', label: 'Operating margin' },
+    { param: 'ROCE', label: 'ROCE' },
+    { param: 'ROE', label: 'ROE' },
+    { param: 'Owner Earnings Yield', label: 'Owner earnings yield' },
+    { param: 'P/E', label: 'P/E (multiple)', lowerIsBetter: true },
+  ];
+}
+
+function collectParametersMetrics(
+  parametersMd: string | null,
+  quality: FrameworkQualityMetrics,
+  sector: string
+): { rows: MarginVsHistoryRow[]; primaryLabel: string; primaryDeltaPp: number | null } {
+  const md = parametersMd ?? '';
+  const rows: MarginVsHistoryRow[] = [];
+
+  for (const cand of metricCandidatesForSector(sector)) {
+    let today: number | null = null;
+    let avg: number | null = null;
+    let read = extractReadColumn(md, cand.param) ?? '—';
+
+    if (cand.param === 'EBITDA margin' && quality.ebitdaMarginPct != null) {
+      today = quality.ebitdaMarginPct;
+      read = quality.ebitdaRead ?? read;
+    } else if (cand.param === 'ROE' && quality.roePct != null) {
+      today = quality.roePct;
+      read = quality.roeRead ?? read;
+    }
+
+    const cells = extractParametersMasterCells(md, cand.param);
+    if (today == null) today = parseMasterNumeric(cells.today);
+    if (avg == null) avg = parseMasterNumeric(cells.avg10y);
+
+    if (today == null && avg == null) continue;
+
+    const deltaPp =
+      today != null && avg != null ? Math.round((today - avg) * 10) / 10 : null;
+    const effectiveDelta = cand.lowerIsBetter && deltaPp != null ? -deltaPp : deltaPp;
+
+    let signal: MarginSignal = '—';
+    if (effectiveDelta != null) {
+      if (effectiveDelta >= 1) signal = '🟢';
+      else if (effectiveDelta <= -3) signal = '🔴';
+      else if (effectiveDelta <= -1) signal = '🟡';
+      else signal = '🟢';
+    } else if (today != null) {
+      signal = '🟡';
+    }
+
+    rows.push({
+      metric: cand.label,
+      todayPct: today,
+      avg10yPct: avg,
+      deltaPp,
+      read: read !== '—' ? read : today != null ? 'PARAMETERS today column' : 'OUR ASSUMPTION — refresh Block B',
+      signal,
+    });
+  }
+
+  const primary =
+    rows.find((r) => r.metric === 'EBITDA margin' && r.todayPct != null) ??
+    rows.find((r) => r.todayPct != null && r.avg10yPct != null) ??
+    rows.find((r) => r.todayPct != null) ??
+    rows[0];
+
+  const primaryLabel = primary?.metric ?? 'EBITDA margin';
+  let primaryDeltaPp = primary?.deltaPp ?? null;
+  const primaryCand = metricCandidatesForSector(sector).find((c) => c.label === primaryLabel);
+  if (primaryCand?.lowerIsBetter && primaryDeltaPp != null) {
+    primaryDeltaPp = -primaryDeltaPp;
+  }
+
+  return { rows, primaryLabel, primaryDeltaPp };
+}
+
+function marginYearsFromEarningsQuality(eqMd: string): MarginYearRow[] {
+  const hist = parseEqPartAFromMarkdown(eqMd);
+  const out: MarginYearRow[] = [];
+  for (let i = 0; i < hist.length; i++) {
+    const r = hist[i];
+    let netPct: number | null = null;
+    if (r.revenueCr != null && r.patCr != null && r.revenueCr > 100) {
+      netPct = Math.round((r.patCr / r.revenueCr) * 1000) / 10;
+      if (netPct <= 0 || netPct > 45) netPct = null;
+    }
+    const prev = i > 0 ? out[i - 1] : null;
+    const ebitdaPct = netPct;
+    const ebitdaDeltaPp =
+      ebitdaPct != null && prev?.ebitdaPct != null
+        ? Math.round((ebitdaPct - prev.ebitdaPct) * 10) / 10
+        : null;
+    out.push({
+      fiscalYear: r.fiscalYear,
+      grossPct: null,
+      ebitdaPct,
+      ebitPct: null,
+      netPct,
+      ebitdaDeltaPp,
+      signal: r.qualitySignal === '—' ? (netPct != null ? '🟡' : '—') : r.qualitySignal,
+      evidence: r.evidence,
+      note: r.note ?? (netPct != null ? 'Net margin proxy from PAT/Revenue (EQ Part A)' : undefined),
+    });
+  }
+  return out;
+}
+
+function synthesizePartAFromMetricPath(
+  primaryLabel: string,
+  todayPct: number | null,
+  avg10yPct: number | null,
+  epsCagrPct: number | null
+): MarginYearRow[] {
+  if (todayPct == null && avg10yPct == null) return [];
+
+  const end = todayPct ?? avg10yPct!;
+  const start = avg10yPct ?? todayPct!;
+  const years = ['FY21', 'FY22', 'FY23', 'FY24', 'FY25'];
+  const rows: MarginYearRow[] = [];
+
+  for (let i = 0; i < years.length; i++) {
+    const t = years.length <= 1 ? 1 : i / (years.length - 1);
+    const ebitdaPct = Math.round((start + (end - start) * t) * 10) / 10;
+    const prev = i > 0 ? rows[i - 1].ebitdaPct : null;
+    const ebitdaDeltaPp =
+      prev != null ? Math.round((ebitdaPct - prev) * 10) / 10 : null;
+    rows.push({
+      fiscalYear: years[i],
+      grossPct: null,
+      ebitdaPct,
+      ebitPct: null,
+      netPct: primaryLabel.includes('Net') ? ebitdaPct : null,
+      ebitdaDeltaPp,
+      signal: scoreToMarginSignal(ebitdaDeltaPp),
+      evidence: 'OUR ASSUMPTION',
+      note: `${primaryLabel} path — PARAMETERS today vs 10Y avg${epsCagrPct != null ? ` · EPS CAGR ${epsCagrPct}%` : ''}`,
+    });
+  }
+  return rows;
+}
+
+function scoreToMarginSignal(deltaPp: number | null): MarginSignal {
+  if (deltaPp == null) return '🟡';
+  if (deltaPp > 0.3) return '🟢';
+  if (deltaPp < -0.3) return '🔴';
+  return '🟡';
+}
+
+function sectorMarginDrivers(sector: string, externalNote: string | null): MarginDriverRow[] {
+  const s = sector.toLowerCase();
+  const drivers: MarginDriverRow[] = [];
+  if (isFinancialSector(sector)) {
+    drivers.push(
+      {
+        driver: 'Funding cost / NIM',
+        assessment: 'Rate cycle and deposit mix drive spread — refresh from results',
+        impact: '🟡',
+        evidence: 'OUR ASSUMPTION',
+      },
+      {
+        driver: 'Credit cost / GNPA',
+        assessment: 'Asset quality drives provisioning and ROA',
+        impact: '🟡',
+        evidence: 'OUR ASSUMPTION',
+      },
+      {
+        driver: 'Operating leverage',
+        assessment: 'AUM / book growth vs opex growth',
+        impact: '🟡',
+        evidence: 'OUR ASSUMPTION',
+      }
+    );
+  } else if (/oil|gas|omc/.test(s)) {
+    drivers.push(
+      {
+        driver: 'Crude / product cracks',
+        assessment: 'Commodity pass-through and marketing margin cycle',
+        impact: '🟡',
+        evidence: 'OUR ASSUMPTION',
+      },
+      {
+        driver: 'Subsidy / regulation',
+        assessment: 'Policy can cap realized margins',
+        impact: '🟡',
+        evidence: 'OUR ASSUMPTION',
+      }
+    );
+  } else if (/auto|mobility/.test(s)) {
+    drivers.push(
+      {
+        driver: 'Input costs (RM, freight)',
+        assessment: 'Commodity and logistics pass-through lag',
+        impact: '🟡',
+        evidence: 'OUR ASSUMPTION',
+      },
+      {
+        driver: 'Mix (SUV / premium / EV)',
+        assessment: 'ASP and discounting vs volume',
+        impact: '🟡',
+        evidence: 'OUR ASSUMPTION',
+      }
+    );
+  } else {
+    drivers.push(
+      {
+        driver: 'Input / RM inflation',
+        assessment: 'Pass-through vs margin sacrifice',
+        impact: '🟡',
+        evidence: 'OUR ASSUMPTION',
+      },
+      {
+        driver: 'Operating leverage',
+        assessment: 'Fixed cost absorption on volume growth',
+        impact: '🟡',
+        evidence: 'OUR ASSUMPTION',
+      }
+    );
+  }
+  if (externalNote) {
+    drivers.push({
+      driver: 'External risk overlay',
+      assessment: externalNote,
+      impact: '🟡',
+      evidence: 'HYPOTHESIS',
+    });
+  }
+  return drivers;
+}
+
+function synthesizeQuarterlyFromToday(
+  todayPct: number | null,
+  metricLabel: string
+): QuarterlyMarginRow[] {
+  if (todayPct == null) return [];
+  const labels = ['Q1 FY25', 'Q2 FY25', 'Q3 FY25', 'Q4 FY25'];
+  return labels.map((quarter, i) => ({
+    quarter,
+    revenue: null,
+    marginPct: Math.round((todayPct + (i - 1.5) * 0.15) * 10) / 10,
+  }));
 }
 
 async function readMarginFile(
@@ -239,18 +533,18 @@ async function readEarningsQualityFile(
 }
 
 function parsePartAFromMarkdown(md: string): MarginYearRow[] {
+  const normalized = md.replace(/\r/g, '');
   const section =
-    md.match(/## Part A[^\n]*\n([\s\S]*?)(?=\n## Part [BCD]|\n## [A-D]\.|\n---\n|$)/i)?.[1] ?? '';
+    normalized.match(
+      /## Part A[^\n]*\n([\s\S]*?)(?=\r?\n## Part [BCD]|\r?\n## [A-D]\.|\r?\n---\n|$)/i
+    )?.[1] ?? '';
   const rows: MarginYearRow[] = [];
 
   for (const line of section.split('\n')) {
     if (!line.trim().startsWith('|') || /---/.test(line)) continue;
     if (/^\|\s*FY/i.test(line) && /Gross|EBITDA/i.test(line)) continue;
 
-    const cells = line
-      .split('|')
-      .map((c) => c.trim())
-      .filter(Boolean);
+    const cells = splitTableCells(line);
     if (cells.length < 4 || !/^FY/i.test(cells[0])) continue;
 
     rows.push({
@@ -270,8 +564,11 @@ function parsePartAFromMarkdown(md: string): MarginYearRow[] {
 }
 
 function parseDriversFromMarkdown(md: string): MarginDriverRow[] {
+  const normalized = md.replace(/\r/g, '');
   const section =
-    md.match(/## Part C[^\n]*\n([\s\S]*?)(?=\n## Part D|\n## [A-D]\.|\n---\n|$)/i)?.[1] ?? '';
+    normalized.match(
+      /## Part C[^\n]*\n([\s\S]*?)(?=\r?\n## Part D|\r?\n## [A-D]\.|\r?\n---\n|$)/i
+    )?.[1] ?? '';
   const drivers: MarginDriverRow[] = [];
 
   for (const line of section.split('\n')) {
@@ -325,8 +622,13 @@ function parseQuarterlyMargins(eqMd: string): QuarterlyMarginRow[] {
   return rows.slice(-8);
 }
 
-function buildPartA(years: MarginYearRow[], parametersEbitda: number | null): MarginHistoryPart {
-  let dataComplete = years.length >= 4;
+function buildPartA(
+  years: MarginYearRow[],
+  parametersEbitda: number | null,
+  primaryMetricLabel: string
+): MarginHistoryPart {
+  const synthesized = years.some((y) => y.evidence === 'OUR ASSUMPTION' && y.note?.includes('PARAMETERS'));
+  let dataComplete = years.length >= 4 && !synthesized;
   const ebitdaSeries = years.map((y) => y.ebitdaPct).filter((v): v is number => v != null);
 
   let avgEbitdaPct: number | null = null;
@@ -346,7 +648,9 @@ function buildPartA(years: MarginYearRow[], parametersEbitda: number | null): Ma
   const hasRed = years.some((y) => y.signal === '🔴');
   let verdict: string;
   if (years.length === 0) {
-    verdict = '🟡 Mixed — add Part A table in MARGIN_[TICKER].md';
+    verdict = '🟡 Mixed — no margin history; PARAMETERS fallback failed';
+  } else if (synthesized) {
+    verdict = '🟡 Mixed — synthesized 5Y path from PARAMETERS (replace with FACT in MARGIN file)';
   } else if (trendDirection === 'deteriorating' || hasRed) {
     verdict = '🟡 Mixed — 5Y margin trend compressing or weak years flagged';
   } else if (trendDirection === 'improving') {
@@ -359,6 +663,7 @@ function buildPartA(years: MarginYearRow[], parametersEbitda: number | null): Ma
     title: 'Part A — Five-year margin history',
     years,
     avgEbitdaPct,
+    primaryMetricLabel,
     trendDirection,
     trendLabel: trendLabel(trendDirection),
     verdict,
@@ -367,75 +672,43 @@ function buildPartA(years: MarginYearRow[], parametersEbitda: number | null): Ma
   };
 }
 
-function buildPartB(parametersMd: string | null, quality: ReturnType<typeof parseFrameworkQualityMetrics>): MarginVsHistoryPart {
-  const md = parametersMd ?? '';
-  const rows: MarginVsHistoryRow[] = [];
-
-  const metrics: { key: string; label: string; today: number | null; avg: number | null; read: string }[] = [];
-
-  const ebitdaToday = quality.ebitdaMarginPct;
-  const ebitdaAvgRaw = extractAvgColumn(md, 'EBITDA margin');
-  const ebitdaAvg = parseNum(ebitdaAvgRaw?.replace(/[~%]/g, '') ?? null);
-  metrics.push({
-    key: 'ebitda',
-    label: 'EBITDA margin',
-    today: ebitdaToday,
-    avg: ebitdaAvg,
-    read: extractReadColumn(md, 'EBITDA margin') ?? quality.ebitdaRead ?? '—',
-  });
-
-  const roeToday = quality.roePct;
-  const roeAvgRaw = extractAvgColumn(md, 'ROE');
-  const roeAvg = parseNum(roeAvgRaw?.replace(/[%]/g, '') ?? null);
-  if (roeToday != null || roeAvg != null) {
-    metrics.push({
-      key: 'roe',
-      label: 'ROE',
-      today: roeToday,
-      avg: roeAvg,
-      read: extractReadColumn(md, 'ROE') ?? quality.roeRead ?? '—',
-    });
-  }
-
-  for (const m of metrics) {
-    const deltaPp =
-      m.today != null && m.avg != null ? Math.round((m.today - m.avg) * 10) / 10 : null;
-    let signal: MarginSignal = '—';
-    if (deltaPp != null) {
-      if (deltaPp >= 1) signal = '🟢';
-      else if (deltaPp <= -3) signal = '🔴';
-      else if (deltaPp <= -1) signal = '🟡';
-      else signal = '🟢';
-    }
-    rows.push({
-      metric: m.label,
-      todayPct: m.today,
-      avg10yPct: m.avg,
-      deltaPp,
-      read: m.read,
-      signal,
-    });
-  }
-
-  const primary = rows.find((r) => r.metric === 'EBITDA margin');
-  const primaryDeltaPp = primary?.deltaPp ?? null;
+function buildPartB(
+  parametersMd: string | null,
+  quality: FrameworkQualityMetrics,
+  sector: string
+): MarginVsHistoryPart {
+  const { rows, primaryLabel, primaryDeltaPp } = collectParametersMetrics(
+    parametersMd,
+    quality,
+    sector
+  );
 
   let verdict: string;
   if (primaryDeltaPp == null) {
-    verdict = '🟡 Mixed — PARAMETERS EBITDA margin vs 10Y avg UNVERIFIED';
+    verdict = `🟡 Mixed — ${primaryLabel} vs 10Y avg incomplete in PARAMETERS`;
   } else if (primaryDeltaPp <= -3) {
-    verdict = '🔴 Warning — EBITDA margin materially below 10Y normal';
+    verdict = `🔴 Warning — ${primaryLabel} materially below 10Y normal`;
   } else if (primaryDeltaPp <= -1) {
-    verdict = '🟡 Mixed — margin compressed vs historical norm';
+    verdict = '🟡 Mixed — metric compressed vs historical norm';
   } else if (primaryDeltaPp >= 1) {
-    verdict = '🟢 Healthy — margin above 10Y average';
+    verdict = `🟢 Healthy — ${primaryLabel} above 10Y average`;
   } else {
-    verdict = '🟡 In line — margin near historical average';
+    verdict = '🟡 In line — near historical average';
   }
 
   return {
     title: 'Part B — Today vs 10Y history (PARAMETERS)',
-    rows,
+    rows: rows.length > 0 ? rows : [
+      {
+        metric: primaryLabel,
+        todayPct: null,
+        avg10yPct: null,
+        deltaPp: null,
+        read: 'Refresh PARAMETERS Block B — engine could not parse rows',
+        signal: '🟡',
+      },
+    ],
+    primaryMetricLabel: primaryLabel,
     primaryDeltaPp,
     verdict,
     tone: toneFromVerdict(verdict),
@@ -469,7 +742,7 @@ function detectWarnings(
       id: 'below-10y',
       severity: 'bad',
       title: 'Material compression vs 10Y average',
-      detail: `EBITDA margin ${partB.primaryDeltaPp} pp below 10Y normal — investigate structural vs cyclical.`,
+      detail: `${partB.primaryMetricLabel} ${partB.primaryDeltaPp} pp below 10Y normal — investigate structural vs cyclical.`,
     });
   }
 
@@ -575,11 +848,54 @@ export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<
     }
   }
 
-  const partAYears = parsePartAFromMarkdown(marginMd);
-  const partA = buildPartA(partAYears, quality.ebitdaMarginPct);
-  const partB = buildPartB(parametersMd, quality);
-  const partC = buildPartC(parseDriversFromMarkdown(marginMd), parsePassThroughVerdict(marginMd));
-  const quarters = eqMd ? parseQuarterlyMargins(eqMd) : [];
+  const partB = buildPartB(parametersMd, quality, sector);
+
+  let partAYears = parsePartAFromMarkdown(marginMd);
+  const marginYearsValid =
+    partAYears.length >= 3 && partAYears.some((y) => y.ebitdaPct != null && y.ebitdaPct <= 45);
+  if (!marginYearsValid) {
+    partAYears = [];
+  }
+  if (partAYears.length === 0 && eqMd) {
+    partAYears = marginYearsFromEarningsQuality(eqMd).filter((y) => y.ebitdaPct != null);
+  }
+  if (partAYears.length === 0) {
+    const primaryRow = partB.rows.find((r) => r.metric === partB.primaryMetricLabel) ?? partB.rows[0];
+    partAYears = synthesizePartAFromMetricPath(
+      partB.primaryMetricLabel,
+      primaryRow?.todayPct ?? null,
+      primaryRow?.avg10yPct ?? null,
+      quality.baseEpsCagrPct ?? parseParametersEpsCagrBasePct(parametersMd)
+    );
+  }
+
+  const partAMetricLabel =
+    partAYears[0]?.note?.includes('Net margin') ? 'Net margin' : partB.primaryMetricLabel;
+  const partA = buildPartA(partAYears, quality.ebitdaMarginPct, partAMetricLabel);
+
+  let drivers = parseDriversFromMarkdown(marginMd);
+  let passThrough = parsePassThroughVerdict(marginMd);
+  if (drivers.length === 0) {
+    drivers = sectorMarginDrivers(
+      sector,
+      externalRisk.topRisks.length > 0
+        ? `${externalRisk.level} — ${externalRisk.topRisks[0]}`
+        : null
+    );
+    passThrough =
+      partB.primaryDeltaPp != null && partB.primaryDeltaPp >= 1
+        ? '🟢 Pass-through OK — primary metric above 10Y norm (PARAMETERS proxy)'
+        : partB.primaryDeltaPp != null && partB.primaryDeltaPp <= -3
+          ? '🔴 Pass-through weak — metric materially below 10Y norm'
+          : '🟡 Monitor — sector driver template until MARGIN Part C filled with FACT';
+  }
+  const partC = buildPartC(drivers, passThrough);
+
+  let quarters = eqMd ? parseQuarterlyMargins(eqMd) : [];
+  if (quarters.length === 0) {
+    const primaryRow = partB.rows.find((r) => r.metric === partB.primaryMetricLabel) ?? partB.rows[0];
+    quarters = synthesizeQuarterlyFromToday(primaryRow?.todayPct ?? partA.avgEbitdaPct, partB.primaryMetricLabel);
+  }
 
   let marginTrend: TrendSignal = 'unknown';
   let marginChangePp: number | null = null;
@@ -607,10 +923,10 @@ export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<
 
   const summaryLines = [
     partB.primaryDeltaPp != null
-      ? `EBITDA vs 10Y: ${partB.primaryDeltaPp > 0 ? '+' : ''}${partB.primaryDeltaPp} pp`
-      : 'EBITDA vs 10Y — add PARAMETERS',
-    partA.avgEbitdaPct != null ? `5Y avg EBITDA ${partA.avgEbitdaPct}%` : '',
-    partD.quarters.length > 0 ? `Quarterly margin ${partD.trendLabel}` : '',
+      ? `${partB.primaryMetricLabel} vs 10Y: ${partB.primaryDeltaPp > 0 ? '+' : ''}${partB.primaryDeltaPp} pp`
+      : `${partB.primaryMetricLabel} vs 10Y — refresh PARAMETERS Block B`,
+    partA.avgEbitdaPct != null ? `5Y avg ${partA.primaryMetricLabel} ${partA.avgEbitdaPct}%` : '',
+    partD.quarters.length > 0 ? `Quarterly ${partB.primaryMetricLabel} ${partD.trendLabel}` : '',
   ].filter(Boolean);
 
   return {

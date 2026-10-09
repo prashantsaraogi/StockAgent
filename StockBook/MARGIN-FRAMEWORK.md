@@ -31,7 +31,16 @@ P/E and revenue growth alone miss **margin quality**: a stock can grow sales 20%
 
 Reads `PARAMETERS_[TICKER].md` master table **Today @ CMP** vs **10Y avg (normal)** (row layout: What · Link · 10Y avg normal · 10Y incl COVID · **Today** · vs · Read):
 
-**Required StockBook files for full tab:** `MARGIN_[TICKER].md` (Part A + Part C) and `EARNINGS_QUALITY_[TICKER].md` (section **D** quarterly table). Bundled at web build for production.
+**Mandatory UI rule:** Margin tab must show **values in Parts A–D** for every Analyze run — never blank hero metrics or empty Part B rows.
+
+Derivation order when `MARGIN_[TICKER].md` is missing:
+
+1. **Part B** — PARAMETERS master table: sector-aware metrics (EBITDA margin; banks/NBFC → ROE, ROA, **Owner earnings yield**, P/E vs 10Y)
+2. **Part A** — MARGIN file → EARNINGS_QUALITY Part A (PAT/Revenue net margin proxy) → **synthesized 5Y path** from Part B today vs 10Y avg (OUR ASSUMPTION)
+3. **Part C** — MARGIN drivers table → **sector driver template** + external-risk snippet
+4. **Part D** — EARNINGS_QUALITY section D → **4-quarter proxy** from Part B today metric
+
+Preferred StockBook files for FACT rows: `MARGIN_[TICKER].md` (Part A + Part C) and `EARNINGS_QUALITY_[TICKER].md` (section **D**). Bundled at web build for production.
 
 | Metric | Use |
 |--------|-----|

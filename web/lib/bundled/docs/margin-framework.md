@@ -29,12 +29,13 @@ P/E and revenue growth alone miss **margin quality**: a stock can grow sales 20%
 
 ### Part B — Today vs history (PARAMETERS lens)
 
-Reads `PARAMETERS_[TICKER].md` master table **Today @ CMP** vs **10Y avg (normal)**:
+Reads `PARAMETERS_[TICKER].md` master table **Today @ CMP** vs **10Y avg (normal)**. **Mandatory:** Parts A–D must show values for every ticker (sector-aware fallbacks when `MARGIN_[TICKER].md` is missing — banks/NBFC use owner earnings yield, ROE, P/E vs 10Y).
 
 | Metric | Use |
 |--------|-----|
 | EBITDA margin | Primary operating lens |
 | Gross / Net margin | When populated in PARAMETERS or MARGIN file |
+| ROE / ROA / owner earnings yield | NBFC, banks, insurers when EBITDA Block B pending |
 | ROE (DuPont) | Margin × turnover × leverage cross-check |
 
 **Verdict bands:**

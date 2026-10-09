@@ -640,14 +640,14 @@ StockBook/PE-EVALUATION-FRAMEWORK.md Part D.`,
         title: 'Margin Analysis — full module (Part A–D)',
         description:
           '5Y margin path · vs 10Y history · drivers/pass-through · quarterly compression flags.',
-        prompt: `{TICKER} — full Margin Analysis per MARGIN-FRAMEWORK.md.
+        prompt: `{TICKER} — full Margin Analysis per MARGIN-FRAMEWORK.md (Parts A–D must not be blank in web tab).
 
-Part A: 5Y Gross/EBITDA/EBIT/Net margins + signals
-Part B: Today @ CMP vs 10Y normal (PARAMETERS)
-Part C: Drivers + pass-through test (oil/RM, mix, discounting)
-Part D: 8-quarter margin trend from EARNINGS_QUALITY
+Part A: 5Y Gross/EBITDA/EBIT/Net margins + signals (or net margin from EQ Part A)
+Part B: Today @ CMP vs 10Y normal — EBITDA margin; NBFC/banks use ROE/ROA/owner earnings yield/P/E when Block B pending
+Part C: Drivers + pass-through test (oil/RM, mix, NIM/credit cost)
+Part D: 8-quarter margin trend from EARNINGS_QUALITY section D
 
-Flag volume↑ margin↓ · write MARGIN_{TICKER}.md · verify Margin Analysis tab.`,
+Replace OUR ASSUMPTION proxies with FACT · write MARGIN_{TICKER}.md · verify Margin Analysis tab.`,
         channel: 'both',
         framework: ['MARGIN-FRAMEWORK', 'EARNINGS-QUALITY-FRAMEWORK', 'PARAMETERS'],
         placeholders: ['{TICKER}'],
