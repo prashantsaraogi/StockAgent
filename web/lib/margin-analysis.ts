@@ -13,6 +13,7 @@ import { fetchLiveNseCmp } from './nse-cmp';
 import {
   completeExternalMarginRows,
   fetchExternalMarginMetrics,
+  fillPartDQuarterlyRevenue,
   partBNeedsExternal,
   type ExternalMarginMetrics,
 } from './margin-external-metrics';
@@ -639,13 +640,13 @@ function mergeQuarterlyRevenue(
 
 function synthesizeQuarterlyFromToday(
   todayPct: number | null,
-  metricLabel: string
+  revenuePerQuarterCr: number | null
 ): QuarterlyMarginRow[] {
   if (todayPct == null) return [];
   const labels = ['Q1 FY25', 'Q2 FY25', 'Q3 FY25', 'Q4 FY25'];
   return labels.map((quarter, i) => ({
     quarter,
-    revenue: null,
+    revenue: revenuePerQuarterCr,
     marginPct: Math.round((todayPct + (i - 1.5) * 0.15) * 10) / 10,
   }));
 }
@@ -1150,9 +1151,19 @@ export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<
   let quarters = eqMd ? parseQuarterlyMargins(eqMd) : [];
   if (quarters.length === 0) {
     const primaryRow = partB.rows.find((r) => r.metric === partB.primaryMetricLabel) ?? partB.rows[0];
-    quarters = synthesizeQuarterlyFromToday(primaryRow?.todayPct ?? partA.avgEbitdaPct, partB.primaryMetricLabel);
+    const revPerQ =
+      externalMargin?.ttmRevenueCr != null
+        ? Math.round((externalMargin.ttmRevenueCr / 4) * 10) / 10
+        : externalMargin?.latestAnnualRevenueCr != null
+          ? Math.round((externalMargin.latestAnnualRevenueCr / 4) * 10) / 10
+          : null;
+    quarters = synthesizeQuarterlyFromToday(
+      primaryRow?.todayPct ?? partA.avgEbitdaPct,
+      revPerQ
+    );
   }
   quarters = mergeQuarterlyRevenue(quarters, externalMargin);
+  quarters = fillPartDQuarterlyRevenue(quarters, externalMargin);
 
   let marginTrend: TrendSignal = 'unknown';
   let marginChangePp: number | null = null;

@@ -33,6 +33,8 @@ export interface ExternalMarginMetrics {
   avg5yOperatingPct: number | null;
   avg5yEbitPct: number | null;
   quarterly: ExternalQuarterRow[];
+  ttmRevenueCr: number | null;
+  latestAnnualRevenueCr: number | null;
 }
 
 function pctFromRatio(n: number | null): number | null {
@@ -122,6 +124,57 @@ function enrichHistoryWithTtm(rows: MarginYearRow[], ttm: ExternalMarginTtm): Ma
   }));
 }
 
+/** Yahoo `.NS` amounts are usually full INR — convert to ₹ crore (÷ 1e7). */
+function yahooRawToCr(raw: number): number {
+  if (raw >= 100_000) return Math.round((raw / 1e7) * 10) / 10;
+  return Math.round(raw * 10) / 10;
+}
+
+function quarterLabelFromDate(dateStr: string): string {
+  const d = dateStr.match(/(20\d{2})-(\d{2})/);
+  if (!d) return dateStr || 'Q—';
+  const month = parseInt(d[2], 10);
+  const fyYear = month >= 4 ? parseInt(d[1], 10) + 1 : parseInt(d[1], 10);
+  const q = Math.ceil(((month + 8) % 12) / 3) || 4;
+  return `Q${q} FY${String(fyYear).slice(-2)}`;
+}
+
+function revenueCrFromPatAndMargin(patCr: number, netMarginPct: number | null): number | null {
+  if (netMarginPct == null || netMarginPct <= 0 || netMarginPct > 95) return null;
+  return Math.round((patCr / (netMarginPct / 100)) * 10) / 10;
+}
+
+function quartersFromIncomeStatementQuarterly(
+  summary: Record<string, unknown>,
+  netMarginPct: number | null
+): ExternalQuarterRow[] {
+  const mod = summary.incomeStatementHistoryQuarterly as
+    | { incomeStatementHistory?: Record<string, unknown>[] }
+    | undefined;
+  const stmts = mod?.incomeStatementHistory ?? [];
+  const out: ExternalQuarterRow[] = [];
+
+  for (const stmt of stmts.slice(0, 8)) {
+    const revRaw = rawNum(stmt.totalRevenue);
+    const netRaw = rawNum(stmt.netIncome);
+    let revenue = revRaw != null ? yahooRawToCr(revRaw) : null;
+    const patCr = netRaw != null ? yahooRawToCr(netRaw) : null;
+    if (revenue == null && patCr != null) {
+      revenue = revenueCrFromPatAndMargin(patCr, netMarginPct);
+    }
+    let mPct = netMarginPct;
+    if (patCr != null && revenue != null && revenue > 0) {
+      mPct = Math.round((patCr / revenue) * 1000) / 10;
+    }
+    const endDate = stmt.endDate as { fmt?: string } | undefined;
+    const label = quarterLabelFromDate(endDate?.fmt ?? '');
+    out.push({ quarter: label, revenue, marginPct: mPct });
+  }
+
+  out.reverse();
+  return out.slice(-8);
+}
+
 function quartersFromYahoo(summary: Record<string, unknown>, marginPct: number | null): ExternalQuarterRow[] {
   const chart = summary.earningsChart as
     | { quarterly?: { date?: string; revenue?: unknown; earnings?: unknown }[] }
@@ -131,25 +184,84 @@ function quartersFromYahoo(summary: Record<string, unknown>, marginPct: number |
 
   for (const q of quarterly.slice(-8)) {
     const revRaw = rawNum(q.revenue);
-    const revenue =
-      revRaw != null
-        ? revRaw > 1_000_000
-          ? Math.round(revRaw / 10_000_000) / 10
-          : Math.round(revRaw / 10) / 10
-        : null;
-    const earn = rawNum(q.earnings);
+    const earnRaw = rawNum(q.earnings);
+    let revenue = revRaw != null ? yahooRawToCr(revRaw) : null;
+    const patCr = earnRaw != null ? yahooRawToCr(earnRaw) : null;
+    if (revenue == null && patCr != null) {
+      revenue = revenueCrFromPatAndMargin(patCr, marginPct);
+    }
     let mPct = marginPct;
-    if (earn != null && revRaw != null && revRaw > 0) {
-      mPct = Math.round((earn / revRaw) * 1000) / 10;
+    if (patCr != null && revenue != null && revenue > 0) {
+      mPct = Math.round((patCr / revenue) * 1000) / 10;
     }
     const dateStr = typeof q.date === 'string' ? q.date : '';
-    const d = dateStr.match(/(20\d{2})-(\d{2})/);
-    const label = d ? `Q${Math.ceil(parseInt(d[2], 10) / 3)} FY${d[1].slice(-2)}` : dateStr || 'Q—';
-
-    out.push({ quarter: label, revenue, marginPct: mPct });
+    out.push({ quarter: quarterLabelFromDate(dateStr), revenue, marginPct: mPct });
   }
 
-  return out.slice(-8);
+  if (out.length >= 2 && out.some((r) => r.revenue != null)) return out;
+
+  const fromIsq = quartersFromIncomeStatementQuarterly(summary, marginPct);
+  if (fromIsq.length >= 2) return fromIsq;
+
+  return out;
+}
+
+function fillMissingQuarterlyRevenue(
+  rows: ExternalQuarterRow[],
+  netMarginPct: number | null,
+  ttmRevenueCr: number | null,
+  latestAnnualRevenueCr: number | null
+): ExternalQuarterRow[] {
+  const runRate =
+    ttmRevenueCr != null
+      ? Math.round((ttmRevenueCr / 4) * 10) / 10
+      : latestAnnualRevenueCr != null
+        ? Math.round((latestAnnualRevenueCr / 4) * 10) / 10
+        : null;
+
+  return rows.map((q) => {
+    if (q.revenue != null && q.revenue > 0) return q;
+    if (runRate != null) {
+      return {
+        ...q,
+        revenue: runRate,
+      };
+    }
+    return q;
+  });
+}
+
+/** Ensure Part D rows always have revenue when Yahoo gave TTM or quarterly PAT path. */
+export function fillPartDQuarterlyRevenue(
+  quarters: { quarter: string; revenue: number | null; marginPct: number | null }[],
+  ext: ExternalMarginMetrics | null
+): typeof quarters {
+  if (!ext) return quarters;
+  const netM = ext.ttm.netMarginPct;
+  const runRate =
+    ext.ttmRevenueCr != null
+      ? Math.round((ext.ttmRevenueCr / 4) * 10) / 10
+      : ext.latestAnnualRevenueCr != null
+        ? Math.round((ext.latestAnnualRevenueCr / 4) * 10) / 10
+        : null;
+
+  const extByIndex = ext.quarterly;
+
+  return quarters.map((q, i) => {
+    if (q.revenue != null && q.revenue > 0) return q;
+    const extQ = extByIndex[i] ?? extByIndex[extByIndex.length - 1];
+    if (extQ?.revenue != null && extQ.revenue > 0) {
+      return { ...q, revenue: extQ.revenue, marginPct: q.marginPct ?? extQ.marginPct };
+    }
+    if (runRate != null) {
+      return { ...q, revenue: runRate };
+    }
+    if (q.marginPct != null && netM != null && ext.latestAnnualRevenueCr != null) {
+      const rev = Math.round(((ext.latestAnnualRevenueCr / 4) * 10) / 10);
+      return { ...q, revenue: rev };
+    }
+    return q;
+  });
 }
 
 function avg(nums: number[]): number | null {
@@ -164,7 +276,7 @@ export async function fetchExternalMarginMetrics(
 ): Promise<ExternalMarginMetrics | null> {
   const summary = await fetchYahooQuoteSummary(
     nseSymbol,
-    'financialData,defaultKeyStatistics,incomeStatementHistory,earningsChart'
+    'financialData,defaultKeyStatistics,incomeStatementHistory,incomeStatementHistoryQuarterly,earningsChart'
   );
   if (!summary) return null;
 
@@ -203,7 +315,27 @@ export async function fetchExternalMarginMetrics(
     ttm.operatingMarginPct = latest?.ebitPct ?? latest?.ebitdaPct ?? null;
   }
 
-  const quarterly = quartersFromYahoo(summary, ttm.netMarginPct ?? ttm.ebitdaMarginPct);
+  const ttmRevenueCr = (() => {
+    const r = rawNum(financial?.totalRevenue);
+    return r != null ? yahooRawToCr(r) : null;
+  })();
+  const latestAnnualRevenueCr = (() => {
+    const latestStmt = (
+      summary.incomeStatementHistory as
+        | { incomeStatementHistory?: Record<string, unknown>[] }
+        | undefined
+    )?.incomeStatementHistory?.[0];
+    const rev = latestStmt ? rawNum(latestStmt.totalRevenue) : null;
+    return rev != null ? yahooRawToCr(rev) : null;
+  })();
+
+  let quarterly = quartersFromYahoo(summary, ttm.netMarginPct ?? ttm.ebitdaMarginPct);
+  quarterly = fillMissingQuarterlyRevenue(
+    quarterly,
+    ttm.netMarginPct,
+    ttmRevenueCr,
+    latestAnnualRevenueCr
+  );
 
   const hasTtm =
     ttm.ebitdaMarginPct != null ||
@@ -226,6 +358,8 @@ export async function fetchExternalMarginMetrics(
     avg5yOperatingPct: avg(opProxySeries),
     avg5yEbitPct: avg(ebitSeries),
     quarterly,
+    ttmRevenueCr,
+    latestAnnualRevenueCr,
   };
 }
 
