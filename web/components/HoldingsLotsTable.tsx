@@ -272,7 +272,7 @@ export function HoldingsLotsTable({ lots, summaryCount }: HoldingsLotsTableProps
       <section className="card inner-summary">
         <h4>Summary by ticker (aggregated)</h4>
         <p className="muted small">
-          Dashboard and Ask Agent use aggregated qty and blended avg cost. CAGR uses each lot row
+          Dashboard uses aggregated qty and blended avg cost. CAGR uses each lot row
           above.
         </p>
       </section>

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { EarningsQualityResult, TrendSignal } from '@/lib/earnings-quality';
+import { formatAnalysisDataSource } from '@/lib/investor-report-format';
 
 function fmtInr(n: number | null): string {
   if (n == null || !Number.isFinite(n)) return '—';
@@ -92,13 +93,7 @@ export function EarningsQualityResults({ data, recordId, savedAt }: EarningsQual
               {data.stockName} <span className="muted">({data.ticker})</span>
             </h2>
             <p className="muted small">
-              {data.sector} · {data.dataSource}
-              {data.earningsQualityFile && (
-                <>
-                  {' '}
-                  · <code>{data.earningsQualityFile}</code>
-                </>
-              )}
+              {data.sector} · {formatAnalysisDataSource(data.dataSource)}
             </p>
           </div>
           <Link href={data.stockbookUrl} className="btn-ghost">
@@ -154,8 +149,8 @@ export function EarningsQualityResults({ data, recordId, savedAt }: EarningsQual
 
         {data.liveMetricsSource && (
           <p className="muted small eq-live-metrics">
-            Live backfill: {data.liveMetricsSource} — add{' '}
-            <code>EARNINGS_QUALITY_{data.ticker}.md</code> Part A for FY-level FACT.
+            Live backfill: {data.liveMetricsSource} — save full earnings history in StockBook for
+            FY-level FACT.
           </p>
         )}
       </section>
@@ -173,8 +168,8 @@ export function EarningsQualityResults({ data, recordId, savedAt }: EarningsQual
 
           {partA.years.length === 0 ? (
             <p className="muted">
-              No 5Y history yet. Add <code>## Part A — Five-year rear-view</code> table to{' '}
-              <code>EARNINGS_QUALITY_{data.ticker}.md</code>, or populate EPS CAGR in PARAMETERS.
+              No 5Y history yet. Add a five-year rear-view table in StockBook, or populate EPS CAGR
+              in company parameters.
             </p>
           ) : (
             <>
@@ -329,8 +324,7 @@ export function EarningsQualityResults({ data, recordId, savedAt }: EarningsQual
 
           {data.quarterly.length === 0 ? (
             <p className="muted">
-              No quarterly table yet. Add section D to{' '}
-              <code>EARNINGS_QUALITY_{data.ticker}.md</code> in StockBook.
+              No quarterly table yet. Add quarterly earnings data in StockBook for this ticker.
             </p>
           ) : (
             <>

@@ -99,9 +99,6 @@ export function FullAnalysisHistoryTimeline({ items, emptyMessage }: Props) {
                                 <strong className="analysis-log-title">{entry.stockName}</strong>
                                 <span className="tag">{entry.ticker}</span>
                                 <span className="tag">{entry.sector}</span>
-                                {entry.sessionOnly && (
-                                  <span className="tag">This browser session</span>
-                                )}
                                 <span className="tag">
                                   {entry.expectedCagrPct}% · {entry.years}Y
                                 </span>

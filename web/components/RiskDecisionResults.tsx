@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { RiskDecisionResult, RiskSignal } from '@/lib/risk-decision';
+import { formatAnalysisDataSource } from '@/lib/investor-report-format';
 
 function fmtInr(n: number | null): string {
   if (n == null || !Number.isFinite(n)) return '—';
@@ -109,7 +110,7 @@ export function RiskDecisionResults({ data, recordId, savedAt }: Props) {
           <div className="pe-eval-metric">
             <span className="pe-eval-label">{data.stockName}</span>
             <strong>{data.sector}</strong>
-            <span className="muted small">{data.dataSource}</span>
+            <span className="muted small">{formatAnalysisDataSource(data.dataSource)}</span>
           </div>
         </div>
       </section>
@@ -189,7 +190,7 @@ export function RiskDecisionResults({ data, recordId, savedAt }: Props) {
           </div>
         )}
         {data.riskFactors.length === 0 ? (
-          <p className="muted">Add Section A to RISK_DECISION file.</p>
+          <p className="muted">Risk factors will appear when saved risk &amp; decision data exists.</p>
         ) : (
           <div className="eq-table-wrap">
             <table className="eq-quarterly-table">
@@ -253,13 +254,54 @@ export function RiskDecisionResults({ data, recordId, savedAt }: Props) {
         <p className="muted small calc-tab-lead">
           What would make the investment thesis <strong>wrong</strong>?
         </p>
-        <ul className="rd-breaker-list">
-          {data.thesisBreakers.map((b) => (
-            <li key={b.text} className={b.severity === 'critical' ? 'rd-breaker-critical' : ''}>
-              {b.severity === 'critical' ? '🔴' : '⚠️'} {b.text}
-            </li>
-          ))}
-        </ul>
+        {data.synthesisSource && (
+          <p className="muted small">Backfill: {data.synthesisSource}</p>
+        )}
+        {data.thesisBreakers.length === 0 ? (
+          <p className="muted">Add thesis breakers in StockBook risk &amp; decision for this ticker.</p>
+        ) : (
+          <ul className="rd-breaker-list">
+            {data.thesisBreakers.map((b) => (
+              <li key={b.text} className={b.severity === 'critical' ? 'rd-breaker-critical' : ''}>
+                {b.severity === 'critical' ? '🔴' : '⚠️'} {b.text}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* Section D Monitor triggers */}
+      <section className="card wide">
+        <h3>Section D — Monitor triggers (reassess if)</h3>
+        <p className="muted small calc-tab-lead">
+          Quarterly checkpoints — when a line crosses, refresh StockBook and surplus rank.
+        </p>
+        {data.monitorTriggers.length === 0 ? (
+          <p className="muted">No triggers — add monitor triggers in StockBook risk &amp; decision.</p>
+        ) : (
+          <div className="eq-table-wrap">
+            <table className="eq-quarterly-table">
+              <thead>
+                <tr>
+                  <th>Trigger</th>
+                  <th>Metric</th>
+                  <th>Threshold</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.monitorTriggers.map((row) => (
+                  <tr key={`${row.trigger}-${row.metric}`}>
+                    <td>{row.trigger}</td>
+                    <td>{row.metric}</td>
+                    <td>{row.threshold}</td>
+                    <td className="muted small">{row.action}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
     </>
   );

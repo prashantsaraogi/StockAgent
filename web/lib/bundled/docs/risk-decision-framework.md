@@ -48,6 +48,19 @@ List explicit breakers with 🔴 severity — e.g. sustained share loss, EPS dec
 
 ---
 
+## Section D — Monitor triggers (reassess if)
+
+Quarterly checkpoints when the thesis needs a **fresh** read (not daily trading):
+
+| Trigger | Metric | Threshold | Action |
+|---------|--------|-----------|--------|
+| Results | Revenue/PAT/EPS YoY | PAT lags revenue 2+ Q | Re-run Earnings Quality · pause adds |
+| Margins | EBITDA/net vs PY | ↓ >150 bps without one-off | Margin tab + core-problem test |
+
+Web tab **backfills Section C + D** from Tabs 1–4, PARAMETERS, and internal/external risk registers when `RISK_DECISION_[TICKER].md` is missing.
+
+---
+
 ## Combined score — five tabs
 
 | Component | Weight | Source tab |

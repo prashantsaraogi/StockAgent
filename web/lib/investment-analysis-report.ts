@@ -51,7 +51,7 @@ function extractTimingCallout(summaryMd: string | null, faq: string | null): str
   const blob = `${summaryMd ?? ''}\n${faq ?? ''}`;
   const results = blob.match(/results[^\n]{0,120}/i)?.[0];
   if (results && /today|tomorrow|after market|Q[1-4]/i.test(results)) {
-    return `> **Important timing:** ${results.trim()}. Confirm on the exchange / company IR calendar before acting. *(From StockBook — verify date.)*`;
+    return `> **Important timing:** ${results.trim()}. Confirm on the exchange / company IR calendar before acting. *(Verify date on company IR / exchange.)*`;
   }
   return null;
 }
@@ -89,8 +89,8 @@ function buildFundamentalRows(
       status: '🟡',
       interpretation:
         pe.avg10yPe != null && Math.abs(pe.avg10yPe - histPe.value) > 0.5
-          ? `10Y mean **${pe.avg10yPe.toFixed(1)}×** for comparison — median from FY history / StockBook`
-          : 'From FY P/E history or StockBook (excl. FY2020–21 when table present)',
+          ? `10Y mean **${pe.avg10yPe.toFixed(1)}×** for comparison — median from FY history`
+          : 'From FY P/E history (excl. FY2020–21 when table present)',
     });
   }
 
@@ -108,7 +108,7 @@ function buildFundamentalRows(
       parameter: 'Revenue CAGR (5Y)',
       value: `**${eq.partA.revenueCagr5y.toFixed(1)}%**`,
       status: growthSignal(eq.partA.revenueCagr5y),
-      interpretation: eq.partA.dataComplete ? 'StockBook earnings file' : 'Partial history — refresh AR',
+      interpretation: eq.partA.dataComplete ? 'Saved earnings history' : 'Partial history — refresh from annual report',
     });
   }
 
@@ -175,7 +175,7 @@ function buildFundamentalRows(
       parameter: 'Data coverage',
       value: '—',
       status: '🟡',
-      interpretation: 'Add StockBook PARAMETERS + earnings files for full scorecard',
+      interpretation: 'Add company parameters + earnings history for full scorecard',
     });
   }
 
@@ -226,7 +226,7 @@ function peerTable(
     return `| ${f.label} | ${cells.join(' | ')} |`;
   });
 
-  return `${header}\n${sep}\n${body.join('\n')}\n\n*Peer signals: live run for **${subjectTicker}**; peers from StockBook PARAMETERS + sector comparative rank (FACT/HYPOTHESIS scores → 🟢/🟡/🔴).*`;
+  return `${header}\n${sep}\n${body.join('\n')}\n\n*Peer signals: live run for **${subjectTicker}**; peers from sector comparative rank (evidence scores → 🟢/🟡/🔴).*`;
 }
 
 function sectionBlock(title: string, signal: Signal, bullets: string[], verdict?: string): string {
@@ -321,7 +321,7 @@ export function buildInvestmentAnalysisReport(parts: InvestorReportParts): strin
   const pcclNote =
     pcclApplied != null
       ? `PCCL anchor **${formatInr(pcclApplied)}** · Premium **${premiumPccl != null ? formatPct(premiumPccl) : '—'}**`
-      : 'PCCL — refresh StockBook PARAMETERS / detail-analysis';
+      : 'PCCL — refresh company parameters / detail analysis';
 
   const bullish = analysis.riskDecision.thesis.whyOwn
     ? analysis.riskDecision.thesis.whyOwn.split(/[.;]/).slice(0, 4).map((s) => s.trim()).filter(Boolean)
@@ -329,7 +329,7 @@ export function buildInvestmentAnalysisReport(parts: InvestorReportParts): strin
         'Sustained earnings / EPS growth vs sector',
         'Margins stable or expanding',
         'Valuation vs 10Y P/E attractive',
-        'Thesis KPIs in StockBook on track',
+        'Thesis KPIs on track',
       ];
 
   const cautious = analysis.riskDecision.concerns.length
@@ -375,7 +375,7 @@ ${positionNote}
 
 ${fundTable(fundRows)}
 
-*Sources: live quote (${cmpSource}), Stock Calculator modules, StockBook PARAMETERS when present. Rows marked — need annual-report / file refresh.*
+*Sources: live quote (${cmpSource}), Stock Analysis modules, company parameters when present. Rows marked — need annual-report refresh.*
 
 ${peerBlock ? `### Against major ${analysis.sector} peers\n\n**Relative positioning — qualitative view**\n\n${peerBlock}` : ''}
 
@@ -393,7 +393,7 @@ ${sectionBlock(
     `Franchise score **${bqScore}/10** (${analysis.businessQuality.dataSource}).`,
     analysis.businessQuality.highlights[0]
       ? `${analysis.businessQuality.highlights[0].factor}: ${analysis.businessQuality.highlights[0].assessment}`
-      : structuralSnippet ?? 'Refresh BUSINESS_QUALITY file for moat evidence.',
+      : structuralSnippet ?? 'Refresh business quality scorecard for moat evidence.',
   ],
   bqScore >= 7 ? '🟢 Quality compounder lens' : '🟡 Average — price may reflect weaker moat'
 )}
@@ -429,7 +429,7 @@ ${sectionBlock(
   analysis.earningsQuality.cashQuality.length ? '🟢' : '🟡',
   analysis.earningsQuality.cashQuality.slice(0, 3).map((c) => `${c.label}: **${c.value}**`).length
     ? analysis.earningsQuality.cashQuality.slice(0, 3).map((c) => `${c.label}: **${c.value}**`)
-    : ['Refresh earnings-quality file for CFO/PAT and working-capital flags'],
+    : ['Refresh earnings quality data for CFO/PAT and working-capital flags'],
   analysis.riskDecision.thesis.riskLabel
 )}
 
@@ -439,7 +439,7 @@ ${/IT|software|tech/i.test(analysis.sector)
       '🟡',
       [
         'IT cluster: treat AI as **both opportunity and pricing threat** (personal discipline: pause heavy IT adds).',
-        structuralSnippet ?? 'See StockBook external-negative-risk and structural-threat notes.',
+        structuralSnippet ?? 'See external risk register and structural-threat notes.',
       ],
       '**AI opportunity:** 🟢 · **Monetisation certainty:** 🟡'
     )
@@ -451,7 +451,7 @@ ${/IT|software|tech/i.test(analysis.sector)
 
 ### ${analysis.sector} — environment
 
-🟡 **Monitor** sector KPIs, policy, and peer results. Use \`News/TICKER-INDEX.md\` and sector comparative rank before sizing surplus.
+🟡 **Monitor** sector KPIs, policy, and peer results. Review latest **news archive** and sector comparative rank before sizing surplus.
 
 ${declineSection ? `### Price / thesis context\n\n${declineSection.replace(/^##[^\n]*\n/, '').slice(0, 1200)}\n` : ''}
 
@@ -530,6 +530,6 @@ ${histPeRef.kind === 'median' && pe.avg10yPe != null ? `| 10Y avg P/E (mean) | $
 
 ---
 
-*Framework report — not investment advice. Numbers without a StockBook file are **live quote or model estimates**; verify against filings before trading.*
+*Discipline report — not investment advice. Numbers without saved company data are **live quote or model estimates**; verify against filings before trading.*
 `;
 }

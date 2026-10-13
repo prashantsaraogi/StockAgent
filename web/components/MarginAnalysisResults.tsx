@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { MarginAnalysisResult, TrendSignal } from '@/lib/margin-analysis';
+import { formatAnalysisDataSource } from '@/lib/investor-report-format';
 
 function fmtNum(n: number | null, digits = 1): string {
   if (n == null || !Number.isFinite(n)) return '—';
@@ -60,7 +61,7 @@ export function MarginAnalysisResults({ data, recordId, savedAt }: MarginAnalysi
               {data.stockName} <span className="muted">({data.ticker})</span>
             </h2>
             <p className="muted small">
-              {data.sector} · {data.dataSource}
+              {data.sector} · {formatAnalysisDataSource(data.dataSource)}
               {data.marginFile && (
                 <>
                   {' '}
@@ -227,7 +228,7 @@ export function MarginAnalysisResults({ data, recordId, savedAt }: MarginAnalysi
         {data.partC.drivers.length === 0 ? (
           <p className="muted">
             No drivers table. Add <code>## Part C — Margin drivers</code> to{' '}
-            <code>MARGIN_{data.ticker}.md</code>.
+            saved margin analysis in StockBook.
           </p>
         ) : (
           <div className="eq-table-wrap">
@@ -268,7 +269,7 @@ export function MarginAnalysisResults({ data, recordId, savedAt }: MarginAnalysi
 
         {data.partD.quarters.length === 0 ? (
           <p className="muted">
-            No quarterly margins. Add section D to <code>EARNINGS_QUALITY_{data.ticker}.md</code>.
+            No quarterly margins yet. Add quarterly margin history in StockBook.
           </p>
         ) : (
           <div className="eq-table-wrap">

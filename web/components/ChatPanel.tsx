@@ -6,7 +6,7 @@ import { MarkdownView } from './MarkdownView';
 import { StockSearchSuggestions } from './StockSearchSuggestions';
 import { createSessionId } from '@/lib/session-id';
 import { STOCK_QUICK_QUESTIONS } from '@/lib/stock-question-types';
-import { sanitizeUserFacingAnswer } from '@/lib/investor-report-format';
+import { sanitizeStockbookMarkdownForWeb } from '@/lib/investor-report-format';
 import {
   clearStockChatThread,
   isGlobalAskAgentThread,
@@ -337,7 +337,7 @@ export function ChatPanel({ showStockQuestions, context }: ChatPanelProps) {
           <div key={i} className={`chat-bubble ${msg.role}`}>
             {msg.role === 'agent' ? (
               <>
-                <MarkdownView content={sanitizeUserFacingAnswer(msg.text)} />
+                <MarkdownView content={sanitizeStockbookMarkdownForWeb(msg.text)} />
                 {msg.meta?.analysisType === 'stock-full' && (
                   <p className="muted small chat-meta">Investment view report</p>
                 )}

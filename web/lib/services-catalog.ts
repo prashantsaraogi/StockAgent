@@ -553,7 +553,7 @@ Update dividend-fy26.json · regenerate portfolio-dividend-rank.md (YoC top 10 +
     id: 'stock-calculator',
     label: 'Stock Analysis',
     description:
-      'Holdings & buy candidates — CAGR · P/E · PEG · Earnings Quality · Margin · Business Quality · Risk. Populate StockBook files the tabs read.',
+      'Holdings & buy candidates — CAGR · P/E · PEG · Earnings Quality · Margin · Business Quality · Risk. Risk tab synthesizes Sections A–D when RISK_DECISION file missing; populate StockBook for FACT-level rows.',
     services: [
       {
         id: 'refresh-earnings-quality',

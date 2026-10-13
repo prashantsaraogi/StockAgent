@@ -16,7 +16,6 @@ import {
 import { riskLevelClass } from '@/lib/stock-calculator-framework';
 import {
   sanitizeStockbookMarkdownForWeb,
-  sanitizeUserFacingAnswer,
   sanitizeVerdictLabel,
 } from '@/lib/investor-report-format';
 
@@ -560,7 +559,7 @@ export function CalculatorSummaryPanel(props: CalculatorSummaryProps) {
         <details className="calc-full-report">
           <summary>Full written report</summary>
           <div className="calc-report-prose">
-            <MarkdownView content={sanitizeUserFacingAnswer(props.report ?? '')} />
+            <MarkdownView content={sanitizeStockbookMarkdownForWeb(props.report ?? '')} />
           </div>
         </details>
       )}

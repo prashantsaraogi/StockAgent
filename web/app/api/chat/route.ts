@@ -5,7 +5,7 @@ import { createAnalysisJob, saveChatExchange } from '@/lib/db/records';
 import { saveAnalysisRecord } from '@/lib/analysis-history';
 import { routeAskAgentQuery } from '@/lib/ask-agent-query-router';
 import { runAskAgentStockAnalysis } from '@/lib/ask-agent-stock-analysis';
-import { sanitizeUserFacingAnswer } from '@/lib/investor-report-format';
+import { sanitizeStockbookMarkdownForWeb } from '@/lib/investor-report-format';
 import { resolveStock, type StockSearchResult } from '@/lib/stock-search';
 
 export const maxDuration = 120;
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     resolvedSector = stock.sector;
 
     const { mode, model } = result;
-    let answer = sanitizeUserFacingAnswer(result.answer);
+    let answer = sanitizeStockbookMarkdownForWeb(result.answer);
     if (fuzzyBanner) {
       answer = fuzzyBanner + answer;
     }

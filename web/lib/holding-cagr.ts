@@ -1,4 +1,8 @@
 import type { HoldingLot } from './holding-lots';
+import {
+  MIN_HOLDING_DAYS_FOR_CAGR,
+  sanitizeCagrPct,
+} from './format-gain';
 
 /** Per-lot holding return metrics (CAGR-FRAMEWORK.md). */
 export function calcLotCagr(
@@ -21,22 +25,34 @@ export function calcLotCagr(
 
   const days =
     (asOf.getTime() - buyDate.getTime()) / (1000 * 60 * 60 * 24);
+  const simpleReturnPct = ((cmp - lot.price) / lot.price) * 100;
+  const simpleRounded = Math.round(simpleReturnPct * 10) / 10;
+
   if (days <= 0) {
     return {
       holdingYears: 0,
-      simpleReturnPct: ((cmp - lot.price) / lot.price) * 100,
+      simpleReturnPct: simpleRounded,
       cagrPct: null,
     };
   }
 
   const years = days / 365.25;
-  const simpleReturnPct = ((cmp - lot.price) / lot.price) * 100;
-  const cagrPct = (Math.pow(cmp / lot.price, 1 / years) - 1) * 100;
+
+  if (days < MIN_HOLDING_DAYS_FOR_CAGR) {
+    return {
+      holdingYears: Math.round(years * 100) / 100,
+      simpleReturnPct: simpleRounded,
+      cagrPct: null,
+    };
+  }
+
+  const rawCagr = (Math.pow(cmp / lot.price, 1 / years) - 1) * 100;
+  const cagrPct = sanitizeCagrPct(Math.round(rawCagr * 10) / 10);
 
   return {
     holdingYears: Math.round(years * 100) / 100,
-    simpleReturnPct: Math.round(simpleReturnPct * 10) / 10,
-    cagrPct: Math.round(cagrPct * 10) / 10,
+    simpleReturnPct: simpleRounded,
+    cagrPct,
   };
 }
 

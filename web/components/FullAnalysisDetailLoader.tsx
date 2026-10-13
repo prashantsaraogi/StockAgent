@@ -19,7 +19,6 @@ interface Props {
 export function FullAnalysisDetailLoader({ recordId, initialTab }: Props) {
   const [entry, setEntry] = useState<CachedFullAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
-  const [fromSession, setFromSession] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -37,7 +36,6 @@ export function FullAnalysisDetailLoader({ recordId, initialTab }: Props) {
           const e = data.entry as CachedFullAnalysis;
           writeFullAnalysisSessionCache(e);
           setEntry(e);
-          setFromSession(false);
           setLoading(false);
           return;
         }
@@ -48,13 +46,14 @@ export function FullAnalysisDetailLoader({ recordId, initialTab }: Props) {
       const cached = readFullAnalysisSessionCache(recordId);
       if (!cancelled && cached) {
         setEntry(cached);
-        setFromSession(true);
         setLoading(false);
         return;
       }
 
       if (!cancelled) {
-        setError('This analysis is not in your saved history on the server (common on Vercel without Supabase). Run Basic Analysis again from Stock Analysis.');
+        setError(
+          'This saved report is no longer available on this device. Run Stock Analysis again for this stock.'
+        );
         setLoading(false);
       }
     }
@@ -106,12 +105,6 @@ export function FullAnalysisDetailLoader({ recordId, initialTab }: Props) {
         </h1>
         <p className="muted">
           Full analysis · {when} · {entry.sector}
-          {fromSession && (
-            <>
-              {' '}
-              · <span className="tag">This browser session only</span>
-            </>
-          )}
         </p>
         <p className="muted small">
           <Link href="/stock-calculator/history">All saved analyses</Link>
@@ -121,25 +114,14 @@ export function FullAnalysisDetailLoader({ recordId, initialTab }: Props) {
         </p>
       </header>
 
-      {!fromSession && (
-        <StockAnalysisRefreshBar
-          recordId={entry.id}
-          ticker={entry.ticker}
-          stockName={entry.stockName}
-          inputs={entry.analysis.inputs}
-          basicAnalysis={entry.analysis.basicAnalysis ?? false}
-          savedAt={entry.createdAt}
-        />
-      )}
-
-      {fromSession && (
-        <section className="card wide">
-          <p className="muted small">
-            Saved to this browser for this session. Sign in with <strong>Supabase</strong> and apply
-            migrations 009–010 for permanent history and refresh on the server.
-          </p>
-        </section>
-      )}
+      <StockAnalysisRefreshBar
+        recordId={entry.id}
+        ticker={entry.ticker}
+        stockName={entry.stockName}
+        inputs={entry.analysis.inputs}
+        basicAnalysis={entry.analysis.basicAnalysis ?? false}
+        savedAt={entry.createdAt}
+      />
 
       <StockCalculatorFullResults
         analysis={entry.analysis}

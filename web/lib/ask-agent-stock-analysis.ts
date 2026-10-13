@@ -7,7 +7,7 @@ import {
   buildFallbackInvestorReport,
 } from './basic-analysis-report';
 import { runFullStockCalculatorAnalysis } from './stock-calculator-full';
-import { sanitizeUserFacingAnswer } from './investor-report-format';
+import { sanitizeStockbookMarkdownForWeb } from './investor-report-format';
 import type { AgentQueryResult } from './agent/framework-agent';
 import type { StockSearchResult } from './stock-search';
 import type { LotPersistenceContext } from './holding-lots';
@@ -16,7 +16,7 @@ function toAgentResult(
   markdown: string,
   reportMode: 'framework-local' | 'gemini'
 ): AgentQueryResult {
-  const answer = sanitizeUserFacingAnswer(markdown);
+  const answer = sanitizeStockbookMarkdownForWeb(markdown);
   const mode: AgentQueryResult['mode'] = reportMode === 'gemini' ? 'gemini' : 'framework-local';
   return {
     answer,

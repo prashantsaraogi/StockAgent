@@ -57,11 +57,12 @@ export function sanitizeUserFacingAnswer(markdown: string): string {
       '**Could not load a full answer** — live market data or analysis modules failed on the server.\n\n' +
       '- Retry in a minute (during market hours)\n' +
       '- Open **Stock Analysis → Basic** for the same ticker\n' +
-      '- On Vercel: ensure bundled StockBook sync ran at build; optional **GOOGLE_GENERATIVE_AI_API_KEY** helps general questions\n\n' +
+      '- Optional **GOOGLE_GENERATIVE_AI_API_KEY** helps general questions\n\n' +
       '*Not investment advice.*'
     );
   }
-  const out = stripFrameworkJargon(toInvestorFacingReport(raw));
+  let out = stripFrameworkJargon(toInvestorFacingReport(raw));
+  out = stripStockbookInternalRefs(out);
   if (!out.trim()) {
     return (
       '**Answer was empty after formatting** — retry or use **Stock Analysis → Basic** for this stock.\n\n' +
@@ -87,8 +88,21 @@ function stripStockbookInternalRefs(markdown: string): string {
   out = out.replace(/^See also `[^`]+`[^\n]*\n/gm, '');
   out = out.replace(/<!--[\s\S]*?-->/g, '');
   out = out.replace(INTERNAL_PATH_BACKTICK, '');
+  out = out.replace(/`[^`]*\.md`/gi, '');
+  out = out.replace(/\b(?:News\/|StockBook\/|\.cursor\/)[^\s,.)`]+\.md\b/gi, '');
+  out = out.replace(/\b[A-Z][A-Z0-9_]*\.md\b/g, '');
   out = out.replace(/`AGENT-RULES\.md`/gi, '');
   out = out.replace(/`holdings\.md`/gi, '');
+  out = out.replace(/\bStockBook PARAMETERS\b/gi, 'company parameters');
+  out = out.replace(/\bStockBook\b/gi, 'saved company analysis');
+  out = out.replace(/\b(?:internal|external)-negative-risk\.md\b/gi, 'risk register');
+  out = out.replace(/\bearnings-quality file\b/gi, 'earnings quality data');
+  out = out.replace(/\bBUSINESS_QUALITY file\b/gi, 'business quality data');
+  out = out.replace(/\bMARGIN_[A-Z0-9]+\.md\b/gi, '');
+  out = out.replace(/\bEARNINGS_QUALITY_[A-Z0-9]+\.md\b/gi, '');
+  out = out.replace(/\bRISK_DECISION_[A-Z0-9]+\.md\b/gi, '');
+  out = out.replace(/\bPARAMETERS_[A-Z0-9]+\.md\b/gi, '');
+  out = out.replace(/\bTICKER-INDEX\.md\b/gi, 'news archive');
   out = out.replace(/What is the framework action\?/gi, 'What is the recommended action?');
   out = out.replace(/\bframework action\b/gi, 'recommended action');
   out = out.replace(/\*\*Framework read \(past \+ forward\)\*\*/gi, '**Analysis read (past + forward)**');
@@ -118,6 +132,21 @@ export function sanitizeStockbookHtmlForWeb(html: string): string {
 /**
  * Wisdom / quotes library on the web — quotes and themes only; agent meta hidden at render time.
  */
+/** Module tab subtitle — hide repo filenames from end users. */
+export function formatAnalysisDataSource(raw: string | null | undefined): string {
+  if (!raw?.trim()) return 'Live analysis';
+  let s = raw.trim();
+  if (/yahoo|nse-yahoo|Live tab synthesis|Live synthesis/i.test(s)) {
+    return s.replace(/[A-Z0-9_]+\.md/g, '').replace(/\s+/g, ' ').trim();
+  }
+  if (/\.md|partial — add|No earnings|No margin|RISK_DECISION/i.test(s)) {
+    return 'Live modules + company parameters (estimates where files missing)';
+  }
+  s = s.replace(/[A-Z][A-Z0-9_]*\.md/g, '').replace(/\([^)]*\.md[^)]*\)/g, '');
+  s = s.replace(/\s+/g, ' ').trim();
+  return s || 'Live analysis';
+}
+
 export function sanitizeWisdomMarkdownForWeb(markdown: string): string {
   let out = sanitizeStockbookMarkdownForWeb(markdown);
   out = out.replace(/^# Investor Wisdom — Quotes Library/m, '# Wisdom — Quotes');

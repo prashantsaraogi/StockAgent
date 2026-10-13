@@ -90,9 +90,8 @@ export function MarginAnalysisPanel() {
       <section className="card wide">
         <h2>📊 Margin Analysis</h2>
         <p className="muted small">
-          Revenue growth without margin quality is a red flag. Reads{' '}
-          <code>MARGIN_[TICKER].md</code> · <code>PARAMETERS_[TICKER].md</code> · quarterly margins
-          from <code>EARNINGS_QUALITY_[TICKER].md</code>.
+          Revenue growth without margin quality is a red flag. Uses margin history, parameters, and
+          quarterly earnings (live backfill when missing).
         </p>
 
         <form onSubmit={submit} className="holding-form calculator-form">

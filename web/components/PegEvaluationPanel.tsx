@@ -94,7 +94,7 @@ export function PegEvaluationPanel() {
         <h2>PEG evaluation</h2>
         <p className="muted small">
           Combines <strong>P/E · PEG · ROCE · Debt · FCF</strong> — reads{' '}
-          <code>PEG_[TICKER].md</code> when present, else <code>PARAMETERS_[TICKER].md</code>. Try{' '}
+          saved PEG analysis when present, else company parameters. Try{' '}
           <strong>Hero (HEROMOTOCO)</strong> or <strong>ITC</strong>.
         </p>
 

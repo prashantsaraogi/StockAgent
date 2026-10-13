@@ -91,8 +91,8 @@ export function EarningsQualityPanel() {
         <h2>⭐ Earnings Quality</h2>
         <p className="muted small">
           P/E tells you price relative to earnings — not whether earnings are <strong>good</strong>{' '}
-          earnings. Reads <code>EARNINGS_QUALITY_[TICKER].md</code> +{' '}
-          <code>PARAMETERS_[TICKER].md</code>. Each run saved to your history.
+          earnings. Uses saved earnings history + company parameters (live backfill when missing).
+          Each run saved to your history.
         </p>
 
         <form onSubmit={submit} className="holding-form calculator-form">

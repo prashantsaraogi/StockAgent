@@ -14,8 +14,21 @@ export function formatGainPct(pct: number | null): string {
   return `${sign}${pct.toFixed(1)}%`;
 }
 
+/** Portfolio lot CAGR above this is treated as not meaningful (e.g. 1-day annualized blow-up). */
+export const MAX_MEANINGFUL_CAGR_PCT = 100;
+
+/** Do not annualize returns until the lot is held at least this long. */
+export const MIN_HOLDING_DAYS_FOR_CAGR = 30;
+
+export function sanitizeCagrPct(cagr: number | null | undefined): number | null {
+  if (cagr == null || !Number.isFinite(cagr)) return null;
+  if (Math.abs(cagr) > MAX_MEANINGFUL_CAGR_PCT) return null;
+  return cagr;
+}
+
 export function formatCagr(pct: number | null): string {
   if (pct == null) return '—';
+  if (!Number.isFinite(pct) || Math.abs(pct) > MAX_MEANINGFUL_CAGR_PCT) return 'N/A';
   const sign = pct >= 0 ? '+' : '';
   return `${sign}${pct.toFixed(1)}%`;
 }

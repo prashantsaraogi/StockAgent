@@ -19,6 +19,14 @@ import {
 } from './stock-calculator-framework';
 import { parseForwardGrowthTab } from './stock-calculator-tabs';
 import { stockbookPath } from './navigation';
+import { getBundledParametersMd } from './load-bundled-stockbook';
+import {
+  synthesizeCatalysts,
+  synthesizeMonitorTriggers,
+  synthesizeRiskFactors,
+  synthesizeThesisBreakers,
+  type MonitorTriggerRow,
+} from './risk-decision-synthesis';
 
 export type RiskSignal = '🟢' | '🟡' | '🔴' | '—';
 export type VerdictTone = 'strong-buy' | 'selective-add' | 'wait' | 'reduce' | 'avoid';
@@ -81,6 +89,8 @@ export interface RiskDecisionResult {
   riskBuckets: { bucket: string; signal: RiskSignal; factorCount: number }[];
   catalysts: CatalystRow[];
   thesisBreakers: ThesisBreaker[];
+  /** Section D — when to reassess (from file or tab synthesis). */
+  monitorTriggers: MonitorTriggerRow[];
   components: ComponentScore[];
   quantitativeScore100: number;
   investmentVerdict: string;
@@ -91,6 +101,8 @@ export interface RiskDecisionResult {
   nextQuarterWatch: string[];
   narrativeSummary: string;
   notScreamingBuy: boolean;
+  /** Set when sections A–D were backfilled without RISK_DECISION file. */
+  synthesisSource?: string | null;
 }
 
 export interface RunRiskDecisionInput {
@@ -206,7 +218,9 @@ function parseCatalysts(md: string): CatalystRow[] {
 }
 
 function parseThesisBreakers(md: string): ThesisBreaker[] {
-  const section = extractSection(md, /## C\. Thesis breakers/i);
+  const section =
+    extractSection(md, /## C\. Thesis breakers/i) ||
+    extractSection(md, /## Part C[^\n]*thesis breakers/i);
   const rows: ThesisBreaker[] = [];
   for (const line of section.split('\n')) {
     if (!line.trim().startsWith('|') || /Breaker|---/i.test(line)) continue;
@@ -215,7 +229,7 @@ function parseThesisBreakers(md: string): ThesisBreaker[] {
     const text = cells[0];
     if (/^breaker$/i.test(text)) continue;
     rows.push({
-      text: cells.length > 1 && cells[0].length < 4 ? cells[1] : text,
+      text,
       severity: (cells[1] ?? cells[0]).includes('🔴') ? 'critical' : 'warn',
     });
   }
@@ -227,6 +241,26 @@ function parseThesisBreakers(md: string): ThesisBreaker[] {
         rows.push({ text, severity: 'critical' });
       }
     }
+  }
+  return rows;
+}
+
+function parseMonitorTriggers(md: string): MonitorTriggerRow[] {
+  const section =
+    extractSection(md, /## D\. Monitor triggers/i) ||
+    extractSection(md, /## D\.[^\n]*reassess/i);
+  const rows: MonitorTriggerRow[] = [];
+  for (const line of section.split('\n')) {
+    if (!line.trim().startsWith('|') || /Trigger|---/i.test(line)) continue;
+    const cells = line.split('|').map((c) => c.trim()).filter(Boolean);
+    if (cells.length < 3) continue;
+    if (/^trigger$/i.test(cells[0])) continue;
+    rows.push({
+      trigger: cells[0],
+      metric: cells[1] ?? '—',
+      threshold: cells[2] ?? '—',
+      action: cells[3] ?? 'Reassess thesis',
+    });
   }
   return rows;
 }
@@ -443,23 +477,72 @@ export async function runRiskDecisionAnalysis(
   const internal = await readStockTabContent(sector, stockName, 'internal-risk', input.tenantId);
   const external = await readStockTabContent(sector, stockName, 'external-risk', input.tenantId);
 
-  const parametersMd = parameters?.content ?? null;
+  const parametersMd = parameters?.content ?? getBundledParametersMd(resolved.ticker);
   const quality = parseFrameworkQualityMetrics(parametersMd, null);
   const forward = parseForwardGrowthTab(parametersMd);
   const internalRisk = parseRiskFactor(internal?.content ?? null, 'internal-negative-risk.md');
   const externalRisk = parseRiskFactor(external?.content ?? null, 'external-negative-risk.md');
 
   const overrides = parseComponentOverrides(rdMd);
-  const riskFactors = parseRiskBucketTables(rdMd);
-  const catalysts = parseCatalysts(rdMd);
-  const thesisBreakers = parseThesisBreakers(rdMd);
+  let riskFactors = parseRiskBucketTables(rdMd);
+  let catalysts = parseCatalysts(rdMd);
+  let thesisBreakers = parseThesisBreakers(rdMd);
+  let monitorTriggers = parseMonitorTriggers(rdMd);
   const parsedThesis = parseThesis(rdMd);
 
   const valuation10 = overrides.valuation ?? deriveValuationScore10(peEval);
   const earnings10 = overrides.earningsQuality ?? deriveEarningsQualityScore10(eq);
   const business10 = overrides.businessQuality ?? bq?.businessQualityScore10 ?? 5;
   const growth10 = overrides.growth ?? deriveGrowthScore10(quality, forward);
-  const risk10 = overrides.risk ?? deriveRiskScore10(riskFactors, internalRisk, externalRisk);
+  let risk10 = overrides.risk ?? deriveRiskScore10(riskFactors, internalRisk, externalRisk);
+
+  let synthesisSource: string | null = null;
+  const needsSynthesis =
+    !rdFile ||
+    riskFactors.length === 0 ||
+    catalysts.length === 0 ||
+    thesisBreakers.length === 0 ||
+    monitorTriggers.length === 0;
+
+  if (needsSynthesis) {
+    synthesisSource = rdFile
+      ? 'Partial RISK_DECISION — filled missing sections from tabs + risk registers'
+      : 'Live synthesis — Tabs 1–4 + internal/external-negative-risk.md + PARAMETERS';
+
+    if (riskFactors.length === 0) {
+      riskFactors = synthesizeRiskFactors({
+        sector,
+        peEval,
+        eq,
+        bq,
+        quality,
+        internalRisk,
+        externalRisk,
+        valuation10,
+        risk10,
+      });
+      risk10 = overrides.risk ?? deriveRiskScore10(riskFactors, internalRisk, externalRisk);
+    }
+    if (catalysts.length === 0) {
+      catalysts = synthesizeCatalysts({ sector, quality, forward, peEval, eq });
+    }
+    if (thesisBreakers.length === 0) {
+      thesisBreakers = synthesizeThesisBreakers({ sector, internalRisk, externalRisk, eq, bq });
+    }
+  }
+
+  const nextQuarterWatch = [
+    'Revenue growth',
+    'Operating margin',
+    'EPS vs prior year',
+  ];
+
+  if (monitorTriggers.length === 0) {
+    monitorTriggers = synthesizeMonitorTriggers({ sector, eq, nextQuarterWatch });
+    if (!synthesisSource && !rdFile) {
+      synthesisSource = 'Live synthesis — monitor triggers from framework';
+    }
+  }
 
   const components: ComponentScore[] = [
     {
@@ -515,12 +598,6 @@ export async function runRiskDecisionAnalysis(
     warnings: eq?.warnings.map((w) => w.detail) ?? [],
   });
 
-  const nextQuarterWatch = [
-    'Revenue growth',
-    'Operating margin',
-    'EPS vs prior year',
-  ];
-
   let cmp: number | null = peEval?.cmp ?? eq?.cmp ?? bq?.cmp ?? null;
   let cmpSource = peEval?.cmpSource ?? eq?.cmpSource ?? bq?.cmpSource ?? 'Unavailable';
   if (cmp == null) {
@@ -574,6 +651,7 @@ export async function runRiskDecisionAnalysis(
     riskBuckets: buildRiskBuckets(riskFactors),
     catalysts,
     thesisBreakers,
+    monitorTriggers,
     components,
     quantitativeScore100,
     investmentVerdict,
@@ -586,5 +664,6 @@ export async function runRiskDecisionAnalysis(
       ? 'Not a screaming BUY — excellent business qualities with valuation and/or near-term earnings caveats.'
       : 'Strong composite score — business, earnings, and valuation align for aggressive add consideration.',
     notScreamingBuy: quantitativeScore100 < 80 || valuation10 < 7.5 || (eq?.warnings.length ?? 0) > 0,
+    synthesisSource,
   };
 }

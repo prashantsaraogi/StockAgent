@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { BusinessQualityResult, MoatPillar, MoatSignal } from '@/lib/business-quality-moat';
+import { formatAnalysisDataSource } from '@/lib/investor-report-format';
 
 function fmtInr(n: number | null): string {
   if (n == null || !Number.isFinite(n)) return '—';
@@ -92,7 +93,7 @@ export function BusinessQualityResults({ data, recordId, savedAt }: BusinessQual
               {data.stockName} <span className="muted">({data.ticker})</span>
             </h2>
             <p className="muted small">
-              {data.sector} · {data.dataSource}
+              {data.sector} · {formatAnalysisDataSource(data.dataSource)}
               {data.businessQualityFile && (
                 <>
                   {' '}

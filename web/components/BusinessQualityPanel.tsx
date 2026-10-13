@@ -92,7 +92,7 @@ export function BusinessQualityPanel() {
         <p className="muted small">
           Answers: <strong>Is this a great business or merely a cheap stock?</strong> Scores 7
           pillars — market position, moat, pricing power, runway, capital efficiency, management,
-          reinvestment. Reads <code>BUSINESS_QUALITY_[TICKER].md</code>.
+          reinvestment. Uses saved business quality scorecard + parameters (live backfill when missing).
         </p>
 
         <form onSubmit={submit} className="holding-form calculator-form">

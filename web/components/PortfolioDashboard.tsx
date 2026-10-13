@@ -187,7 +187,7 @@ export function PortfolioDashboardCharts({ data }: PortfolioDashboardProps) {
           <h3>Holdings detail — gain &amp; CAGR per stock</h3>
           <p className="muted small">
             Each stock shows blended totals and every purchase lot. CAGR is annualized from
-            buy date to CMP (CAGR-FRAMEWORK).
+            buy date to live CMP.
           </p>
 
           <div className="stock-detail-list">

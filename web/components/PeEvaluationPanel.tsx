@@ -99,7 +99,7 @@ export function PeEvaluationPanel() {
           Separates <strong>“Was my purchase good?”</strong> (Part A/B) from{' '}
           <strong>“Is the stock attractive today?”</strong> (Part C) plus an interactive{' '}
           <strong>Gordon fair P/E</strong> anchor (Part D). Each run is saved to your private
-          history. Reads <code>PARAMETERS_[TICKER].md</code> + live CMP.
+          history. Uses company parameters + live CMP.
         </p>
 
         <form onSubmit={submit} className="holding-form calculator-form">
