@@ -586,18 +586,17 @@ Run Stock Analysis → Earnings Quality to verify Part A/B render. Write-back fa
         categoryId: 'stock-calculator',
         title: 'Update forward-year risk context (Part B)',
         description:
-          'When oil, RBI, policy, or competition shifts — refresh external-negative-risk.md so Part B haircuts and AI year notes stay current.',
+          'Refresh internal/external risk registers (or create from _templates) so Part B haircuts beat sector defaults; web falls back to dynamic overlay when files missing.',
         cadence: 'on-demand',
         actionType: 'prompt',
         channel: 'both',
         prompt: `Update Earnings Quality Part B forward context for {TICKER} — analysis date = today.
 
-1. Read external-negative-risk.md + internal-negative-risk.md · live-search sector headlines
-2. Set L1/L2/L3 levels and top risks (oil, policy, competition, execution)
-3. Note current FY external overlay (e.g. "FY27 oil elevated — ASSUMPTION")
-4. Update News/TICKER-INDEX if material · re-run Earnings Quality tab
+1. Create/update internal-negative-risk.md + external-negative-risk.md from StockBook/_templates if missing
+2. Fill ## Risk register rows (L1–L3, growth impact pp, evidence) · live-search sector headlines
+3. Update News/TICKER-INDEX if material · re-run Earnings Quality tab
 
-Part B engine: base EPS CAGR minus max(internal, external haircut); temporary external risks taper in outer years.`,
+Engine: file registers override sector dynamic overlay · base EPS CAGR minus risk haircuts; external trims taper in outer years.`,
       },
       {
         id: 'pe-gordon-fair-pe',

@@ -29,7 +29,11 @@ export interface RiskFactorResult {
   activeRiskCount: number;
   topRisks: string[];
   summary: string;
-  source: 'internal-negative-risk.md' | 'external-negative-risk.md' | 'unavailable';
+  source:
+    | 'internal-negative-risk.md'
+    | 'external-negative-risk.md'
+    | 'unavailable'
+    | 'dynamic-synthesis';
 }
 
 export interface CagrGapAnalysis {

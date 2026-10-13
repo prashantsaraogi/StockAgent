@@ -178,9 +178,9 @@ export function synthesizeRiskFactors(input: {
     push(
       'External risk',
       'Macro / policy',
-      input.externalRisk.summary !== 'Risk register not available in StockBook.'
+      input.externalRisk.source === 'dynamic-synthesis'
         ? input.externalRisk.summary
-        : 'Add external-negative-risk.md for sector/policy overlay',
+        : input.externalRisk.summary,
       'L1',
       '🟡'
     );

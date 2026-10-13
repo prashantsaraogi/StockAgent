@@ -5,6 +5,7 @@
 
 import type { EvidenceType, QualityTone } from './earnings-quality';
 import type { FrameworkQualityMetrics, RiskFactorResult } from './stock-calculator-framework';
+import { investorRiskFactorShort } from './dynamic-risk-register';
 
 export interface HistoricalYearRow {
   fiscalYear: string;
@@ -280,14 +281,8 @@ export function buildPartB(input: {
     input.quality.baseEpsCagrPct ?? 8;
   const intBase = input.internalRisk.haircutMidPp;
   const extBase = input.externalRisk.haircutMidPp;
-  const intFactor =
-    input.internalRisk.topRisks[0] ??
-    input.internalRisk.summary.slice(0, 80) ??
-    'No internal risks parsed';
-  const extFactor =
-    input.externalRisk.topRisks[0] ??
-    input.externalRisk.summary.slice(0, 80) ??
-    'No external risks parsed';
+  const intFactor = investorRiskFactorShort(input.internalRisk);
+  const extFactor = investorRiskFactorShort(input.externalRisk);
 
   const currentMonth = new Date().getMonth();
   const startFyNum =

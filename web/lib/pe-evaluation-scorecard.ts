@@ -7,8 +7,8 @@ import { fetchLiveNseCmp } from './nse-cmp';
 import { parseParametersMetrics } from './stock-calculator-engine';
 import {
   parseFrameworkQualityMetrics,
-  parseRiskFactor,
 } from './stock-calculator-framework';
+import { resolveRiskFactor } from './dynamic-risk-register';
 import {
   parseForwardGrowthTab,
   parseHistoricalGrowthTab,
@@ -195,7 +195,12 @@ export async function runPeEvaluationScorecard(
   const forward = parseForwardGrowthTab(parametersMd);
   const historical = parseHistoricalGrowthTab(parametersMd);
   const quality = parseFrameworkQualityMetrics(parametersMd, null);
-  const internalRisk = parseRiskFactor(internalMd, 'internal-negative-risk.md');
+  const internalRisk = resolveRiskFactor(internalMd, 'internal-negative-risk.md', {
+    sector: base.sector,
+    ticker: base.ticker,
+    stockName: base.stockName,
+    quality,
+  });
 
   let cmp = base.cmp;
   let cmpSource = base.cmpSource;

@@ -147,6 +147,22 @@ StockBook/[Sector]/[Stock Name]/EARNINGS_QUALITY_MARUTI.md
 
 Sections **Part A**, **Part B**, and **A–D** as markdown tables. Engine also reads `PARAMETERS_[TICKER].md`, `internal-negative-risk.md`, and `external-negative-risk.md`.
 
+### Dynamic risk register (web / serverless)
+
+When **internal** or **external** risk files are missing or empty, the web engine **does not** show “register not available” to end users. It builds a **sector overlay** from:
+
+- Sector templates (auto → SIAM/volumes, input costs, EV policy; banks → credit/RBI; OMC → crude/margin; etc.)
+- Quality signals (ROE, leverage, Earnings Quality warnings)
+
+**Agent workflow — create or refresh registers (preferred over template):**
+
+1. Copy `StockBook/_templates/internal-negative-risk.md` and `external-negative-risk.md` into `StockBook/[Sector]/[Stock Name]/`.
+2. Fill **## Risk register — internal / external** rows: `#`, Risk, Level (L1–L3), Growth impact (`-X to -Y pp`), Evidence, Status.
+3. Live-search material drivers (commodity, policy, governance) on analysis date; label FACT vs ASSUMPTION in **Evidence** column only (not in web UI).
+4. Re-run **Stock Calculator → Earnings Quality** — Part B haircuts and factor columns use file registers when parsed.
+
+Implementation: `web/lib/dynamic-risk-register.ts` · `resolveRiskFactor()` wraps `parseRiskFactor()` then `synthesizeDynamicRiskFactor()`.
+
 ### Part A table template
 
 ```markdown

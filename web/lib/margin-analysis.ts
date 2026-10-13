@@ -22,9 +22,9 @@ import { stockbookPath } from './navigation';
 import {
   extractParametersMasterCells,
   parseFrameworkQualityMetrics,
-  parseRiskFactor,
   type FrameworkQualityMetrics,
 } from './stock-calculator-framework';
+import { resolveRiskFactor } from './dynamic-risk-register';
 import { parseParametersEpsCagrBasePct } from './parameters-assumptions';
 import { parsePartAFromMarkdown as parseEqPartAFromMarkdown } from './earnings-quality-parts';
 import {
@@ -1023,7 +1023,11 @@ export async function runMarginAnalysis(input: RunMarginAnalysisInput): Promise<
 
   const marginMd = marginFile?.content ?? '';
   const quality = parseFrameworkQualityMetrics(parametersMd, null);
-  const externalRisk = parseRiskFactor(external?.content ?? null, 'external-negative-risk.md');
+  const externalRisk = resolveRiskFactor(
+    external?.content ?? null,
+    'external-negative-risk.md',
+    { sector, ticker: resolved.ticker, stockName, quality }
+  );
 
   let cmp: number | null = null;
   let cmpSource = 'Unavailable';

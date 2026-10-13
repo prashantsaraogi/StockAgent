@@ -599,10 +599,11 @@ Write StockBook/EARNINGS_QUALITY_{TICKER}.md ## Part A table.`,
         description: 'Update risk registers when macro/sector shifts — feeds Part B haircuts + AI notes.',
         prompt: `{TICKER} — refresh Earnings Quality Part B forward context (analysis date = today).
 
-Read/update external-negative-risk.md and internal-negative-risk.md.
-State current FY dominant factor (oil, RBI, policy, competition, execution).
-Note L1/L2/L3 and haircut rationale · update News/TICKER-INDEX if material.
-Re-run Earnings Quality tab — check adjusted EPS growth FY27–FY31 table.`,
+If missing, create from StockBook/_templates/internal-negative-risk.md + external-negative-risk.md under StockBook/[Sector]/[Stock]/.
+Fill ## Risk register rows (Level L1–L3, growth impact pp, evidence FACT/ASSUMPTION).
+Web uses file registers when present; else sector dynamic overlay (see EARNINGS-QUALITY-FRAMEWORK § Dynamic risk register).
+State current FY dominant factor (oil, RBI, policy, competition, execution) · News/TICKER-INDEX if material.
+Re-run Earnings Quality tab — FY27–FY31 adjusted EPS table + factor columns.`,
         channel: 'both',
         framework: ['EARNINGS-QUALITY-FRAMEWORK', 'dynamic-context-analysis'],
         placeholders: ['{TICKER}'],

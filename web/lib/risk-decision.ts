@@ -13,10 +13,8 @@ import { fetchLiveNseCmp } from './nse-cmp';
 import { loadPeEvaluation } from './pe-evaluation';
 import { runEarningsQualityAnalysis } from './earnings-quality';
 import { runBusinessQualityAnalysis } from './business-quality-moat';
-import {
-  parseFrameworkQualityMetrics,
-  parseRiskFactor,
-} from './stock-calculator-framework';
+import { parseFrameworkQualityMetrics, type RiskFactorResult } from './stock-calculator-framework';
+import { resolveRiskFactor } from './dynamic-risk-register';
 import { parseForwardGrowthTab } from './stock-calculator-tabs';
 import { stockbookPath } from './navigation';
 import { getBundledParametersMd } from './load-bundled-stockbook';
@@ -369,8 +367,8 @@ function deriveGrowthScore10(
 
 function deriveRiskScore10(
   riskFactors: RiskFactorRow[],
-  internal: ReturnType<typeof parseRiskFactor>,
-  external: ReturnType<typeof parseRiskFactor>
+  internal: RiskFactorResult,
+  external: RiskFactorResult
 ): number {
   if (riskFactors.length > 0) {
     const signals = riskFactors.map((r) => r.signal);
@@ -480,8 +478,30 @@ export async function runRiskDecisionAnalysis(
   const parametersMd = parameters?.content ?? getBundledParametersMd(resolved.ticker);
   const quality = parseFrameworkQualityMetrics(parametersMd, null);
   const forward = parseForwardGrowthTab(parametersMd);
-  const internalRisk = parseRiskFactor(internal?.content ?? null, 'internal-negative-risk.md');
-  const externalRisk = parseRiskFactor(external?.content ?? null, 'external-negative-risk.md');
+  const overallEqTone: 'good' | 'mixed' | 'bad' =
+    eq?.overallTone === 'bad' || eq?.overallTone === 'warn'
+      ? 'bad'
+      : eq?.overallTone === 'good'
+        ? 'good'
+        : 'mixed';
+  const riskCtx = {
+    sector,
+    ticker: resolved.ticker,
+    stockName,
+    quality,
+    eqWarning: eq?.warnings[0]?.detail ?? null,
+    overallEqTone,
+  };
+  const internalRisk = resolveRiskFactor(
+    internal?.content ?? null,
+    'internal-negative-risk.md',
+    riskCtx
+  );
+  const externalRisk = resolveRiskFactor(
+    external?.content ?? null,
+    'external-negative-risk.md',
+    riskCtx
+  );
 
   const overrides = parseComponentOverrides(rdMd);
   let riskFactors = parseRiskBucketTables(rdMd);

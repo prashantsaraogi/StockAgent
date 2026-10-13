@@ -97,7 +97,7 @@ export function EarningsQualityResults({ data, recordId, savedAt }: EarningsQual
             </p>
           </div>
           <Link href={data.stockbookUrl} className="btn-ghost">
-            Open PARAMETERS →
+            View parameters →
           </Link>
         </div>
 
@@ -248,9 +248,19 @@ export function EarningsQualityResults({ data, recordId, savedAt }: EarningsQual
             <span className={`eq-part-verdict ${toneClass(partB.tone)}`}>{partB.verdict}</span>
           </div>
           <p className="muted small calc-tab-lead">
-            Base EPS growth from PARAMETERS, reduced by internal and external risk haircuts per year.
-            Temporary external risks (e.g. oil) taper in outer years; L3 risks persist.
-            {partB.aiEnriched ? ' AI context from risk registers + News index.' : ' Rule-based context (set GOOGLE_GENERATIVE_AI_API_KEY for AI notes).'}
+            Starts from your base EPS growth assumption, then trims each year for company-specific and
+            macro/sector risks. Temporary external pressures usually fade in later years; severe risks
+            stay in the path.{' '}
+            <Link href="/readme/glossary">How to read risk levels →</Link>
+            {partB.internalRisk.source === 'dynamic-synthesis' ||
+            partB.externalRisk.source === 'dynamic-synthesis' ? (
+              <>
+                {' '}
+                <span className="eq-estimated-badge">Estimated risk overlay</span> — sector defaults
+                until company-specific risk registers are saved.
+              </>
+            ) : null}
+            {partB.aiEnriched ? ' Year notes enriched from latest news context.' : null}
           </p>
 
           <div className="eq-forward-highlight">{partB.currentYearHighlight}</div>

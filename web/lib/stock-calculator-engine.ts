@@ -356,13 +356,22 @@ export async function runStockCalculator(
     qualityParsed,
     sector
   );
-  const internalRisk = parseRiskFactor(
+  const riskCtx = {
+    sector,
+    ticker: resolved.ticker,
+    stockName: loc?.stock ?? resolved.company,
+    quality,
+  };
+  const { resolveRiskFactor } = await import('./dynamic-risk-register');
+  const internalRisk = resolveRiskFactor(
     internalFile?.content ?? null,
-    'internal-negative-risk.md'
+    'internal-negative-risk.md',
+    riskCtx
   );
-  const externalRisk = parseRiskFactor(
+  const externalRisk = resolveRiskFactor(
     externalFile?.content ?? null,
-    'external-negative-risk.md'
+    'external-negative-risk.md',
+    riskCtx
   );
 
   const paramMetrics = paramFile

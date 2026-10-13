@@ -13,11 +13,8 @@ import { fetchLiveNseCmp } from './nse-cmp';
 import { stockbookPath } from './navigation';
 import { buildPartA, buildPartB } from './earnings-quality-parts';
 import { enrichForwardYearContext } from './earnings-quality-context';
-import {
-  parseFrameworkQualityMetrics,
-  parseRiskFactor,
-  type FrameworkQualityMetrics,
-} from './stock-calculator-framework';
+import { parseFrameworkQualityMetrics, type FrameworkQualityMetrics } from './stock-calculator-framework';
+import { resolveRiskFactor } from './dynamic-risk-register';
 import { getBundledEarningsQualityMd, getBundledParametersMd } from './load-bundled-stockbook';
 import { parseParametersEpsCagrBasePct } from './parameters-assumptions';
 import { parseParametersMetrics } from './stock-calculator-engine';
@@ -566,8 +563,6 @@ export async function runEarningsQualityAnalysis(
   const internal = await readStockTabContent(sector, stockName, 'internal-risk', input.tenantId);
   const external = await readStockTabContent(sector, stockName, 'external-risk', input.tenantId);
   const quality = parseFrameworkQualityMetrics(parametersMd, detail?.content ?? null);
-  const internalRisk = parseRiskFactor(internal?.content ?? null, 'internal-negative-risk.md');
-  const externalRisk = parseRiskFactor(external?.content ?? null, 'external-negative-risk.md');
 
   const growthMap = parseSectionTable(eqMd, 'A');
   const profitMap = parseSectionTable(eqMd, 'B');
@@ -680,6 +675,27 @@ export async function runEarningsQualityAnalysis(
   const quarterlyTrends = buildQuarterlyTrends(quarterly);
   const warnings = detectWarnings(quarterly, quarterlyTrends);
   const annualSignals = buildAnnualSignals(growth, profitability, quarterlyTrends, partA);
+
+  const overallToneEarly =
+    warnings.some((w) => w.severity === 'bad') ? 'bad' : warnings.length > 0 ? 'mixed' : 'good';
+  const riskCtx = {
+    sector,
+    ticker: resolved.ticker,
+    stockName,
+    quality,
+    eqWarning: warnings[0]?.detail ?? null,
+    overallEqTone: overallToneEarly as 'good' | 'mixed' | 'bad',
+  };
+  const internalRisk = resolveRiskFactor(
+    internal?.content ?? null,
+    'internal-negative-risk.md',
+    riskCtx
+  );
+  const externalRisk = resolveRiskFactor(
+    external?.content ?? null,
+    'external-negative-risk.md',
+    riskCtx
+  );
 
   const startingEps =
     latestEps ??
