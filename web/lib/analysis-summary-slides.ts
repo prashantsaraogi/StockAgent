@@ -17,11 +17,19 @@ export interface SummarySlideRow {
   takeaway: string;
 }
 
+export interface SummarySlideCard {
+  label: string;
+  verdict: string;
+  tone: SlideBulletTone;
+}
+
 export interface SummarySlide {
   title: string;
   subtitle?: string;
   bullets?: SummarySlideBullet[];
   rows?: SummarySlideRow[];
+  /** Overview-style module cards (no links — for video slide 1). */
+  cards?: SummarySlideCard[];
 }
 
 function cleanVerdict(raw: string): string {
@@ -119,46 +127,21 @@ function riskBullets(pe: StockCalculatorFullResult): SummarySlideBullet[] {
   return bullets.slice(0, 4);
 }
 
-function moduleRows(pe: StockCalculatorFullResult): SummarySlideRow[] {
+function overviewCards(pe: StockCalculatorFullResult): SummarySlideCard[] {
   const o = pe.overview;
-  return [
-    {
-      module: 'CAGR / growth test',
-      signal: signalLabel(o.cagrVerdict),
-      takeaway: cleanVerdict(pe.cagr.frameworkVerdict ?? pe.cagr.impliedVerdict).slice(0, 48),
-    },
-    {
-      module: 'P/E valuation',
-      signal: signalLabel(o.peVerdict),
-      takeaway:
-        pe.peParameters.premiumTo10yPct != null
-          ? `${pe.peParameters.premiumTo10yPct >= 0 ? '+' : ''}${pe.peParameters.premiumTo10yPct.toFixed(1)}% vs 10Y`
-          : 'See P/E tab',
-    },
-    {
-      module: 'Earnings quality',
-      signal: signalLabel(o.earningsQualityVerdict),
-      takeaway: 'Cash vs profit cross-check',
-    },
-    {
-      module: 'Margin',
-      signal: signalLabel(o.marginVerdict),
-      takeaway: 'Vs history & peers',
-    },
-    {
-      module: 'Business quality',
-      signal: signalLabel(o.businessQualityVerdict),
-      takeaway:
-        pe.businessQuality.businessQualityScore10 != null
-          ? `Score ${pe.businessQuality.businessQualityScore10.toFixed(1)}/10`
-          : 'Moat pillars',
-    },
-    {
-      module: 'Risk & decision',
-      signal: signalLabel(o.riskVerdict),
-      takeaway: cleanVerdict(pe.riskDecision.investmentVerdict).slice(0, 48),
-    },
+  const items: { label: string; verdict: string }[] = [
+    { label: 'CAGR Evaluation', verdict: o.cagrVerdict },
+    { label: 'PE Evaluation', verdict: o.peVerdict },
+    { label: 'Earnings Quality', verdict: o.earningsQualityVerdict },
+    { label: 'Margin Analysis', verdict: o.marginVerdict },
+    { label: 'Business Quality', verdict: o.businessQualityVerdict },
+    { label: 'Risk & Decision', verdict: o.riskVerdict },
   ];
+  return items.map((item) => ({
+    label: item.label,
+    verdict: signalLabel(item.verdict),
+    tone: toneFromVerdict(item.verdict),
+  }));
 }
 
 function overallBullets(pe: StockCalculatorFullResult): SummarySlideBullet[] {
@@ -191,12 +174,9 @@ export function buildAnalysisSummarySlides(analysis: StockCalculatorFullResult):
 
   return [
     {
-      title: analysis.stockName,
-      subtitle: `${analysis.ticker} · ${analysis.sector} · Stock Analysis · ${date}`,
-      bullets: [
-        { text: '60-second summary — positives, risks, module ranks', tone: 'neutral' },
-        { text: 'Not investment advice · from your saved run', tone: 'neutral' },
-      ],
+      title: 'Overview',
+      subtitle: `${analysis.stockName} (${analysis.ticker}) · ${analysis.sector} · ${date}`,
+      cards: overviewCards(analysis),
     },
     {
       title: 'What looks supportive',
@@ -207,19 +187,14 @@ export function buildAnalysisSummarySlides(analysis: StockCalculatorFullResult):
       bullets: riskBullets(analysis),
     },
     {
-      title: 'Module signals (this run)',
-      rows: moduleRows(analysis),
-    },
-    {
       title: 'Overall',
       bullets: overallBullets(analysis),
     },
     {
       title: 'End',
-      subtitle: `${analysis.stockName} (${analysis.ticker}) · ${date}`,
+      subtitle: `${analysis.stockName} · ${analysis.ticker}`,
       bullets: [
-        { text: 'Full detail: Stock Analysis → same saved report', tone: 'neutral' },
-        { text: 'Re-run when CMP or results move materially', tone: 'neutral' },
+        { text: 'Re-run when price or results change materially', tone: 'neutral' },
         { text: 'Not investment advice', tone: 'neutral' },
       ],
     },
@@ -227,6 +202,6 @@ export function buildAnalysisSummarySlides(analysis: StockCalculatorFullResult):
 }
 
 /** Slide count × duration ≈ 60s for YouTube capture */
-export const SUMMARY_SLIDE_COUNT = 6;
+export const SUMMARY_SLIDE_COUNT = 5;
 export const SUMMARY_TOTAL_SECONDS = 60;
 export const SUMMARY_SECONDS_PER_SLIDE = SUMMARY_TOTAL_SECONDS / SUMMARY_SLIDE_COUNT;

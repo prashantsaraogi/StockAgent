@@ -73,6 +73,16 @@ export function AnalysisSummaryVideoPlayer({ slides, recordMode = false }: Props
               ))}
             </ul>
           )}
+          {slide.cards && slide.cards.length > 0 && (
+            <div className="asv-overview-grid">
+              {slide.cards.map((card) => (
+                <article key={card.label} className="asv-overview-card">
+                  <span className="asv-card-label">{card.label}</span>
+                  <p className={`asv-card-verdict asv-card-${card.tone}`}>{card.verdict}</p>
+                </article>
+              ))}
+            </div>
+          )}
           {slide.rows && (
             <table className="asv-table">
               <thead>

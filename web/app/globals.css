@@ -4654,3 +4654,58 @@ td.gain-neg {
   margin-top: 0.75rem;
 }
 
+.asv-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(0.35rem, 1.2vw, 0.65rem);
+  margin-top: 0.35rem;
+}
+
+@media (max-width: 720px) {
+  .asv-overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.asv-overview-card {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid #243044;
+  border-radius: 8px;
+  padding: clamp(0.35rem, 1vw, 0.55rem) clamp(0.45rem, 1.2vw, 0.65rem);
+  min-height: 4.5rem;
+}
+
+.asv-card-label {
+  display: block;
+  font-size: clamp(0.62rem, 1.4vw, 0.75rem);
+  color: #8b9cb3;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.25rem;
+}
+
+.asv-card-verdict {
+  font-size: clamp(0.72rem, 1.6vw, 0.88rem);
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.asv-card-good {
+  color: #34d399;
+}
+.asv-card-warn {
+  color: #fbbf24;
+}
+.asv-card-bad {
+  color: #f87171;
+}
+.asv-card-neutral {
+  color: #e8edf4;
+}
+
+.asv-record-mode .asv-title {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  margin-bottom: 0.5rem;
+}
+
