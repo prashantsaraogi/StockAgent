@@ -289,7 +289,9 @@ export async function saveFullAnalysisRecord(
       if (error && isMissingTableError(error)) {
         markSupabaseTableUnavailable(FULL_HISTORY_TABLE);
         warnMissingTableOnce(FULL_HISTORY_TABLE, '009_stock_calculator_full_history.sql');
-      } else if (!error) {
+      } else if (error) {
+        console.warn('[full_history] save failed:', error.message);
+      } else {
         persisted = true;
       }
     }

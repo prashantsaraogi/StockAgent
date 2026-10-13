@@ -5,11 +5,8 @@ import { useEffect, useState } from 'react';
 import { StockCalculatorFullResults, type FullResultTabId } from '@/components/StockCalculatorFullResults';
 import { StockAnalysisRefreshBar } from '@/components/StockAnalysisRefreshBar';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
-import {
-  readFullAnalysisSessionCache,
-  writeFullAnalysisSessionCache,
-  type CachedFullAnalysis,
-} from '@/lib/stock-full-analysis-session-cache';
+import type { CachedFullAnalysis } from '@/lib/stock-full-analysis-session-cache';
+import { loadFullAnalysisEntry } from '@/lib/load-full-analysis-client';
 
 interface Props {
   recordId: string;
@@ -27,35 +24,17 @@ export function FullAnalysisDetailLoader({ recordId, initialTab }: Props) {
     async function load() {
       setLoading(true);
       setError('');
-      try {
-        const res = await fetch(
-          `/api/stock-calculator/full?recordId=${encodeURIComponent(recordId)}`
-        );
-        const data = await res.json();
-        if (!cancelled && data.ok && data.entry) {
-          const e = data.entry as CachedFullAnalysis;
-          writeFullAnalysisSessionCache(e);
-          setEntry(e);
-          setLoading(false);
-          return;
-        }
-      } catch {
-        /* try session cache */
-      }
-
-      const cached = readFullAnalysisSessionCache(recordId);
-      if (!cancelled && cached) {
-        setEntry(cached);
+      const e = await loadFullAnalysisEntry(recordId);
+      if (cancelled) return;
+      if (e) {
+        setEntry(e);
         setLoading(false);
         return;
       }
-
-      if (!cancelled) {
-        setError(
-          'This saved report is no longer available on this device. Run Stock Analysis again for this stock.'
-        );
-        setLoading(false);
-      }
+      setError(
+        'This saved report is no longer available on this device. Run Stock Analysis again for this stock.'
+      );
+      setLoading(false);
     }
 
     void load();
