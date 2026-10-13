@@ -798,6 +798,12 @@ button.stock-quick-q:disabled {
   gap: 0.75rem 1rem;
 }
 
+.stock-analysis-saved-bar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 /* ——— Report iframe ——— */
 .report-frame-wrap {
   width: 100%;
@@ -4510,5 +4516,141 @@ td.gain-neg {
   .sector-rank-links {
     columns: 1;
   }
+}
+
+/* Analysis summary video (60s / YouTube capture) */
+.asv-page-record {
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0c1117;
+}
+
+.asv-root {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.asv-record-mode.asv-root {
+  max-width: none;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.asv-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #151b24;
+  border: 1px solid #243044;
+  border-radius: 12px;
+  padding: clamp(1rem, 3vw, 2rem);
+  overflow: hidden;
+}
+
+.asv-record-mode .asv-stage {
+  border-radius: 0;
+  border: none;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  max-width: 1920px;
+  max-height: 1080px;
+}
+
+.asv-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: var(--accent, #3b82f6);
+  transition: width 0.2s linear;
+}
+
+.asv-subtitle {
+  color: #8b9cb3;
+  font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+  margin-bottom: 0.5rem;
+}
+
+.asv-title {
+  font-size: clamp(1.35rem, 3.5vw, 2rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #e8edf4;
+}
+
+.asv-bullets {
+  list-style: none;
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  line-height: 1.5;
+  color: #e8edf4;
+}
+
+.asv-bullets li {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+  position: relative;
+}
+
+.asv-bullets li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #3b82f6;
+  font-weight: 700;
+}
+
+.asv-bullet-good::before {
+  color: #34d399;
+}
+.asv-bullet-warn::before {
+  color: #fbbf24;
+}
+.asv-bullet-bad::before {
+  color: #f87171;
+}
+
+.asv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(0.72rem, 1.6vw, 0.88rem);
+  color: #e8edf4;
+}
+
+.asv-table th {
+  text-align: left;
+  color: #8b9cb3;
+  font-weight: 500;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid #243044;
+}
+
+.asv-table td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid #243044;
+  vertical-align: top;
+}
+
+.asv-muted {
+  color: #8b9cb3;
+}
+
+.asv-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.asv-hint {
+  text-align: center;
+  margin-top: 0.75rem;
 }
 

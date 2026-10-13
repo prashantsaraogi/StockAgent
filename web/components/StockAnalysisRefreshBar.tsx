@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import type { StockCalculatorFullInputs } from '@/lib/stock-calculator-full';
 import { writeFullAnalysisSessionCache } from '@/lib/stock-full-analysis-session-cache';
@@ -85,9 +86,17 @@ export function StockAnalysisRefreshBar({
         <p className="muted small">
           Saved to your history · last run <strong>{when}</strong> IST
         </p>
-        <button type="button" className="btn-secondary" onClick={refresh} disabled={loading}>
-          {loading ? 'Refreshing…' : 'Refresh with latest data'}
-        </button>
+        <div className="stock-analysis-saved-bar-actions">
+          <Link
+            href={`/stock-calculator/full/${recordId}/summary-video`}
+            className="btn-secondary"
+          >
+            60s summary (YouTube)
+          </Link>
+          <button type="button" className="btn-secondary" onClick={refresh} disabled={loading}>
+            {loading ? 'Refreshing…' : 'Refresh with latest data'}
+          </button>
+        </div>
       </div>
       {error && <p className="form-error small">{error}</p>}
     </div>

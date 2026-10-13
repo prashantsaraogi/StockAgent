@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Havells — Stock Analysis demo (60s)</title>
+  <style>
+    :root {
+      --bg: #0c1117;
+      --card: #151b24;
+      --text: #e8edf4;
+      --muted: #8b9cb3;
+      --accent: #3b82f6;
+      --good: #34d399;
+      --warn: #fbbf24;
+      --bad: #f87171;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .frame {
+      width: min(960px, 100vw);
+      aspect-ratio: 16 / 9;
+      background: var(--card);
+      border: 1px solid #243044;
+      border-radius: 12px;
+      padding: clamp(1.25rem, 4vw, 2.5rem);
+      position: relative;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
+    }
+    .slide {
+      position: absolute;
+      inset: clamp(1.25rem, 4vw, 2.5rem);
+      opacity: 0;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      animation: show 60s infinite;
+    }
+    .slide:nth-child(1) { animation-name: s1; }
+    .slide:nth-child(2) { animation-name: s2; }
+    .slide:nth-child(3) { animation-name: s3; }
+    .slide:nth-child(4) { animation-name: s4; }
+    .slide:nth-child(5) { animation-name: s5; }
+    .slide:nth-child(6) { animation-name: s6; }
+
+    @keyframes s1 { 0%, 2% { opacity: 1; } 14%, 100% { opacity: 0; } }
+    @keyframes s2 { 0%, 14% { opacity: 0; } 16%, 30% { opacity: 1; } 32%, 100% { opacity: 0; } }
+    @keyframes s3 { 0%, 32% { opacity: 0; } 34%, 52% { opacity: 1; } 54%, 100% { opacity: 0; } }
+    @keyframes s4 { 0%, 54% { opacity: 0; } 56%, 72% { opacity: 1; } 74%, 100% { opacity: 0; } }
+    @keyframes s5 { 0%, 74% { opacity: 0; } 76%, 90% { opacity: 1; } 92%, 100% { opacity: 0; } }
+    @keyframes s6 { 0%, 92% { opacity: 0; } 94%, 100% { opacity: 1; } }
+
+    h1 {
+      font-size: clamp(1.5rem, 4vw, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+    h2 {
+      font-size: clamp(1.1rem, 2.8vw, 1.45rem);
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+    .tagline {
+      color: var(--muted);
+      font-size: clamp(0.85rem, 2vw, 1rem);
+      margin-bottom: 1.25rem;
+    }
+    ul {
+      list-style: none;
+      font-size: clamp(0.95rem, 2.2vw, 1.15rem);
+      line-height: 1.55;
+    }
+    li {
+      margin: 0.55rem 0;
+      padding-left: 1.35rem;
+      position: relative;
+    }
+    li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    li.good::before { color: var(--good); }
+    li.warn::before { color: var(--warn); }
+    li.bad::before { color: var(--bad); }
+    .rank-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+      margin-top: 0.5rem;
+    }
+    .rank-table th, .rank-table td {
+      text-align: left;
+      padding: 0.45rem 0.6rem;
+      border-bottom: 1px solid #243044;
+    }
+    .rank-table th { color: var(--muted); font-weight: 500; }
+    .pill {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    .pill-g { background: rgba(52,211,153,0.15); color: var(--good); }
+    .pill-y { background: rgba(251,191,36,0.15); color: var(--warn); }
+    .pill-r { background: rgba(248,113,113,0.15); color: var(--bad); }
+    .progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: var(--accent);
+      animation: bar 60s linear infinite;
+      width: 0;
+    }
+    @keyframes bar { to { width: 100%; } }
+    .controls {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: var(--text);
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    button:hover { border-color: var(--accent); }
+    .hint {
+      margin-top: 0.75rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-align: center;
+      max-width: 640px;
+    }
+    .verdict-line {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      font-weight: 600;
+      margin-top: 0.75rem;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide { animation: none !important; opacity: 0; }
+      .slide:first-child { opacity: 1; }
+      .progress { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame" id="frame">
+    <div class="progress" aria-hidden="true"></div>
+
+    <section class="slide">
+      <p class="tagline">Stock Analysis · demo walkthrough</p>
+      <h1>Havells India</h1>
+      <p class="tagline">HAVELLS · Consumer electricals · ~60 seconds</p>
+      <p class="verdict-line" style="color: var(--muted); font-weight: 500;">
+        Search → run all modules → read verdict &amp; rank
+      </p>
+    </section>
+
+    <section class="slide">
+      <h2>What looks good</h2>
+      <ul>
+        <li class="good">Strong brand · wires, lighting, appliances — nationwide distribution</li>
+        <li class="good">P/E below long-run average (~48×) — cheaper vs own 10-year history</li>
+        <li class="good">Owner earnings yield above historical norm — not priced for perfection</li>
+        <li class="good">Legacy book in profit — quality compounder profile for long-term holders</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Risk lens</h2>
+      <ul>
+        <li class="warn">Rural / volume cycles — demand can lag urban premium mix</li>
+        <li class="warn">Input &amp; packaging costs — margin pressure if pass-through lags</li>
+        <li class="warn">Price above conservative buy band — ~+20% vs stress entry (PCCL zone)</li>
+        <li class="warn">12% growth test vs supported band — gap negative → <strong>WAIT</strong> on lump-sum adds</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Module ranking (this run)</h2>
+      <table class="rank-table">
+        <thead>
+          <tr><th>Module</th><th>Signal</th><th>Takeaway</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Business quality</td><td><span class="pill pill-g">Strong</span></td><td>Franchise OK for hold</td></tr>
+          <tr><td>Valuation / P/E</td><td><span class="pill pill-y">Fair</span></td><td>Not deep discount vs history</td></tr>
+          <tr><td>Earnings quality</td><td><span class="pill pill-y">Mixed</span></td><td>Watch cash vs profit</td></tr>
+          <tr><td>CAGR vs supported</td><td><span class="pill pill-r">Stretched</span></td><td>Expected &gt; risk-adjusted path</td></tr>
+          <tr><td>Surplus rank</td><td><span class="pill pill-y">~10%</span></td><td>Not #1 for fresh ₹ today</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide">
+      <h2>Overall</h2>
+      <ul>
+        <li class="good"><strong>HOLD</strong> existing shares — wealth mandate</li>
+        <li class="warn"><strong>Slow SIP</strong> only if price at/below personal add gate (~₹1,125 cap in book)</li>
+        <li class="warn">Fresh surplus — deploy to higher-ranked names with better margin of safety first</li>
+        <li>One line: <strong>Quality name · fair-not-cheap · patience on new money</strong></li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <h2>Try it in the app</h2>
+      <ul>
+        <li>Stock Analysis → search <strong>Havells</strong></li>
+        <li>Tabs: Investment view · CAGR · P/E · Earnings · Margin · Moat · Risk</li>
+        <li>Re-run when results or CMP move ≥10%</li>
+      </ul>
+      <p class="tagline" style="margin-top: 1.25rem;">Not investment advice · illustrative demo</p>
+    </section>
+  </div>
+
+  <div class="controls">
+    <button type="button" id="restart">Restart 60s</button>
+    <button type="button" id="fs">Fullscreen (record here)</button>
+  </div>
+  <p class="hint">
+    To save a video: click Fullscreen, press <strong>Win + G</strong> (Xbox Game Bar) or OBS → Record,
+    then Restart. Loop repeats every 60 seconds.
+  </p>
+
+  <script>
+    document.getElementById('restart').addEventListener('click', () => location.reload());
+    document.getElementById('fs').addEventListener('click', () => {
+      const el = document.getElementById('frame');
+      (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el);
+    });
+  </script>
+</body>
+</html>

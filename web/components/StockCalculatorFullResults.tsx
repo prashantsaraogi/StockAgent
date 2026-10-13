@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 import type { StockCalculatorFullResult } from '@/lib/stock-calculator-full';
 import type { FullAnalysisChildIds } from '@/lib/stock-calculator-full-history';
@@ -147,6 +148,14 @@ export function StockCalculatorFullResults({
           {analysis.inputs.peBasis === 'forward' ? 'Forward' : 'TTM'} P/E
           {savedAt &&
             ` · ${new Date(savedAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })} IST`}
+          {fullRecordId && (
+            <>
+              {' · '}
+              <Link href={`/stock-calculator/full/${fullRecordId}/summary-video`}>
+                60s summary →
+              </Link>
+            </>
+          )}
         </p>
 
         <nav className="sub-nav calc-tabs calc-full-module-tabs" aria-label="Analysis modules">
