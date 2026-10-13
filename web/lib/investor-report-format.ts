@@ -113,6 +113,11 @@ function stripStockbookInternalRefs(markdown: string): string {
   out = out.replace(/\bframework terms\b/gi, 'investment terms');
   out = out.replace(/\bTwo-axis framework\b/gi, 'Two-axis valuation');
   out = out.replace(/\bframework read\b/gi, 'analysis read');
+  out = out.replace(/\|\s*UNVERIFIED\s*\|/gi, '| — |');
+  out = out.replace(/\|\s*Qualitative \/ UNVERIFIED\s*\|/gi, '| — |');
+  out = out.replace(/\|\s*PARAMETERS Part 1\s*\|/gi, '| Company parameters |');
+  out = out.replace(/\|\s*StockBook \/ PARAMETERS\s*\|/gi, '| Company parameters |');
+  out = out.replace(/Refresh from AR/gi, 'See annual report for audit detail');
   out = out.replace(/\n{3,}/g, '\n\n');
   return out.trim();
 }
@@ -132,6 +137,41 @@ export function sanitizeStockbookHtmlForWeb(html: string): string {
 /**
  * Wisdom / quotes library on the web — quotes and themes only; agent meta hidden at render time.
  */
+/** Moat tab — pillar headlines, factor rows, ceiling notes (keep raw strings in API/StockBook). */
+export function sanitizeMoatLine(text: string | null | undefined): string {
+  if (!text?.trim()) return '—';
+  let out = stripFrameworkJargon(stripStockbookInternalRefs(text));
+  out = out.replace(
+    /Framework proxy [\d./]+(?:\/10)?\s*vs anchor\s*[\d.—]+(?:\s*—\s*)?(?:add\s*)?[^.]*pillar detail\.?/gi,
+    'Preliminary score from sector and growth inputs'
+  );
+  out = out.replace(
+    /PEG anchor [\d./]+(?:\/10)?\s*→\s*pillar\s*[\d./]+(?:\/10)?\s*—[^.]*/gi,
+    'Derived from valuation quality score'
+  );
+  out = out.replace(
+    /Derived from PARAMETERS \/ sector baseline[^.]*/gi,
+    'Estimated from sector and company parameters'
+  );
+  out = out.replace(/\s*—\s*PARAMETERS Part \d+/gi, '');
+  out = out.replace(/\bPARAMETERS Part \d+\b/gi, '5-year growth assumptions');
+  out = out.replace(/\bPARAMETERS \/ sector baseline\b/gi, 'Sector baseline');
+  out = out.replace(/\bPARAMETERS file\b/gi, 'company parameters');
+  out = out.replace(/\bdetail §\d+\b/gi, 'company analysis');
+  out = out.replace(/\s*§\d+\b/g, '');
+  out = out.replace(/\s*\((?:OUR ASSUMPTION|UNVERIFIED|HYPOTHESIS)\)/gi, '');
+  out = out.replace(/\bPEG businessQualityScore10\b/gi, 'Valuation quality score');
+  out = out.replace(/Pillar proxy from bundled PEG \([^)]+\)/gi, 'Score aligned to valuation quality');
+  out = out.replace(/\bpartial\s*—\s*add\s*[^.]*/gi, 'Partial data — run a full refresh for detail');
+  if (
+    /framework\s*proxy|vs\s*anchor|pillar\s*detail|add\s+business\s+quality/i.test(out)
+  ) {
+    out = 'Preliminary score from sector and growth inputs';
+  }
+  out = out.replace(/\s+/g, ' ').trim();
+  return out || '—';
+}
+
 /** Module tab subtitle — hide repo filenames from end users. */
 export function formatAnalysisDataSource(raw: string | null | undefined): string {
   if (!raw?.trim()) return 'Live analysis';

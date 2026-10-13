@@ -6,11 +6,11 @@
 
 import { readRepoFile } from './stockbook';
 import type { StockCalculatorResult, ProjectionScenario, PeBasis } from './stock-calculator-engine';
-import type {
-  FrameworkQualityMetrics,
-  RiskFactorResult,
-  CagrGapAnalysis,
-} from './stock-calculator-framework';
+import type { RiskFactorResult, CagrGapAnalysis } from './stock-calculator-framework';
+import {
+  qualityMetricSourceLabel,
+  type EnrichedQualityMetrics,
+} from './framework-quality-external';
 
 export interface StockbookReportContext {
   summaryExcerpt: string | null;
@@ -213,13 +213,14 @@ ${ctx.approachExcerpt ? `\n### Approach excerpt (StockBook)\n\n${ctx.approachExc
 
 ## Business quality
 
-| Metric | Today @ CMP | Framework read | Label |
-|--------|------------:|----------------|-------|
-| **ROE** | ${quality.roeDisplay} | ${quality.roeRead ?? '—'} | ${quality.roePct != null && quality.roePct >= 15 ? 'FACT — Buffett gate pass' : quality.roePct != null ? 'FACT — below 15% gate' : 'UNVERIFIED'} |
-| **EBITDA margin** | ${quality.ebitdaDisplay} | ${quality.ebitdaRead ?? '—'} | PARAMETERS Part 1 |
-| **Debt / leverage** | ${quality.debtDisplay} | ${quality.debtRead ?? '—'} | ${quality.debtRatio != null ? 'FACT' : 'Qualitative / UNVERIFIED'} |
-| **Cash flow / balance sheet** | ${quality.cashFlowDisplay} | ${quality.cashFlowRead ?? '—'} | StockBook / PARAMETERS |
+| Metric | Today @ CMP | Analysis read | Source |
+|--------|------------:|----------------|--------|
+| **ROE** | ${quality.roeDisplay} | ${quality.roeRead ?? '—'} | ${qualityMetricSourceLabel(quality.roeSource)} |
+| **EBITDA margin** | ${quality.ebitdaDisplay} | ${quality.ebitdaRead ?? '—'} | ${qualityMetricSourceLabel(quality.ebitdaSource)} |
+| **Debt / leverage** | ${quality.debtDisplay} | ${quality.debtRead ?? '—'} | ${qualityMetricSourceLabel(quality.debtSource)} |
+| **Cash flow / balance sheet** | ${quality.cashFlowDisplay} | ${quality.cashFlowRead ?? '—'} | ${qualityMetricSourceLabel(quality.cashFlowSource)} |
 
+${quality.liveEnrichmentLabel ? `*Live profitability and balance-sheet fields backfilled from **${quality.liveEnrichmentLabel}** when company parameters were pending.*\n` : ''}
 *Separate **business quality** from **valuation at CMP** — excellent business can still be a poor entry at the wrong price.*
 
 ---

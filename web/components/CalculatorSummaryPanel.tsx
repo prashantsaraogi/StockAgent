@@ -407,7 +407,7 @@ function ProfitabilityTab({ quality }: Pick<CalculatorSummaryProps, 'quality'>) 
   return (
     <>
       <p className="calc-tab-lead muted">
-        Business quality at CMP — separate from valuation (PARAMETERS Part 1 + detail-analysis).
+        Business quality at CMP — separate from valuation (historical metrics + forward assumptions).
       </p>
       <div className="calc-metrics-grid">
         <article className="calc-metric-card">

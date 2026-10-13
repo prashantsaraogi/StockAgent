@@ -20,6 +20,10 @@ import {
 } from './stock-calculator-tabs';
 import { getBundledParametersMd } from './load-bundled-stockbook';
 import { parseMedian10yPeFromMd } from './pe-history-reference';
+import {
+  enrichFrameworkQualityMetrics,
+  type EnrichedQualityMetrics,
+} from './framework-quality-external';
 
 export type PeBasis = 'ttm' | 'forward';
 
@@ -82,7 +86,7 @@ export interface StockCalculatorResult {
   projectedEps: number;
   scenarios: ProjectionScenario[];
   impliedVerdict: string;
-  quality: FrameworkQualityMetrics;
+  quality: EnrichedQualityMetrics;
   internalRisk: RiskFactorResult;
   externalRisk: RiskFactorResult;
   cagrGap: CagrGapAnalysis;
@@ -342,10 +346,15 @@ export async function runStockCalculator(
     ? await readStockTabContent(loc.sector, loc.stock, 'external-risk', 'dev')
     : null;
 
-  const quality = parseFrameworkQualityMetrics(
+  const qualityParsed = parseFrameworkQualityMetrics(
     paramFile?.content ?? null,
     detailFile?.content ?? null,
     internalFile?.content ?? externalFile?.content ?? null
+  );
+  const quality = await enrichFrameworkQualityMetrics(
+    resolved.ticker,
+    qualityParsed,
+    sector
   );
   const internalRisk = parseRiskFactor(
     internalFile?.content ?? null,

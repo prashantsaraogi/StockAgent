@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import type { BusinessQualityResult, MoatPillar, MoatSignal } from '@/lib/business-quality-moat';
-import { formatAnalysisDataSource } from '@/lib/investor-report-format';
+import { formatAnalysisDataSource, sanitizeMoatLine } from '@/lib/investor-report-format';
 
 function fmtInr(n: number | null): string {
   if (n == null || !Number.isFinite(n)) return '—';
@@ -20,23 +20,36 @@ function signalClass(s: MoatSignal): string {
   return 'bq-signal-none';
 }
 
+function displayPillar(pillar: MoatPillar): MoatPillar {
+  return {
+    ...pillar,
+    headline: sanitizeMoatLine(pillar.headline),
+    factors: pillar.factors.map((f) => ({
+      ...f,
+      label: sanitizeMoatLine(f.label),
+      assessment: sanitizeMoatLine(f.assessment),
+    })),
+  };
+}
+
 function PillarCard({ pillar }: { pillar: MoatPillar }) {
+  const p = displayPillar(pillar);
   return (
     <section className="card bq-pillar-card">
       <div className="bq-pillar-head">
         <h3>
-          {pillar.number}. {pillar.title}
+          {p.number}. {p.title}
         </h3>
         <div className="bq-pillar-score">
-          <span className={`bq-score-badge ${signalClass(pillar.signal)}`}>
-            {pillar.score10 ?? '—'}/10
+          <span className={`bq-score-badge ${signalClass(p.signal)}`}>
+            {p.score10 ?? '—'}/10
           </span>
-          <span className={`bq-signal ${signalClass(pillar.signal)}`}>{pillar.signal}</span>
+          <span className={`bq-signal ${signalClass(p.signal)}`}>{p.signal}</span>
         </div>
       </div>
-      <p className="muted small bq-pillar-headline">{pillar.headline}</p>
+      <p className="muted small bq-pillar-headline">{p.headline}</p>
 
-      {pillar.factors.length > 0 ? (
+      {p.factors.length > 0 ? (
         <table className="bq-factor-table">
           <thead>
             <tr>
@@ -46,7 +59,7 @@ function PillarCard({ pillar }: { pillar: MoatPillar }) {
             </tr>
           </thead>
           <tbody>
-            {pillar.factors.map((f) => (
+            {p.factors.map((f) => (
               <tr key={f.id}>
                 <td>{f.label}</td>
                 <td>{f.assessment}</td>
@@ -56,7 +69,7 @@ function PillarCard({ pillar }: { pillar: MoatPillar }) {
           </tbody>
         </table>
       ) : (
-        <p className="muted small">No factor rows — add to BUSINESS_QUALITY file.</p>
+        <p className="muted small">No detailed factor breakdown yet — refresh after the next company update.</p>
       )}
     </section>
   );
@@ -94,12 +107,6 @@ export function BusinessQualityResults({ data, recordId, savedAt }: BusinessQual
             </h2>
             <p className="muted small">
               {data.sector} · {formatAnalysisDataSource(data.dataSource)}
-              {data.businessQualityFile && (
-                <>
-                  {' '}
-                  · <code>{data.businessQualityFile}</code>
-                </>
-              )}
             </p>
           </div>
           <Link href={data.stockbookUrl} className="btn-ghost">
@@ -119,7 +126,7 @@ export function BusinessQualityResults({ data, recordId, savedAt }: BusinessQual
             <div className="pe-eval-metric">
               <span className="pe-eval-label">CMP</span>
               <strong>{fmtInr(data.cmp)}</strong>
-              <span className="muted small">{data.cmpSource}</span>
+              <span className="muted small">{sanitizeMoatLine(data.cmpSource)}</span>
             </div>
             <div className="pe-eval-metric">
               <span className="pe-eval-label">Pillars scored</span>
@@ -140,7 +147,9 @@ export function BusinessQualityResults({ data, recordId, savedAt }: BusinessQual
         </div>
 
         {data.summaryLines.length > 0 && (
-          <p className="muted small eq-summary-lines">{data.summaryLines.join(' · ')}</p>
+          <p className="muted small eq-summary-lines">
+            {data.summaryLines.map((line) => sanitizeMoatLine(line)).join(' · ')}
+          </p>
         )}
       </section>
 
@@ -152,7 +161,7 @@ export function BusinessQualityResults({ data, recordId, savedAt }: BusinessQual
               <div key={h.factor} className="bq-highlight-cell">
                 <span className={`bq-signal ${signalClass(h.signal)}`}>{h.signal}</span>
                 <strong>{h.factor}</strong>
-                <span className="muted small">{h.assessment}</span>
+                <span className="muted small">{sanitizeMoatLine(h.assessment)}</span>
               </div>
             ))}
           </div>
@@ -171,7 +180,9 @@ export function BusinessQualityResults({ data, recordId, savedAt }: BusinessQual
             </tr>
           </thead>
           <tbody>
-            {data.pillars.map((p) => (
+            {data.pillars.map((pillar) => {
+              const p = displayPillar(pillar);
+              return (
               <tr key={p.id}>
                 <td>
                   {p.number}. {p.title}
@@ -182,7 +193,8 @@ export function BusinessQualityResults({ data, recordId, savedAt }: BusinessQual
                 <td className={signalClass(p.signal)}>{p.signal}</td>
                 <td className="muted small">{p.headline}</td>
               </tr>
-            ))}
+            );
+            })}
           </tbody>
         </table>
       </section>
@@ -198,10 +210,12 @@ export function BusinessQualityResults({ data, recordId, savedAt }: BusinessQual
           <h3>Why not 10/10?</h3>
           <ul>
             {data.notTenReasons.map((r) => (
-              <li key={r}>{r}</li>
+              <li key={r}>{sanitizeMoatLine(r)}</li>
             ))}
           </ul>
-          {data.ceilingNote && <p className="muted small">{data.ceilingNote}</p>}
+          {data.ceilingNote && (
+            <p className="muted small">{sanitizeMoatLine(data.ceilingNote)}</p>
+          )}
         </section>
       )}
     </>

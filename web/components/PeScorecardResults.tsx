@@ -255,7 +255,7 @@ export function PeScorecardResults({ data, recordId, savedAt }: PeScorecardResul
 
       <div className="pe-eval-columns">
         <section className="card">
-          <h3>PARAMETERS Part 1 — 10Y rear-view</h3>
+          <h3>10-year historical view</h3>
           {params.historical.rows.length > 0 ? (
             <div className="table-wrap">
               <table className="data-table calc-tab-table">
@@ -287,7 +287,7 @@ export function PeScorecardResults({ data, recordId, savedAt }: PeScorecardResul
         </section>
 
         <section className="card">
-          <h3>PARAMETERS Part 2 — 5Y forward</h3>
+          <h3>5-year forward view</h3>
           <p className="muted small calc-tab-lead">Forward P/E is confirmatory only.</p>
           <div className="table-wrap">
             <table className="data-table calc-tab-table">

@@ -19,6 +19,7 @@ import { saveEarningsQualityRecord } from './earnings-quality-history';
 import { saveMarginRecord } from './margin-history';
 import { saveBusinessQualityRecord } from './business-quality-history';
 import { saveRiskDecisionRecord } from './risk-decision-history';
+import { toInvestorFacingBusinessQuality } from './business-quality-investor-view';
 
 export interface FullAnalysisChildIds {
   cagr: string;
@@ -382,6 +383,17 @@ export async function getLatestFullAnalysisByTicker(
   return all.find((e) => e.ticker.toUpperCase() === key) ?? null;
 }
 
+function polishFullAnalysisRecord(record: StockCalculatorFullRecord): StockCalculatorFullRecord {
+  if (!record.analysis?.businessQuality) return record;
+  return {
+    ...record,
+    analysis: {
+      ...record.analysis,
+      businessQuality: toInvestorFacingBusinessQuality(record.analysis.businessQuality),
+    },
+  };
+}
+
 export async function getFullAnalysisRecord(
   tenantId: string,
   id: string,
@@ -392,12 +404,12 @@ export async function getFullAnalysisRecord(
     const remote = await fetchOneFromSupabase(userId, id);
     if (remote) {
       await persistRecordToDisk(tenantId, remote);
-      return remote;
+      return polishFullAnalysisRecord(remote);
     }
   }
 
   const local = (await readIndex(tenantId)).entries.find((e) => e.id === id);
-  if (local) return local;
+  if (local) return polishFullAnalysisRecord(local);
 
   return null;
 }

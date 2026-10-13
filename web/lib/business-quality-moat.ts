@@ -21,6 +21,7 @@ import {
   getBundledParametersMd,
   getBundledPegMd,
 } from './load-bundled-stockbook';
+import { toInvestorFacingBusinessQuality } from './business-quality-investor-view';
 
 export type EvidenceType = 'FACT' | 'MANAGEMENT CLAIM' | 'HYPOTHESIS' | 'OUR ASSUMPTION' | 'UNVERIFIED';
 export type MoatSignal = '🟢' | '🟡' | '🔴' | '—';
@@ -206,7 +207,21 @@ function pillarHeadlineFromFactors(factors: MoatFactor[], explicit?: string): st
   if (explicit && !/^partial\s*—/i.test(explicit) && explicit !== '—') return explicit;
   const parts = factors.map((f) => f.assessment).filter((a) => a && a !== '—');
   if (parts.length > 0) return parts.join(' · ').slice(0, 160);
-  return 'Derived from PARAMETERS / sector baseline (OUR ASSUMPTION) — deepen in BUSINESS_QUALITY file';
+  return 'Estimated from sector and company parameters';
+}
+
+function preliminaryPillarHeadline(score10: number): string {
+  return `Preliminary score (${score10}/10) from sector and growth inputs`;
+}
+
+function isPlaceholderMoatPillar(p: MoatPillar): boolean {
+  if (p.score10 == null) return true;
+  if (/^partial\s*—/i.test(p.headline)) return true;
+  if (/Framework proxy|add BUSINESS_QUALITY|PEG anchor/i.test(p.headline)) return true;
+  return (
+    p.factors.length === 1 &&
+    (p.factors[0].id.endsWith('_baseline') || p.factors[0].id.endsWith('_peg_proxy'))
+  );
 }
 
 function pillarFromFactors(
@@ -328,10 +343,7 @@ function mergePillars(primary: MoatPillar[], derived: MoatPillar[]): MoatPillar[
   return PILLAR_DEFS.map((def) => {
     const p = primary.find((x) => x.id === def.id)!;
     const d = derived.find((x) => x.id === def.id)!;
-    const pWeak =
-      p.score10 == null ||
-      /^partial\s*—/i.test(p.headline) ||
-      p.headline.includes('add BUSINESS_QUALITY');
+    const pWeak = isPlaceholderMoatPillar(p);
     if (!pWeak && p.score10 != null) {
       return {
         ...p,
@@ -379,9 +391,8 @@ function ensureEveryPillarScored(
     if (anchorScore != null) {
       score10 = clampScore(anchorScore + (PILLAR_SCORE_DELTA[p.id] ?? 0));
     }
-    const headline =
-      base?.headline ??
-      `Framework proxy ${score10}/10 vs anchor ${anchorScore ?? '—'} — add BUSINESS_QUALITY file for pillar detail`;
+    const headline = base?.headline ?? preliminaryPillarHeadline(score10);
+    const factorAssessment = base?.headline ?? preliminaryPillarHeadline(score10);
     return {
       ...p,
       score10,
@@ -393,8 +404,8 @@ function ensureEveryPillarScored(
           : [
               {
                 id: `${p.id}_baseline`,
-                label: 'PARAMETERS / sector baseline',
-                assessment: headline,
+                label: 'Sector baseline',
+                assessment: factorAssessment,
                 signal: scoreToSignal(score10),
                 evidence: 'OUR ASSUMPTION' as EvidenceType,
               },
@@ -629,7 +640,7 @@ function buildParameterDerivedPillars(
     runwayFactors.push({
       id: 'param_eps_cagr',
       label: 'Forward EPS CAGR (base)',
-      assessment: `${quality.baseEpsCagrPct}% — PARAMETERS Part 2`,
+      assessment: `${quality.baseEpsCagrPct}% base EPS CAGR (5Y)`,
       signal: quality.baseEpsCagrPct >= 10 ? '🟢' : quality.baseEpsCagrPct >= 5 ? '🟡' : '🔴',
       evidence: 'OUR ASSUMPTION',
     });
@@ -637,7 +648,7 @@ function buildParameterDerivedPillars(
     runwayFactors.push({
       id: 'param_implied_cagr_runway',
       label: 'Implied 5Y price CAGR (base)',
-      assessment: `${quality.impliedPriceCagrPct}% — PARAMETERS Part 2`,
+      assessment: `${quality.impliedPriceCagrPct}% implied 5Y price CAGR`,
       signal: quality.impliedPriceCagrPct >= 12 ? '🟢' : '🟡',
       evidence: 'OUR ASSUMPTION',
     });
@@ -728,7 +739,7 @@ function buildParameterDerivedPillars(
     reinvestFactors.push({
       id: 'param_implied_cagr',
       label: 'Forward 5Y implied CAGR (base)',
-      assessment: `+${impliedCagr}% — PARAMETERS Part 2`,
+      assessment: `+${impliedCagr}% implied 5Y price CAGR`,
       signal: parseFloat(impliedCagr) >= 12 ? '🟢' : '🟡',
       evidence: 'OUR ASSUMPTION',
     });
@@ -756,12 +767,12 @@ function buildParameterDerivedPillars(
         title: def.title,
         score10: proxy,
         signal: scoreToSignal(proxy),
-        headline: `PEG anchor ${pegScore}/10 → pillar ${proxy}/10 — add BUSINESS_QUALITY file for factor rows`,
+        headline: `Estimated from valuation quality (${proxy}/10)`,
         factors: [
           {
             id: `${def.id}_peg_proxy`,
-            label: 'PEG businessQualityScore10',
-            assessment: `Pillar proxy from bundled PEG (${pegScore}/10 overall)`,
+            label: 'Valuation quality score',
+            assessment: `Aligned to overall valuation quality (${pegScore}/10)`,
             signal: scoreToSignal(proxy),
             evidence: 'OUR ASSUMPTION',
           },
@@ -897,7 +908,7 @@ export async function runBusinessQualityAnalysis(
         : 'Moat score reflects industry and transition risks',
   ];
 
-  return {
+  const raw: BusinessQualityResult = {
     ticker: resolved.ticker,
     stockName,
     sector,
@@ -922,4 +933,6 @@ export async function runBusinessQualityAnalysis(
     summaryLines,
     notTenReasons,
   };
+
+  return toInvestorFacingBusinessQuality(raw);
 }

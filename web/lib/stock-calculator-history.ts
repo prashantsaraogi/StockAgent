@@ -15,11 +15,8 @@ import {
   warnMissingTableOnce,
 } from './supabase/schema-errors';
 import type { PeBasis, StockCalculatorResult } from './stock-calculator-engine';
-import type {
-  FrameworkQualityMetrics,
-  RiskFactorResult,
-  CagrGapAnalysis,
-} from './stock-calculator-framework';
+import type { RiskFactorResult, CagrGapAnalysis } from './stock-calculator-framework';
+import type { EnrichedQualityMetrics } from './framework-quality-external';
 import {
   buildFallbackTabAnalysis,
   type CalculatorTabAnalysis,
@@ -46,7 +43,7 @@ export interface CalculatorRecord {
   scenarios: StockCalculatorResult['scenarios'];
   projectedEps: number;
   anchorEps: number;
-  quality?: FrameworkQualityMetrics;
+  quality?: EnrichedQualityMetrics;
   internalRisk?: RiskFactorResult;
   externalRisk?: RiskFactorResult;
   cagrGap?: CagrGapAnalysis;
@@ -83,7 +80,7 @@ interface CalculatorHistoryRow {
   created_at: string;
 }
 
-const EMPTY_QUALITY: FrameworkQualityMetrics = {
+const EMPTY_QUALITY: EnrichedQualityMetrics = {
   roePct: null,
   roeDisplay: '—',
   roeRead: null,
@@ -98,6 +95,11 @@ const EMPTY_QUALITY: FrameworkQualityMetrics = {
   baseEpsCagrPct: null,
   baseEpsCagrRange: null,
   impliedPriceCagrPct: null,
+  roeSource: null,
+  ebitdaSource: null,
+  debtSource: null,
+  cashFlowSource: null,
+  liveEnrichmentLabel: null,
 };
 
 function normalizeRecord(entry: CalculatorRecord): CalculatorRecord {
@@ -193,7 +195,7 @@ function rowToRecord(row: CalculatorHistoryRow): CalculatorRecord {
         : row.manual_pe_override == null
           ? Number(row.anchor_pe)
           : null,
-    quality: (meta.quality as FrameworkQualityMetrics) ?? EMPTY_QUALITY,
+    quality: (meta.quality as EnrichedQualityMetrics) ?? EMPTY_QUALITY,
     internalRisk: (meta.internalRisk as RiskFactorResult) ?? normalizeRecord({} as CalculatorRecord).internalRisk!,
     externalRisk: (meta.externalRisk as RiskFactorResult) ?? normalizeRecord({} as CalculatorRecord).externalRisk!,
     cagrGap: (meta.cagrGap as CagrGapAnalysis) ?? {
@@ -216,7 +218,7 @@ function rowToRecord(row: CalculatorHistoryRow): CalculatorRecord {
         : 'framework-local',
     tabAnalysis:
       (meta.tabAnalysis as CalculatorTabAnalysis) ??
-      buildFallbackTabAnalysis(row.snapshot, (meta.quality as FrameworkQualityMetrics) ?? EMPTY_QUALITY),
+      buildFallbackTabAnalysis(row.snapshot, (meta.quality as EnrichedQualityMetrics) ?? EMPTY_QUALITY),
     impliedVerdict: row.implied_verdict,
     report: row.report,
     snapshot: row.snapshot,

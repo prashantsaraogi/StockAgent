@@ -12,6 +12,7 @@ import {
   warnMissingTableOnce,
 } from './supabase/schema-errors';
 import type { BusinessQualityResult } from './business-quality-moat';
+import { toInvestorFacingBusinessQuality } from './business-quality-investor-view';
 import { findFullAnalysisByChildModuleId } from './full-analysis-child-lookup';
 
 export interface BusinessQualityRecord {
@@ -273,6 +274,13 @@ export async function listBusinessQualityRecords(
   return entries.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
+function polishBusinessQualityRecord(record: BusinessQualityRecord): BusinessQualityRecord {
+  return {
+    ...record,
+    analysis: toInvestorFacingBusinessQuality(record.analysis),
+  };
+}
+
 export async function getBusinessQualityRecord(
   tenantId: string,
   id: string,
@@ -280,19 +288,19 @@ export async function getBusinessQualityRecord(
   authMode?: 'supabase' | 'cookie-dev'
 ): Promise<BusinessQualityRecord | null> {
   const local = (await readIndex(tenantId)).entries.find((e) => e.id === id);
-  if (local) return local;
+  if (local) return polishBusinessQualityRecord(local);
 
   if (authMode === 'supabase' && userId) {
     const remote = await fetchOneFromSupabase(userId, id);
     if (remote) {
       await persistRecordToDisk(tenantId, remote);
-      return remote;
+      return polishBusinessQualityRecord(remote);
     }
   }
 
   const full = await findFullAnalysisByChildModuleId(tenantId, id, userId, authMode);
   if (full?.childIds.businessQuality === id) {
-    return analysisToRecord(full.analysis.businessQuality, id);
+    return polishBusinessQualityRecord(analysisToRecord(full.analysis.businessQuality, id));
   }
 
   return null;

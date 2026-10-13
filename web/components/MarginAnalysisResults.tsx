@@ -71,7 +71,7 @@ export function MarginAnalysisResults({ data, recordId, savedAt }: MarginAnalysi
             </p>
           </div>
           <Link href={data.stockbookUrl} className="btn-ghost">
-            Open PARAMETERS →
+            View parameters →
           </Link>
         </div>
 

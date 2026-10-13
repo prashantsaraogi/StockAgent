@@ -8,6 +8,13 @@ import {
 import { getUserPaths } from './tenant';
 import { toSlug } from './navigation';
 import { STOCKBOOK_TABS, type StockbookTabId } from './navigation';
+import { buildStockbookTickerIndex } from './stockbook-index';
+import { getBundledParametersMd } from './load-bundled-stockbook';
+import {
+  getBundledApproachMd,
+  getBundledFaqMd,
+  getBundledSummaryMd,
+} from './load-bundled-stockbook-tabs';
 
 export interface StockEntry {
   sector: string;
@@ -97,16 +104,81 @@ export async function listStockEntries(tenantId = 'dev'): Promise<StockEntry[]> 
   );
 }
 
+async function findStockEntryBySlugs(
+  sectorSlug: string,
+  stockSlug: string,
+  tenantId: string
+): Promise<StockEntry | null> {
+  const all = await listStockEntries(tenantId);
+  const hit = all.find((e) => e.sectorSlug === sectorSlug && e.stockSlug === stockSlug);
+  if (hit) return hit;
+
+  const index = await buildStockbookTickerIndex();
+  for (const loc of index.values()) {
+    if (loc.sectorSlug === sectorSlug && loc.stockSlug === stockSlug) {
+      return {
+        sector: loc.sector,
+        stock: loc.stock,
+        sectorSlug: loc.sectorSlug,
+        stockSlug: loc.stockSlug,
+        ticker: loc.ticker,
+        hasFiles: true,
+      };
+    }
+  }
+  return null;
+}
+
+/** Portfolio first, then full StockBook + bundled ticker index (Stock Analysis stocks). */
 export async function resolveStockFromSlugs(
   sectorSlug: string,
   stockSlug: string,
   tenantId = 'dev'
 ): Promise<StockEntry | null> {
   const { listPortfolioHoldings } = await import('./holdings');
-  const entries = await listPortfolioHoldings(tenantId);
-  return (
-    entries.find((e) => e.sectorSlug === sectorSlug && e.stockSlug === stockSlug) ?? null
-  );
+  const portfolio = await listPortfolioHoldings(tenantId);
+  const held =
+    portfolio.find((e) => e.sectorSlug === sectorSlug && e.stockSlug === stockSlug) ?? null;
+  if (held) return held;
+
+  return findStockEntryBySlugs(sectorSlug, stockSlug, tenantId);
+}
+
+async function tickerForStockFolder(sector: string, stock: string): Promise<string | null> {
+  const index = await buildStockbookTickerIndex();
+  for (const loc of index.values()) {
+    if (loc.sector === sector && loc.stock === stock) return loc.ticker;
+  }
+  return null;
+}
+
+function bundledTabContent(
+  tabId: StockbookTabId,
+  ticker: string
+): { content: string; filename: string; type: 'md' | 'html' } | null {
+  const key = ticker.toUpperCase();
+  switch (tabId) {
+    case 'summary': {
+      const content = getBundledSummaryMd(key);
+      return content ? { content, filename: 'summary-analysis.md', type: 'md' } : null;
+    }
+    case 'faq': {
+      const content = getBundledFaqMd(key);
+      return content ? { content, filename: 'faq.md', type: 'md' } : null;
+    }
+    case 'approach': {
+      const content = getBundledApproachMd(key);
+      return content ? { content, filename: 'suggested-approach.md', type: 'md' } : null;
+    }
+    case 'parameters': {
+      const content = getBundledParametersMd(key);
+      return content
+        ? { content, filename: `PARAMETERS_${key}.md`, type: 'md' }
+        : null;
+    }
+    default:
+      return null;
+  }
 }
 
 async function findFileByPattern(dir: string, pattern: string): Promise<string | null> {
@@ -153,9 +225,17 @@ export async function readStockTabContent(
     }
   }
 
-  if (!filePath) return null;
-  const content = await fs.readFile(filePath, 'utf8');
-  return { content, filename: path.basename(filePath), type };
+  if (filePath) {
+    const content = await fs.readFile(filePath, 'utf8');
+    return { content, filename: path.basename(filePath), type };
+  }
+
+  const ticker = await tickerForStockFolder(sector, stock);
+  if (ticker) {
+    return bundledTabContent(tabId, ticker);
+  }
+
+  return null;
 }
 
 export async function readRepoMarkdown(relativePath: string): Promise<string | null> {
