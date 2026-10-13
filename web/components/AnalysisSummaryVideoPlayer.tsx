@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { SummarySlide } from '@/lib/analysis-summary-slides';
 import {
-  SUMMARY_SECONDS_PER_SLIDE,
   SUMMARY_TOTAL_SECONDS,
+  summarySecondsPerSlide,
 } from '@/lib/analysis-summary-slides';
 
 interface Props {
@@ -25,7 +25,7 @@ export function AnalysisSummaryVideoPlayer({ slides, recordMode = false }: Props
   const [playing, setPlaying] = useState(true);
   const [elapsed, setElapsed] = useState(0);
 
-  const slideDurationMs = SUMMARY_SECONDS_PER_SLIDE * 1000;
+  const secondsPerSlide = summarySecondsPerSlide(slides.length);
 
   useEffect(() => {
     if (!playing) return;
@@ -36,13 +36,16 @@ export function AnalysisSummaryVideoPlayer({ slides, recordMode = false }: Props
           setIndex(0);
           return 0;
         }
-        const idx = Math.min(slides.length - 1, Math.floor(next / SUMMARY_SECONDS_PER_SLIDE));
+        const idx = Math.min(
+          slides.length - 1,
+          Math.floor(next / secondsPerSlide)
+        );
         setIndex(idx);
         return next;
       });
     }, 250);
     return () => clearInterval(tick);
-  }, [playing, slides.length]);
+  }, [playing, slides.length, secondsPerSlide]);
 
   const restart = useCallback(() => {
     setIndex(0);
@@ -83,6 +86,30 @@ export function AnalysisSummaryVideoPlayer({ slides, recordMode = false }: Props
               ))}
             </div>
           )}
+          {slide.charts?.map((chart) => (
+            <div key={chart.heading} className="asv-chart-block">
+              <h2 className="asv-chart-heading">{chart.heading}</h2>
+              <div className="asv-bar-list">
+                {chart.bars.map((bar) => {
+                  const pct = bar.max > 0 ? Math.min(100, (bar.value / bar.max) * 100) : 0;
+                  return (
+                    <div key={bar.label} className="asv-bar-row">
+                      <span className="asv-bar-label">{bar.label}</span>
+                      <div className="asv-bar-track">
+                        <div
+                          className={`asv-bar-fill asv-bar-fill-${bar.tone ?? 'neutral'}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className={`asv-bar-value asv-card-${bar.tone ?? 'neutral'}`}>
+                        {bar.display}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
           {slide.rows && (
             <table className="asv-table">
               <thead>

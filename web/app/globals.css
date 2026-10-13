@@ -4709,3 +4709,72 @@ td.gain-neg {
   margin-bottom: 0.5rem;
 }
 
+.asv-chart-block {
+  margin-top: 0.35rem;
+}
+
+.asv-chart-block + .asv-chart-block {
+  margin-top: 0.65rem;
+}
+
+.asv-chart-heading {
+  font-size: clamp(0.72rem, 1.6vw, 0.85rem);
+  font-weight: 600;
+  color: #8b9cb3;
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.asv-bar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.asv-bar-row {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 28%) 1fr minmax(3.2rem, 18%);
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.asv-bar-label {
+  font-size: clamp(0.65rem, 1.45vw, 0.78rem);
+  color: #c5d0de;
+  line-height: 1.2;
+}
+
+.asv-bar-track {
+  height: clamp(0.55rem, 1.2vw, 0.7rem);
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #243044;
+}
+
+.asv-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.35s ease;
+}
+
+.asv-bar-fill-good {
+  background: #34d399;
+}
+.asv-bar-fill-warn {
+  background: #fbbf24;
+}
+.asv-bar-fill-bad {
+  background: #f87171;
+}
+.asv-bar-fill-neutral {
+  background: #3b82f6;
+}
+
+.asv-bar-value {
+  font-size: clamp(0.65rem, 1.4vw, 0.78rem);
+  font-weight: 600;
+  text-align: right;
+}
+

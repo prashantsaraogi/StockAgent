@@ -23,6 +23,19 @@ export interface SummarySlideCard {
   tone: SlideBulletTone;
 }
 
+export interface SummarySlideBar {
+  label: string;
+  value: number;
+  max: number;
+  display: string;
+  tone?: SlideBulletTone;
+}
+
+export interface SummarySlideChart {
+  heading: string;
+  bars: SummarySlideBar[];
+}
+
 export interface SummarySlide {
   title: string;
   subtitle?: string;
@@ -30,6 +43,8 @@ export interface SummarySlide {
   rows?: SummarySlideRow[];
   /** Overview-style module cards (no links — for video slide 1). */
   cards?: SummarySlideCard[];
+  /** Horizontal bar charts (parameters / scores). */
+  charts?: SummarySlideChart[];
 }
 
 function cleanVerdict(raw: string): string {
@@ -47,50 +62,6 @@ function signalLabel(v: string): string {
   const c = cleanVerdict(v);
   if (c.length > 36) return `${c.slice(0, 33)}…`;
   return c || '—';
-}
-
-function pePositive(pe: StockCalculatorFullResult): SummarySlideBullet[] {
-  const bullets: SummarySlideBullet[] = [];
-  const bq = cleanVerdict(pe.businessQuality.verdict);
-  if (bq) {
-    bullets.push({
-      text: `Business quality: ${bq}`,
-      tone: toneFromVerdict(pe.businessQuality.verdict),
-    });
-  }
-  const prem = pe.peParameters.premiumTo10yPct;
-  if (prem != null && prem <= 0) {
-    bullets.push({
-      text: `P/E at or below 10-year reference (${prem >= 0 ? '+' : ''}${prem.toFixed(1)}%)`,
-      tone: 'good',
-    });
-  } else if (prem != null && prem < 12) {
-    bullets.push({
-      text: `P/E only modestly above 10-year norm (+${prem.toFixed(1)}%)`,
-      tone: 'neutral',
-    });
-  }
-  const score = pe.businessQuality.businessQualityScore10;
-  if (score != null && score >= 7) {
-    bullets.push({ text: `Moat score ${score.toFixed(1)}/10 — above average franchise`, tone: 'good' });
-  }
-  const gap = pe.cagr.cagrGap;
-  if (gap.gapTone === 'positive') {
-    bullets.push({
-      text: `Your ${pe.inputs.expectedCagrPct}% CAGR test is conservative vs supported band`,
-      tone: 'good',
-    });
-  }
-  if (bullets.length < 3 && pe.cagr.snapshot.cmp > 0) {
-    bullets.push({
-      text: `${pe.stockName} — ${pe.sector} · CMP ₹${Math.round(pe.cagr.snapshot.cmp).toLocaleString('en-IN')}`,
-      tone: 'neutral',
-    });
-  }
-  while (bullets.length < 3) {
-    bullets.push({ text: 'Quality compounder profile — review modules for detail', tone: 'neutral' });
-  }
-  return bullets.slice(0, 4);
 }
 
 function riskBullets(pe: StockCalculatorFullResult): SummarySlideBullet[] {
@@ -144,6 +115,145 @@ function overviewCards(pe: StockCalculatorFullResult): SummarySlideCard[] {
   }));
 }
 
+function barToneScore10(score: number): SlideBulletTone {
+  if (score >= 7.5) return 'good';
+  if (score >= 5.5) return 'warn';
+  return 'bad';
+}
+
+function valuationParameterCharts(a: StockCalculatorFullResult): SummarySlideChart[] {
+  const snap = a.cagr.snapshot;
+  const ttm = snap.ttmPe ?? a.peParameters.ttmPe;
+  const avg10 = snap.avg10yPe ?? a.peParameters.avg10yPe;
+  const fair = snap.forwardFairPe ?? a.peParameters.forwardFairPe;
+  const bars: SummarySlideBar[] = [];
+  const values = [ttm, avg10, fair].filter((v): v is number => v != null && v > 0);
+  const max = values.length > 0 ? Math.max(...values) * 1.08 : 50;
+
+  if (ttm != null && ttm > 0) {
+    bars.push({
+      label: 'TTM P/E today',
+      value: ttm,
+      max,
+      display: `${ttm.toFixed(1)}×`,
+      tone:
+        avg10 != null && ttm <= avg10
+          ? 'good'
+          : avg10 != null && ttm > avg10 * 1.15
+            ? 'warn'
+            : 'neutral',
+    });
+  }
+  if (avg10 != null && avg10 > 0) {
+    bars.push({
+      label: '10-year avg P/E',
+      value: avg10,
+      max,
+      display: `${avg10.toFixed(1)}×`,
+      tone: 'neutral',
+    });
+  }
+  if (fair != null && fair > 0) {
+    bars.push({
+      label: 'Forward fair P/E',
+      value: fair,
+      max,
+      display: `${fair.toFixed(1)}×`,
+      tone: 'neutral',
+    });
+  }
+  const prem = a.peParameters.premiumTo10yPct;
+  if (prem != null && avg10 != null) {
+    const premBar = Math.min(40, Math.max(0, Math.abs(prem)));
+    bars.push({
+      label: prem >= 0 ? 'Premium vs 10Y' : 'Discount vs 10Y',
+      value: premBar,
+      max: 40,
+      display: `${prem >= 0 ? '+' : ''}${prem.toFixed(1)}%`,
+      tone: prem <= 0 ? 'good' : prem > 15 ? 'warn' : 'neutral',
+    });
+  }
+  if (bars.length === 0) {
+    bars.push({
+      label: 'P/E data',
+      value: 1,
+      max: 10,
+      display: 'Refresh parameters',
+      tone: 'neutral',
+    });
+  }
+  return [{ heading: 'Valuation vs history', bars }];
+}
+
+function moduleScoreCharts(a: StockCalculatorFullResult): SummarySlideChart[] {
+  const comps = a.riskDecision.components?.filter((c) => c.score10 > 0) ?? [];
+  const bars: SummarySlideBar[] = comps.slice(0, 6).map((c) => ({
+    label: c.label.replace(/\s*\(.*\)/, '').slice(0, 22),
+    value: c.score10,
+    max: 10,
+    display: `${c.score10.toFixed(1)}/10`,
+    tone: barToneScore10(c.score10),
+  }));
+  if (bars.length === 0) {
+    bars.push({
+      label: 'Business quality',
+      value: a.businessQuality.businessQualityScore10,
+      max: 10,
+      display: `${a.businessQuality.businessQualityScore10.toFixed(1)}/10`,
+      tone: barToneScore10(a.businessQuality.businessQualityScore10),
+    });
+  }
+  return [{ heading: 'Module scores (0–10)', bars }];
+}
+
+function growthParameterCharts(a: StockCalculatorFullResult): SummarySlideChart[] {
+  const gap = a.cagr.cagrGap;
+  const expected = a.inputs.expectedCagrPct;
+  const possible = gap.possibleCagrPct;
+  const base = gap.frameworkBaseEpsCagrPct ?? a.cagr.quality.baseEpsCagrPct;
+  const bars: SummarySlideBar[] = [];
+  const nums = [expected, possible, base].filter((v): v is number => v != null);
+  const max = nums.length > 0 ? Math.max(...nums) * 1.15 : 20;
+
+  bars.push({
+    label: 'Your CAGR test',
+    value: expected,
+    max,
+    display: `${expected.toFixed(1)}%`,
+    tone: gap.gapTone === 'negative' ? 'warn' : gap.gapTone === 'positive' ? 'good' : 'neutral',
+  });
+  if (possible != null) {
+    bars.push({
+      label: 'Supported band',
+      value: possible,
+      max,
+      display: `${possible.toFixed(1)}%`,
+      tone: 'neutral',
+    });
+  }
+  if (base != null) {
+    bars.push({
+      label: 'Base EPS CAGR',
+      value: base,
+      max,
+      display: `${base.toFixed(1)}%`,
+      tone: 'neutral',
+    });
+  }
+  const intH = a.cagr.internalRisk.haircutMidPp;
+  const extH = a.cagr.externalRisk.haircutMidPp;
+  if (intH > 0 || extH > 0) {
+    bars.push({
+      label: 'Risk haircut (max)',
+      value: Math.max(intH, extH),
+      max: 12,
+      display: `−${Math.max(intH, extH).toFixed(1)} pp`,
+      tone: Math.max(intH, extH) >= 5 ? 'warn' : 'neutral',
+    });
+  }
+  return [{ heading: 'Growth & risk trim', bars }];
+}
+
 function overallBullets(pe: StockCalculatorFullResult): SummarySlideBullet[] {
   const one = pe.frameworkReport?.oneLineVerdict
     ? cleanVerdict(pe.frameworkReport.oneLineVerdict)
@@ -179,8 +289,17 @@ export function buildAnalysisSummarySlides(analysis: StockCalculatorFullResult):
       cards: overviewCards(analysis),
     },
     {
-      title: 'What looks supportive',
-      bullets: pePositive(analysis),
+      title: 'Parameters · valuation',
+      subtitle: `CMP ₹${Math.round(analysis.cagr.snapshot.cmp).toLocaleString('en-IN')} · ${analysis.inputs.peBasis.toUpperCase()} lens`,
+      charts: valuationParameterCharts(analysis),
+    },
+    {
+      title: 'Parameters · scores',
+      charts: moduleScoreCharts(analysis),
+    },
+    {
+      title: 'Parameters · growth',
+      charts: growthParameterCharts(analysis),
     },
     {
       title: 'Risk lens',
@@ -201,7 +320,9 @@ export function buildAnalysisSummarySlides(analysis: StockCalculatorFullResult):
   ];
 }
 
-/** Slide count × duration ≈ 60s for YouTube capture */
-export const SUMMARY_SLIDE_COUNT = 5;
+/** Total runtime for YouTube capture — duration per slide = total / slide count */
 export const SUMMARY_TOTAL_SECONDS = 60;
-export const SUMMARY_SECONDS_PER_SLIDE = SUMMARY_TOTAL_SECONDS / SUMMARY_SLIDE_COUNT;
+
+export function summarySecondsPerSlide(slideCount: number): number {
+  return SUMMARY_TOTAL_SECONDS / Math.max(1, slideCount);
+}
