@@ -353,6 +353,7 @@ export function StockCalculatorHub() {
           childIds={childIds ?? undefined}
           savedAt={savedAt ?? undefined}
           preferFrameworkTab={mode === 'basic'}
+          embedAllModules
         />
       )}
     </div>

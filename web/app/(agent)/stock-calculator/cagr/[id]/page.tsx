@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { requireSession } from '@/lib/auth';
 import { getCalculatorRecord } from '@/lib/stock-calculator-history';
+import { findFullAnalysisByChildModuleId } from '@/lib/full-analysis-child-lookup';
 import { CalculatorSummaryPanel } from '@/components/CalculatorSummaryPanel';
 import { sanitizeVerdictLabel } from '@/lib/investor-report-format';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
@@ -23,7 +24,16 @@ export default async function CagrEvaluationDetailPage({ params }: Props) {
     session.userId,
     session.authMode
   );
-  if (!entry) notFound();
+  if (!entry) {
+    const full = await findFullAnalysisByChildModuleId(
+      session.tenantId,
+      id,
+      session.userId,
+      session.authMode
+    );
+    if (full) redirect(`/stock-calculator/full/${full.id}?tab=cagr`);
+    notFound();
+  }
 
   const when = new Date(entry.createdAt).toLocaleString('en-IN', {
     dateStyle: 'full',
@@ -66,7 +76,7 @@ export default async function CagrEvaluationDetailPage({ params }: Props) {
         <StockCalculatorSubNav />
       </header>
 
-      {entry.quality && entry.cagrGap && (
+      {entry.quality && entry.cagrGap ? (
         <CalculatorSummaryPanel
           ticker={entry.ticker}
           stockName={entry.stockName}
@@ -89,11 +99,19 @@ export default async function CagrEvaluationDetailPage({ params }: Props) {
           frameworkVerdict={entry.frameworkVerdict}
           reportMode={entry.reportMode}
         />
+      ) : (
+        <section className="card wide">
+          <p className="muted">
+            This saved run is missing valuation details. Run Stock Analysis again for {entry.ticker}.
+          </p>
+          <Link href="/stock-calculator" className="btn-primary">
+            Stock Analysis →
+          </Link>
+        </section>
       )}
 
       <p className="footer-note muted small">
         Private to {session.email} · ID <code>{entry.id.slice(0, 8)}…</code>
-        report (not generic AI)
       </p>
     </div>
   );

@@ -45,6 +45,8 @@ interface StockCalculatorFullResultsProps {
   initialTab?: FullResultTabId;
   /** Basic Analysis — default to Framework report tab when present */
   preferFrameworkTab?: boolean;
+  /** Stock Analysis hub — modules are on one page; hide per-module history links. */
+  embedAllModules?: boolean;
 }
 
 function verdictToneClass(verdict: string): string {
@@ -60,12 +62,18 @@ export function StockCalculatorFullResults({
   savedAt,
   initialTab,
   preferFrameworkTab,
+  embedAllModules,
 }: StockCalculatorFullResultsProps) {
   const defaultTab: FullResultTabId =
     initialTab ??
     (preferFrameworkTab && analysis.frameworkReport?.markdown ? 'report' : 'overview');
   const [activeTab, setActiveTab] = useState<FullResultTabId>(defaultTab);
   const c = analysis.cagr;
+
+  /** Per-module history URLs often 404 on serverless — full analysis already embeds all modules. */
+  const hideModuleHistory = Boolean(fullRecordId || embedAllModules);
+  const standaloneModuleRecordId = (id: string | null | undefined) =>
+    hideModuleHistory ? undefined : id ?? undefined;
 
   const tabs: { id: FullResultTabId; label: string }[] = analysis.frameworkReport?.markdown
     ? [{ id: 'report', label: 'Investment view' }, ...MODULE_TABS]
@@ -210,7 +218,8 @@ export function StockCalculatorFullResults({
           cagrGap={c.cagrGap}
           scenarios={c.scenarios}
           investmentAmountInr={c.investmentAmountInr}
-          detailId={childIds?.cagr}
+          detailId={standaloneModuleRecordId(childIds?.cagr)}
+          embeddedInFullAnalysis={hideModuleHistory}
           report={c.report}
           frameworkVerdict={c.frameworkVerdict}
           reportMode={c.reportMode}
@@ -219,7 +228,10 @@ export function StockCalculatorFullResults({
 
       {activeTab === 'pe' &&
         (analysis.peScorecard ? (
-          <PeScorecardResults data={analysis.peScorecard} recordId={childIds?.pe ?? undefined} />
+          <PeScorecardResults
+            data={analysis.peScorecard}
+            recordId={standaloneModuleRecordId(childIds?.pe ?? undefined)}
+          />
         ) : (
           <PeParametersBrief
             data={analysis.peParameters}
@@ -230,23 +242,29 @@ export function StockCalculatorFullResults({
       {activeTab === 'earnings-quality' && (
         <EarningsQualityResults
           data={analysis.earningsQuality}
-          recordId={childIds?.earningsQuality}
+          recordId={standaloneModuleRecordId(childIds?.earningsQuality)}
         />
       )}
 
       {activeTab === 'margin' && (
-        <MarginAnalysisResults data={analysis.margin} recordId={childIds?.margin} />
+        <MarginAnalysisResults
+          data={analysis.margin}
+          recordId={standaloneModuleRecordId(childIds?.margin)}
+        />
       )}
 
       {activeTab === 'business-quality' && (
         <BusinessQualityResults
           data={analysis.businessQuality}
-          recordId={childIds?.businessQuality}
+          recordId={standaloneModuleRecordId(childIds?.businessQuality)}
         />
       )}
 
       {activeTab === 'risk' && (
-        <RiskDecisionResults data={analysis.riskDecision} recordId={childIds?.riskDecision} />
+        <RiskDecisionResults
+          data={analysis.riskDecision}
+          recordId={standaloneModuleRecordId(childIds?.riskDecision)}
+        />
       )}
 
       {fullRecordId && (

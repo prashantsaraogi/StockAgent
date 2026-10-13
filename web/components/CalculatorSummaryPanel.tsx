@@ -47,7 +47,10 @@ export interface CalculatorSummaryProps {
   snapshot: PeSnapshot;
   tabAnalysis: CalculatorTabAnalysis;
   investmentAmountInr?: number | null;
+  /** Standalone CAGR history id — omit when CAGR is embedded in Stock Analysis (full report). */
   detailId?: string | null;
+  /** True on Stock Analysis / saved full analysis — hides broken per-module history link. */
+  embeddedInFullAnalysis?: boolean;
   report?: string;
   frameworkVerdict?: string;
   reportMode?: 'framework-local' | 'gemini';
@@ -221,7 +224,8 @@ function RiskTab({
   return (
     <>
       <p className="calc-tab-lead muted">
-        L1 = 0–2 pp haircut · L2 = 3–7 pp · L3 = ≥8 pp off sustainable EPS CAGR (AGENT-RULES).
+        L1 = 0–2 pp haircut · L2 = 3–7 pp · L3 = ≥8 pp off supported EPS growth.{' '}
+        <a href="/readme/glossary">Risk levels →</a>
       </p>
       <div className="calc-risk-row">
         <article className={`calc-risk-card ${riskLevelClass(internalRisk.level)}`}>
@@ -548,15 +552,21 @@ export function CalculatorSummaryPanel(props: CalculatorSummaryProps) {
         {activeTab === 'entry-approach' && <EntryApproachTab {...props} />}
       </div>
 
-      {props.detailId && (
+      {!props.embeddedInFullAnalysis && props.detailId && (
         <p className="muted small calc-tab-footer">
           Saved to history ·{' '}
-          <a href={`/stock-calculator/cagr/${props.detailId}`}>Open full report →</a>
+          <a href={`/stock-calculator/cagr/${props.detailId}`}>Open saved CAGR run →</a>
+        </p>
+      )}
+
+      {props.embeddedInFullAnalysis && props.report && (
+        <p className="muted small calc-tab-footer">
+          Written report for this module is in <strong>Full written report</strong> below.
         </p>
       )}
 
       {props.report && (
-        <details className="calc-full-report">
+        <details className="calc-full-report" open={props.embeddedInFullAnalysis}>
           <summary>Full written report</summary>
           <div className="calc-report-prose">
             <MarkdownView content={sanitizeStockbookMarkdownForWeb(props.report ?? '')} />
