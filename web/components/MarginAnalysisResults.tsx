@@ -140,7 +140,7 @@ export function MarginAnalysisResults({ data, recordId, savedAt }: MarginAnalysi
         ) : (
           <>
             {!data.partA.dataComplete && (
-              <p className="muted small eq-tag-warn">Partial data — add FY-level FACT rows in StockBook.</p>
+              <p className="muted small eq-tag-warn">Partial data — add verified annual figures in company parameters when you can.</p>
             )}
             <div className="eq-table-wrap">
               <table className="eq-part-table">

@@ -150,7 +150,7 @@ function buildFundamentalRows(
   });
 
   rows.push({
-    parameter: 'Risk score (framework)',
+    parameter: 'Risk score',
     value: `**${analysis.riskDecision.quantitativeScore100}/100**`,
     status:
       analysis.riskDecision.quantitativeScore100 >= 65
@@ -365,7 +365,7 @@ ${timing ?? ''}
 ${positionNote}  
 **CMP:** ${cmp != null ? `${formatInr(cmp)} (${cmpSource})` : 'UNVERIFIED'} · ${pcclNote}
 
-> **One-line (framework):** ${oneLine}
+> **One-line:** ${oneLine}
 
 ---
 
@@ -476,7 +476,7 @@ ${[
 
 ## 🎯 Overall view: **${bqScore >= 7 ? '🟢 QUALITY' : '🟡 MIXED QUALITY'} — ${valSignal.includes('🟢') ? '🟢' : '🟡'} VALUATION / ENTRY DEPENDENT**
 
-**Framework read:** ${structuralSnippet ?? oneLine}
+**Summary:** ${structuralSnippet ?? oneLine}
 
 ### What would improve conviction 🟢
 
@@ -486,7 +486,7 @@ ${bullish.map((b) => `- ${b}`).join('\n')}
 
 ${cautious.map((c) => `- ${c}`).join('\n')}
 
-### Investor action framework
+### What to do by situation
 
 | Situation | Action |
 |-----------|--------|

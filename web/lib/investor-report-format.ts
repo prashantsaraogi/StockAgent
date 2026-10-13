@@ -118,6 +118,24 @@ function stripStockbookInternalRefs(markdown: string): string {
   out = out.replace(/\|\s*PARAMETERS Part 1\s*\|/gi, '| Company parameters |');
   out = out.replace(/\|\s*StockBook \/ PARAMETERS\s*\|/gi, '| Company parameters |');
   out = out.replace(/Refresh from AR/gi, 'See annual report for audit detail');
+  out = out.replace(/\s*\[(?:FACT|ASSUMPTION|HYPOTHESIS|MODEL OUTPUT|RULE|UNVERIFIED)\]/gi, '');
+  out = out.replace(
+    /\*\*(?:FACT|ASSUMPTION|HYPOTHESIS|MODEL OUTPUT|RULE|UNVERIFIED)\*\*:?\s*/gi,
+    ''
+  );
+  out = out.replace(/\[(?:FACT\s*\/\s*ASSUMPTION|HYPOTHESIS\s*\/\s*FACT)[^\]]*\]/gi, '');
+  out = out.replace(/Synthesis mode: Gemini[^\n]*\n?/gi, '');
+  out = out.replace(
+    /\*\*`?\[(?:FACT|ASSUMPTION|HYPOTHESIS|MODEL OUTPUT|RULE|UNVERIFIED)\]`?\*\*/gi,
+    ''
+  );
+  out = out.replace(
+    /(\*\*[^*\n]+?\*\*)\s*\[(?:FACT\s*\/\s*ASSUMPTION|HYPOTHESIS\s*\/\s*FACT)[^\]]*\]/gi,
+    '$1'
+  );
+  out = out.replace(/`[A-Z_]+_[A-Z0-9]+\.md`/gi, 'company files');
+  out = out.replace(/buy-decision-workflow\.md/gi, 'buy checklist');
+  out = out.replace(/PARAMETERS_[A-Z0-9]+\.md/gi, 'company parameters');
   out = out.replace(/\n{3,}/g, '\n\n');
   return out.trim();
 }

@@ -78,7 +78,7 @@ function buildCagrRow(analysis: StockCalculatorFullResult): ScorecardRow {
 
   if (gap.possibleCagrPct != null) {
     bullets.push(
-      `Framework-supported CAGR band ~**${gap.possibleCagrPct.toFixed(1)}%** vs your **${analysis.inputs.expectedCagrPct}%** assumption (${formatCagrGapPp(gap.cagrGapPp)}).`
+      `Supported growth band ~**${gap.possibleCagrPct.toFixed(1)}%** vs your **${analysis.inputs.expectedCagrPct}%** assumption (${formatCagrGapPp(gap.cagrGapPp)}).`
     );
   }
   if (gap.gapTone === 'positive') {

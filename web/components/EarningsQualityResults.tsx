@@ -150,7 +150,7 @@ export function EarningsQualityResults({ data, recordId, savedAt }: EarningsQual
         {data.liveMetricsSource && (
           <p className="muted small eq-live-metrics">
             Live backfill: {data.liveMetricsSource} — save full earnings history in StockBook for
-            FY-level FACT.
+            verified annual figures.
           </p>
         )}
       </section>
@@ -194,7 +194,7 @@ export function EarningsQualityResults({ data, recordId, savedAt }: EarningsQual
 
               {!partA.dataComplete && (
                 <p className="muted small eq-tag-warn">
-                  Partial data — some years estimated from CAGR. Add FY-level FACT rows in StockBook.
+                  Partial data — some years estimated from CAGR. Add verified annual figures when you can.
                 </p>
               )}
 
