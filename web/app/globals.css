@@ -3423,6 +3423,107 @@ td.gain-neg {
   font-weight: 600;
 }
 
+.calc-pf-overview {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.calc-pf-intro {
+  margin: 0.5rem 0 1rem;
+  max-width: 52rem;
+  line-height: 1.45;
+}
+
+.calc-pf-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+
+.calc-pf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.calc-pf-table th,
+.calc-pf-table td {
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.calc-pf-table thead th {
+  background: var(--surface2);
+  font-weight: 600;
+  text-align: left;
+}
+
+.calc-pf-col-past {
+  background: color-mix(in srgb, var(--surface2) 85%, #3b82f6 15%);
+}
+
+.calc-pf-col-future {
+  background: color-mix(in srgb, var(--surface2) 85%, #10b981 15%);
+}
+
+.calc-pf-col-hint {
+  display: block;
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+}
+
+.calc-pf-param strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.calc-pf-ref summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.calc-pf-ref summary::-webkit-details-marker {
+  display: none;
+}
+
+.calc-pf-ref-dl {
+  margin: 0.35rem 0 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.calc-pf-ref-dl dt {
+  font-weight: 600;
+}
+
+.calc-pf-ref-dl dd {
+  margin: 0 0 0.25rem;
+}
+
+.calc-pf-value {
+  font-weight: 600;
+}
+
+.calc-pf-read {
+  margin-top: 0.25rem;
+  font-size: 0.82rem;
+}
+
+.pf-read-good {
+  color: var(--good, #16a34a);
+}
+
+.pf-read-warn {
+  color: var(--bad, #dc2626);
+}
+
+.pf-read-neutral {
+  color: var(--muted);
+}
+
 .calc-full-pe-hint {
   margin: 0.75rem 0 0;
 }

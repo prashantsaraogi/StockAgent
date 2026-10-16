@@ -8,6 +8,31 @@
 
 Cross-ref: `StockBook/AGENT-RULES.md` · `StockBook/PE-EVALUATION-FRAMEWORK.md` (purchase vs today scorecard) · `pccl-analysis` · `valuation-analysis`
 
+**Public cross-check (mandatory when refreshing PARAMETERS):**
+
+| Site | URL | Use for |
+|------|-----|---------|
+| **Value Research Online** | [valueresearchonline.com/stocks](https://www.valueresearchonline.com/stocks/) | Trailing **Key Ratios** (P/E, P/B, ROE, OPM, growth 1Y–10Y), FY-end P/E table, peer median |
+| **Moneycontrol** | [moneycontrol.com](https://www.moneycontrol.com/) | Quote-page **TTM** P/E, ROE, margins, returns; results / broker tabs for forward hints |
+
+VRO emphasises **current vs own history** (rear-view). Moneycontrol mixes **TTM past** with **broker forward** on some names. Our **Part 1 = past performance** · **Part 2 = future performance** — Stock Analysis **Overview** shows both columns for the **same parameter** with VRO/MC label cheat-sheets per row.
+
+---
+
+## External parameter map (same row — past left · future right)
+
+| Our parameter (Part 1 → Part 2) | Value Research (past / trailing) | Moneycontrol (past / TTM) | Value Research (future lens) | Moneycontrol (future lens) |
+|---------------------------------|------------------------------------|---------------------------|------------------------------|----------------------------|
+| **P/E** | TTM P/E · 3Y/5Y avg · FY P/E table | P/E (TTM) · annual P/E history | Forward P/E · PEG (5Y hist EPS growth) | Forward P/E · est. EPS when listed |
+| **Owner earnings yield** | Earnings yield (EBIT/EV) · TTM | EPS (TTM) ÷ price | Norm EPS ÷ CMP (Part 2) | Forward EPS yield |
+| **ROE** | ROE % TTM · 5Y avg | Return on equity | ROE trajectory (thesis) | Guidance / trend on results |
+| **EBITDA / OPM** | OPM % TTM | Operating / EBITDA margin | Margin path (Part 2 base) | Margin commentary |
+| **EPS / profit growth** | EPS growth 1Y/3Y/5Y (Growth tab) | Profit growth YoY / multi-year | EPS CAGR (5Y) base case | Broker EPS growth |
+| **Premium vs fair** | P/E vs history · vs peers | P/E vs sector · 52W range | Premium to forward IV | Target / upside (brokers) |
+| **Return outlook** | Price return 1Y–10Y | Returns on quote header | Implied 5Y price CAGR (base) | Target upside % |
+
+**Rule:** Never copy VRO/MC numbers into StockBook without date and source label (FACT). Use them to **validate** Part 1 trailing and to **sanity-check** Part 2 assumptions.
+
 ---
 
 ## Core idea — past ≠ future

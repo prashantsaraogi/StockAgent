@@ -16,6 +16,7 @@ import {
   sanitizeStockbookMarkdownForWeb,
   sanitizeVerdictLabel,
 } from '@/lib/investor-report-format';
+import { ParametersPastForwardOverview } from '@/components/ParametersPastForwardOverview';
 
 export type FullResultTabId =
   | 'report'
@@ -205,6 +206,7 @@ export function StockCalculatorFullResults({
             Use the tabs above or <strong>View module detail</strong> on each card — all six modules
             are in this report for this stock.
           </p>
+          <ParametersPastForwardOverview analysis={analysis} />
         </section>
       )}
 

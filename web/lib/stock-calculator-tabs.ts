@@ -47,6 +47,12 @@ export interface ForwardGrowthTab {
   epsCagrPessimistic: string | null;
   epsCagrOptimistic: string | null;
   forwardFairPe: string | null;
+  forwardPe: string | null;
+  forwardOwnerYield: string | null;
+  roeTrajectory: string | null;
+  roeTrajectoryRead: string | null;
+  ebitdaMarginPath: string | null;
+  ebitdaMarginPathRead: string | null;
   framework5yFairPrice: string | null;
   implied5yPriceCagr: string | null;
   forwardPremiumIv: string | null;
@@ -181,11 +187,31 @@ export function parseForwardGrowthTab(parametersMd: string | null): ForwardGrowt
 
   const volume = md.match(/\|\s*\*\*Volume CAGR[^|]*\*\*[^\n]*\|\s*\*\*([^*]+?)\*\*/i);
 
+  const forwardPeM = md.match(
+    /\|\s*\*\*Forward P\/E\*\*[\s\S]*?\|\s*\*\*([^*]+?)\*\*/i
+  );
+  const forwardYieldM = md.match(
+    /\|\s*\*\*Forward Owner Earnings Yield\*\*[\s\S]*?\|\s*\*\*([^*]+?)\*\*/i
+  );
+
+  const roeBlockB = md.match(
+    /\|\s*\*\*ROE trajectory\*\*[^|\n]*\|\s*\*\*([^*]+?)\*\*[^|\n]*\|[^|\n]*\|[^|\n]*\|\s*([^|\n]+?)\s*\|/i
+  );
+  const ebitdaBlockB = md.match(
+    /\|\s*\*\*EBITDA margin path\*\*[^|\n]*\|\s*\*\*([^*]+?)\*\*[^|\n]*\|[^|\n]*\|[^|\n]*\|\s*([^|\n]+?)\s*\|/i
+  );
+
   return {
     epsCagrBase: extractAssumptionCell(md, 'EPS CAGR \\(5Y\\)', 'base'),
     epsCagrPessimistic: extractAssumptionCell(md, 'EPS CAGR \\(5Y\\)', 'pessimistic'),
     epsCagrOptimistic: extractAssumptionCell(md, 'EPS CAGR \\(5Y\\)', 'optimistic'),
     forwardFairPe: extractAssumptionCell(md, 'Forward fair P/E', 'base'),
+    forwardPe: forwardPeM ? cleanCell(forwardPeM[1]) : null,
+    forwardOwnerYield: forwardYieldM ? cleanCell(forwardYieldM[1]) : null,
+    roeTrajectory: roeBlockB ? cleanCell(roeBlockB[1]) : null,
+    roeTrajectoryRead: roeBlockB ? cleanCell(roeBlockB[2]) : null,
+    ebitdaMarginPath: ebitdaBlockB ? cleanCell(ebitdaBlockB[1]) : null,
+    ebitdaMarginPathRead: ebitdaBlockB ? cleanCell(ebitdaBlockB[2]) : null,
     framework5yFairPrice: fairPrice ? `₹${cleanCell(fairPrice[1])}` : null,
     implied5yPriceCagr: implied ? cleanCell(implied[1]) : null,
     forwardPremiumIv: forwardPrem ? cleanCell(forwardPrem[1]) : null,
@@ -261,6 +287,12 @@ export function buildFallbackTabAnalysis(
       epsCagrPessimistic: null,
       epsCagrOptimistic: null,
       forwardFairPe: snapshot.forwardFairPe != null ? `${snapshot.forwardFairPe.toFixed(1)}×` : null,
+      forwardPe: null,
+      forwardOwnerYield: null,
+      roeTrajectory: null,
+      roeTrajectoryRead: null,
+      ebitdaMarginPath: null,
+      ebitdaMarginPathRead: null,
       framework5yFairPrice:
         snapshot.framework5yFairPrice != null
           ? `₹${Math.round(snapshot.framework5yFairPrice).toLocaleString('en-IN')}`

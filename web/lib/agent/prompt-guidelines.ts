@@ -532,6 +532,8 @@ Write-back: faq.md · summary-analysis.md · EARNINGS_QUALITY_{TICKER}.md (Part 
         description: 'Part 1 rear-view vs Part 2 forward — Axis B confirmatory only.',
         prompt: `{TICKER} — PARAMETERS read: Part 1 (10Y) vs Part 2 (forward) @ CMP.
 
+Cross-check trailing vs [Value Research](https://www.valueresearchonline.com/stocks/) Key Ratios and Moneycontrol TTM on the quote page (date-stamped FACT). Same parameter row: **past performance** (Part 1) vs **future performance** (Part 2).
+
 Cheap or expensive vs history? Forward IV premium? ADD case from PARAMETERS quick read.`,
         channel: 'both',
         framework: ['PARAMETERS-FRAMEWORK', 'sector-news-orientation-lens'],
