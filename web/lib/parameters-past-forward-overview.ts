@@ -7,6 +7,7 @@
 import type { StockCalculatorFullResult } from './stock-calculator-full';
 import type { ParameterExternalSupplement } from './parameters-external-supplement';
 import { label10yPe, resolve10yPeReference } from './pe-history-reference';
+import { fmtPeTimes, fmtSpreadTimes, resolveTtmForwardPeMetrics } from './pe-ttm-forward-metrics';
 
 export interface ExternalParamLabels {
   valueResearchPast: string;
@@ -133,45 +134,31 @@ export function buildParametersPastForwardOverview(
   const eq = analysis.earningsQuality;
   const margin = analysis.margin;
 
-  const pePastToday = pick(
-    hist.peToday,
-    fmtPe(pe.ttmPe),
-    fmtPe(ext?.trailingPe ?? null)
-  );
-  const pePastAvg = pick(hist.pe10yAvg, fmtPe(pe.avg10yPe), fmtPe(pe.median10yPe));
+  const pePair = resolveTtmForwardPeMetrics(analysis);
+  const pePastAvg = pick(hist.pe10yAvg, fmtPeTimes(pePair.avg10yPe));
   const pePastRead =
     pick(findHistRead(hist.rows, 'P/E'), hist.part1Verdict) ??
-    (pe.premiumTo10yPct != null
-      ? `${pe.premiumTo10yPct >= 0 ? '+' : ''}${pe.premiumTo10yPct.toFixed(1)}% vs ${label10yPe(histPe.kind)}`
+    (pePair.premiumTtmVs10yPct != null
+      ? `${pePair.premiumTtmVs10yPct >= 0 ? '+' : ''}${pePair.premiumTtmVs10yPct.toFixed(1)}% vs ${label10yPe(histPe.kind)}`
       : null);
 
-  const forwardPeDisplay = pick(
-    fmtPe(pe.forwardPe),
-    fwd.forwardPe,
-    fmtPe(ext?.forwardPe ?? null),
-    pe.normalizedEps != null && pe.cmp != null && pe.cmp > 0
-      ? fmtPe(pe.cmp / pe.normalizedEps)
-      : null
-  );
   const forwardFair = pick(
     fwd.forwardFairPe,
-    fmtPe(pe.forwardFairPe),
+    fmtPeTimes(pePair.forwardFairPe),
     tab?.forward.forwardFairPe
   );
 
-  const pePastValue =
-    pePastToday && pePastAvg
-      ? `${pePastToday} TTM · ${label10yPe(histPe.kind)} ${pePastAvg}`
-      : pick(`${pePastToday ?? ''} TTM · ${label10yPe(histPe.kind)} pending`, pePastToday) ??
-        `TTM ${fmtPe(ext?.trailingPe ?? pe.ttmPe) ?? 'pending'} · ${pe.cmpSource}`;
+  const pePastValue = `${fmtPeTimes(pePair.ttmPe)} TTM${
+    pePastAvg ? ` · ${label10yPe(histPe.kind)} ${pePastAvg}` : ''
+  }`;
 
-  const peFutureValue =
-    forwardPeDisplay && forwardFair
-      ? `${forwardPeDisplay} forward · fair ${forwardFair}`
-      : pick(
-          `${forwardPeDisplay ?? fmtPe(ext?.forwardPe ?? null) ?? 'Forward P/E pending'} · fair ${forwardFair ?? 'see PARAMETERS Part 2'}`,
-          forwardPeDisplay
-        ) ?? 'Forward P/E — fill PARAMETERS Part 2 or run refresh';
+  const peFutureValue = `${fmtPeTimes(pePair.forwardPe)} forward · fair ${forwardFair ?? fmtPeTimes(pePair.forwardFairPe)}`;
+  const peFutureRead = pick(
+    pePair.premiumForwardVsFairPct != null
+      ? `${pePair.premiumForwardVsFairPct >= 0 ? '+' : ''}${pePair.premiumForwardVsFairPct.toFixed(1)}% vs forward fair`
+      : null,
+    fmtSpreadTimes(pePair.spreadTimes)
+  );
 
   const oeyPast = pick(
     hist.ownerEarningsYield,
@@ -276,12 +263,12 @@ export function buildParametersPastForwardOverview(
   return [
     row(
       'pe',
-      'P/E',
-      { value: pePastValue, read: pePastRead, source: pePastToday ? pe.cmpSource : yahooNote },
+      'TTM P/E vs Forward P/E',
+      { value: pePastValue, read: pePastRead, source: pe.cmpSource ?? yahooNote },
       {
         value: peFutureValue,
-        read: pick(fwd.forwardPremiumIv ? `vs forward IV ${fwd.forwardPremiumIv}` : null),
-        source: forwardFair ? 'PARAMETERS Part 2' : yahooNote,
+        read: peFutureRead ?? pick(fwd.forwardPremiumIv ? `vs forward IV ${fwd.forwardPremiumIv}` : null),
+        source: 'PARAMETERS Part 2 / norm EPS',
       }
     ),
     row(

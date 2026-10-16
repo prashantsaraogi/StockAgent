@@ -3,6 +3,7 @@
  */
 
 import type { StockCalculatorFullResult } from './stock-calculator-full';
+import { resolveTtmForwardPeMetrics } from './pe-ttm-forward-metrics';
 
 export type SlideBulletTone = 'good' | 'warn' | 'bad' | 'neutral';
 
@@ -122,12 +123,13 @@ function barToneScore10(score: number): SlideBulletTone {
 }
 
 function valuationParameterCharts(a: StockCalculatorFullResult): SummarySlideChart[] {
-  const snap = a.cagr.snapshot;
-  const ttm = snap.ttmPe ?? a.peParameters.ttmPe;
-  const avg10 = snap.avg10yPe ?? a.peParameters.avg10yPe;
-  const fair = snap.forwardFairPe ?? a.peParameters.forwardFairPe;
+  const peM = resolveTtmForwardPeMetrics(a);
+  const ttm = peM.ttmPe;
+  const fwd = peM.forwardPe;
+  const avg10 = peM.avg10yPe;
+  const fair = peM.forwardFairPe;
   const bars: SummarySlideBar[] = [];
-  const values = [ttm, avg10, fair].filter((v): v is number => v != null && v > 0);
+  const values = [ttm, fwd, avg10, fair].filter((v): v is number => v != null && v > 0);
   const max = values.length > 0 ? Math.max(...values) * 1.08 : 50;
 
   if (ttm != null && ttm > 0) {
@@ -140,6 +142,20 @@ function valuationParameterCharts(a: StockCalculatorFullResult): SummarySlideCha
         avg10 != null && ttm <= avg10
           ? 'good'
           : avg10 != null && ttm > avg10 * 1.15
+            ? 'warn'
+            : 'neutral',
+    });
+  }
+  if (fwd != null && fwd > 0) {
+    bars.push({
+      label: 'Forward P/E',
+      value: fwd,
+      max,
+      display: `${fwd.toFixed(1)}×`,
+      tone:
+        fair != null && fwd <= fair
+          ? 'good'
+          : fair != null && fwd > fair * 1.1
             ? 'warn'
             : 'neutral',
     });

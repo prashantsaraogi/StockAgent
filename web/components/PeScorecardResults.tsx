@@ -98,12 +98,21 @@ export function PeScorecardResults({ data, recordId, savedAt }: PeScorecardResul
             <span className={toneClass(data.purchasePeTone)}>{data.purchasePeBand}</span>
           </div>
           <div className="pe-eval-metric">
-            <span className="pe-eval-label">Current P/E</span>
+            <span className="pe-eval-label">TTM P/E</span>
             <strong>{fmtPe(params.ttmPe)}</strong>
             <span className="muted small">
               {data.peCompressionPp != null
                 ? `${data.peCompressionPp > 0 ? '+' : ''}${data.peCompressionPp.toFixed(1)}pp vs purchase`
-                : '—'}
+                : 'Trailing @ CMP'}
+            </span>
+          </div>
+          <div className="pe-eval-metric">
+            <span className="pe-eval-label">Forward P/E</span>
+            <strong>{fmtPe(params.forwardPe)}</strong>
+            <span className="muted small">
+              {params.forwardFairPe != null
+                ? `Fair ${fmtPe(params.forwardFairPe)}`
+                : 'Norm EPS ÷ CMP'}
             </span>
           </div>
           <div className="pe-eval-metric">

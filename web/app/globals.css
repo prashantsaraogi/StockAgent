@@ -3423,6 +3423,66 @@ td.gain-neg {
   font-weight: 600;
 }
 
+.calc-pe-ttm-fwd-strip {
+  margin-bottom: 1.25rem;
+}
+
+.calc-pe-ttm-fwd-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+@media (max-width: 640px) {
+  .calc-pe-ttm-fwd-grid {
+    grid-template-columns: 1fr;
+  }
+  .calc-pe-ttm-fwd-vs {
+    display: none;
+  }
+}
+
+.calc-pe-ttm-fwd-card {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.calc-pe-ttm-fwd-card.calc-pe-ttm {
+  border-color: color-mix(in srgb, var(--border) 70%, #3b82f6 30%);
+}
+
+.calc-pe-ttm-fwd-card.calc-pe-fwd {
+  border-color: color-mix(in srgb, var(--border) 70%, #10b981 30%);
+}
+
+.calc-pe-ttm-fwd-value {
+  font-size: 1.35rem;
+}
+
+.calc-pe-ttm-fwd-vs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 0.85rem;
+  min-width: 3rem;
+}
+
+.calc-pe-ttm-fwd-note {
+  margin: 0.5rem 0 0;
+}
+
+.calc-pe-ttm-fwd-inline strong {
+  color: var(--text);
+}
+
 .calc-pf-overview {
   margin-top: 1.75rem;
   padding-top: 1.25rem;

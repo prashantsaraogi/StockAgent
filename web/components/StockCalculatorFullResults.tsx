@@ -17,6 +17,7 @@ import {
   sanitizeVerdictLabel,
 } from '@/lib/investor-report-format';
 import { ParametersPastForwardOverview } from '@/components/ParametersPastForwardOverview';
+import { PeTtmForwardStrip } from '@/components/PeTtmForwardStrip';
 
 export type FullResultTabId =
   | 'report'
@@ -146,7 +147,7 @@ export function StockCalculatorFullResults({
         )}
         <p className="muted small">
           {analysis.sector} · {analysis.inputs.expectedCagrPct}% CAGR · {analysis.inputs.years}Y ·{' '}
-          {analysis.inputs.peBasis === 'forward' ? 'Forward' : 'TTM'} P/E
+          <PeTtmForwardStrip analysis={analysis} variant="inline" />
           {savedAt &&
             ` · ${new Date(savedAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })} IST`}
           {fullRecordId && (
@@ -184,6 +185,7 @@ export function StockCalculatorFullResults({
 
       {activeTab === 'overview' && (
         <section className="card wide calc-full-overview">
+          <PeTtmForwardStrip analysis={analysis} />
           <h3>Module verdicts</h3>
           <div className="calc-full-overview-grid">
             {overviewModules.map((mod) => (
