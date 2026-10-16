@@ -3524,6 +3524,12 @@ td.gain-neg {
   color: var(--muted);
 }
 
+.calc-pf-source {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  opacity: 0.85;
+}
+
 .calc-full-pe-hint {
   margin: 0.75rem 0 0;
 }

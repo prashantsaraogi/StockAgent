@@ -1,5 +1,6 @@
 /** Tab-specific analysis slices for Stock Calculator UI. */
 
+import { extractParametersMasterCells } from './stock-calculator-framework';
 import type { PeBasis, PeSnapshot, ProjectionScenario } from './stock-calculator-engine';
 import type {
   CagrGapAnalysis,
@@ -82,21 +83,6 @@ function cleanCell(raw: string | undefined): string {
   return (raw ?? '').replace(/\*\*/g, '').trim() || '—';
 }
 
-function extractTableRow(md: string, paramPattern: string): ParamCompareRow | null {
-  const re = new RegExp(
-    `\\|\\s*\\*\\*${paramPattern}[^|]*\\*\\*[^\\n]*\\|[^\\n]*\\|[^\\n]*\\|[^\\n]*\\|\\s*([^|]+?)\\s*\\|\\s*[^|]*\\|\\s*([^|]+?)\\s*\\|\\s*([^|]+?)\\s*\\|`,
-    'i'
-  );
-  const m = md.match(re);
-  if (!m) return null;
-  return {
-    parameter: paramPattern.replace(/\\[()]/g, (c) => (c === '(' ? '(' : ')')),
-    avg10y: cleanCell(m[1]),
-    today: cleanCell(m[2]),
-    read: cleanCell(m[3]),
-  };
-}
-
 function extractQuickRead(md: string, label: string): string | null {
   const re = new RegExp(`\\|\\s*\\*\\*${label}[^|]*\\*\\*[^\\n]*\\|[^\\n]*\\|[^\\n]*\\|\\s*\\*\\*([^*]+?)\\*\\*`, 'i');
   const m = md.match(re);
@@ -134,8 +120,15 @@ export function parseHistoricalGrowthTab(parametersMd: string | null): Historica
   const rows: ParamCompareRow[] = [];
 
   for (const p of ['P/E', 'Owner Earnings Yield', 'Premium to IV', 'ROE', 'EBITDA margin', 'P/B']) {
-    const row = extractTableRow(md, p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-    if (row) rows.push(row);
+    const cells = extractParametersMasterCells(md, p);
+    if (cells.avg10y || cells.today || cells.read) {
+      rows.push({
+        parameter: p,
+        avg10y: cells.avg10y ?? '—',
+        today: cells.today ?? '—',
+        read: cells.read ?? '—',
+      });
+    }
   }
 
   const peRow = rows.find((r) => r.parameter === 'P/E');

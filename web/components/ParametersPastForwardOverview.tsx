@@ -21,10 +21,7 @@ function readTone(read: string | null): string {
 }
 
 export function ParametersPastForwardOverview({ analysis }: ParametersPastForwardOverviewProps) {
-  const rows = buildParametersPastForwardOverview({
-    pe: analysis.peParameters,
-    earningsQuality: analysis.earningsQuality,
-  });
+  const rows = buildParametersPastForwardOverview(analysis);
   const links = buildExternalStockReferenceLinks(analysis.ticker, analysis.stockName);
   const paramDate = analysis.peParameters.parametersDate;
 
@@ -92,11 +89,17 @@ export function ParametersPastForwardOverview({ analysis }: ParametersPastForwar
                   {row.past.read && (
                     <div className={`calc-pf-read ${readTone(row.past.read)}`}>{row.past.read}</div>
                   )}
+                  {row.past.source && (
+                    <div className="calc-pf-source muted small">Source: {row.past.source}</div>
+                  )}
                 </td>
                 <td className="calc-pf-col-future">
                   <div className="calc-pf-value">{row.future.value}</div>
                   {row.future.read && (
                     <div className={`calc-pf-read ${readTone(row.future.read)}`}>{row.future.read}</div>
+                  )}
+                  {row.future.source && (
+                    <div className="calc-pf-source muted small">Source: {row.future.source}</div>
                   )}
                 </td>
               </tr>

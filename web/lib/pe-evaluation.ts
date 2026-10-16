@@ -12,6 +12,10 @@ import {
 } from './stock-calculator-tabs';
 import { stockbookPath } from './navigation';
 import { parseMedian10yPeFromMd, resolve10yPeReference } from './pe-history-reference';
+import {
+  fetchParameterExternalSupplement,
+  type ParameterExternalSupplement,
+} from './parameters-external-supplement';
 
 export interface PeEvaluationResult {
   ticker: string;
@@ -36,6 +40,8 @@ export interface PeEvaluationResult {
   historical: HistoricalGrowthTab;
   forward: ForwardGrowthTab;
   stockbookParametersUrl: string;
+  /** Yahoo .NS fill when StockBook Part 1/2 cells are empty (align with VRO/MC TTM). */
+  externalSupplement?: ParameterExternalSupplement | null;
 }
 
 export async function loadPeEvaluation(
@@ -109,6 +115,20 @@ export async function loadPeEvaluation(
 
   enrichParametersPeMetrics(metrics, cmp, trailingEps);
 
+  const externalSupplement = await fetchParameterExternalSupplement(resolved.ticker);
+
+  if (externalSupplement) {
+    if (metrics.ttmPe == null && externalSupplement.trailingPe != null) {
+      metrics.ttmPe = externalSupplement.trailingPe;
+    }
+    if (metrics.forwardPe == null && externalSupplement.forwardPe != null) {
+      metrics.forwardPe = externalSupplement.forwardPe;
+    }
+    if (trailingEps == null && externalSupplement.trailingEps != null) {
+      trailingEps = externalSupplement.trailingEps;
+    }
+  }
+
   const histRef = resolve10yPeReference(metrics);
   const premiumTo10yPct =
     metrics.ttmPe != null && histRef.value != null && histRef.value > 0
@@ -140,5 +160,6 @@ export async function loadPeEvaluation(
     historical: parseHistoricalGrowthTab(md),
     forward: parseForwardGrowthTab(md),
     stockbookParametersUrl: stockbookPath(sector, stockName, 'parameters'),
+    externalSupplement,
   };
 }
