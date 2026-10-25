@@ -13,8 +13,10 @@ export function StockCalculatorSubNav() {
         const active =
           item.href === '/stock-calculator'
             ? pathname === '/stock-calculator'
-            : pathname === '/stock-calculator/history' ||
-              pathname.startsWith('/stock-calculator/full/');
+            : item.href === '/stock-calculator/pe'
+              ? pathname === '/stock-calculator/pe' || pathname.startsWith('/stock-calculator/pe/')
+              : pathname === '/stock-calculator/history' ||
+                pathname.startsWith('/stock-calculator/full/');
         return (
           <Link
             key={item.href}

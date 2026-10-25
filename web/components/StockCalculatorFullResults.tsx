@@ -18,6 +18,7 @@ import {
 } from '@/lib/investor-report-format';
 import { ParametersPastForwardOverview } from '@/components/ParametersPastForwardOverview';
 import { PeTtmForwardStrip } from '@/components/PeTtmForwardStrip';
+import { EarningsBasedPePanel } from '@/components/EarningsBasedPePanel';
 
 export type FullResultTabId =
   | 'report'
@@ -244,18 +245,26 @@ export function StockCalculatorFullResults({
         />
       )}
 
-      {activeTab === 'pe' &&
-        (analysis.peScorecard ? (
-          <PeScorecardResults
-            data={analysis.peScorecard}
-            recordId={standaloneModuleRecordId(childIds?.pe ?? undefined)}
+      {activeTab === 'pe' && (
+        <>
+          <EarningsBasedPePanel
+            embedded
+            defaultTicker={analysis.ticker}
+            defaultStockLabel={analysis.stockName}
           />
-        ) : (
-          <PeParametersBrief
-            data={analysis.peParameters}
-            hint="Add optional purchase price & date in the form for the full PE scorecard (legacy holder lens)."
-          />
-        ))}
+          {analysis.peScorecard ? (
+            <PeScorecardResults
+              data={analysis.peScorecard}
+              recordId={standaloneModuleRecordId(childIds?.pe ?? undefined)}
+            />
+          ) : (
+            <PeParametersBrief
+              data={analysis.peParameters}
+              hint="Optional: run Purchase P/E scorecard from Stock Analysis → P/E module page with purchase price & date."
+            />
+          )}
+        </>
+      )}
 
       {activeTab === 'earnings-quality' && (
         <EarningsQualityResults

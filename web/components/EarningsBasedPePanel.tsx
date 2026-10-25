@@ -15,8 +15,21 @@ const N_OPTIONS: { n: RunRateQuarterCount; label: string }[] = [
   { n: 6, label: '6 quarters' },
 ];
 
-export function EarningsBasedPePanel() {
-  const [stockName, setStockName] = useState('');
+interface EarningsBasedPePanelProps {
+  /** When opened from a full analysis PE tab — pre-fill ticker and hide duplicate intro. */
+  defaultTicker?: string;
+  defaultStockLabel?: string;
+  embedded?: boolean;
+}
+
+export function EarningsBasedPePanel({
+  defaultTicker,
+  defaultStockLabel,
+  embedded = false,
+}: EarningsBasedPePanelProps = {}) {
+  const [stockName, setStockName] = useState(
+    defaultStockLabel ?? (defaultTicker ? defaultTicker : '')
+  );
   const [selected, setSelected] = useState<StockSearchResult | null>(null);
   const [quarterCount, setQuarterCount] = useState<RunRateQuarterCount>(4);
   const { suggestions, queueSearch } = useStockSearchSuggestions();
@@ -57,7 +70,7 @@ export function EarningsBasedPePanel() {
     setLoading(true);
     setData(null);
 
-    const ticker = selected?.ticker ?? stockName.trim();
+    const ticker = defaultTicker ?? selected?.ticker ?? stockName.trim();
     if (!ticker) {
       setError('Select a stock from StockBook.');
       setLoading(false);
@@ -83,10 +96,13 @@ export function EarningsBasedPePanel() {
     }
   }
 
+  const stockFieldId = embedded ? 'eb-pe-stock-embedded' : 'eb-pe-stock';
+
   return (
     <div className="earnings-based-pe-panel">
-      <section className="card wide">
-        <h2>Earnings-based P/E vs market TTM</h2>
+      <section className={embedded ? 'calc-full-module-section' : 'card wide'}>
+        {!embedded && <h2>Earnings-based P/E vs market TTM</h2>}
+        {embedded && <h3>Earnings-based P/E vs market TTM</h3>}
         <p className="muted small">
           Consolidated PAT for the latest <strong>N</strong> quarters → annualised earnings →{' '}
           <strong>market cap ÷ annualised PAT</strong>. Compare to verified{' '}
@@ -95,21 +111,29 @@ export function EarningsBasedPePanel() {
         </p>
 
         <form onSubmit={submit} className="holding-form calculator-form">
-          <div className="form-row" ref={wrapRef}>
-            <label htmlFor="eb-pe-stock">Stock name and ticker (NSE)</label>
-            <input
-              id="eb-pe-stock"
-              type="text"
-              value={stockName}
-              onChange={(e) => onStockInput(e.target.value)}
-              placeholder="e.g. Havells India (HAVELLS)"
-              autoComplete="off"
-              required
-            />
-            {showSuggestions && suggestions.length > 0 && (
-              <StockSearchSuggestions suggestions={suggestions} onPick={pickStock} />
-            )}
-          </div>
+          {!defaultTicker && (
+            <div className="form-row" ref={wrapRef}>
+              <label htmlFor={stockFieldId}>Stock name and ticker (NSE)</label>
+              <input
+                id={stockFieldId}
+                type="text"
+                value={stockName}
+                onChange={(e) => onStockInput(e.target.value)}
+                placeholder="e.g. Havells India (HAVELLS)"
+                autoComplete="off"
+                required
+              />
+              {showSuggestions && suggestions.length > 0 && (
+                <StockSearchSuggestions suggestions={suggestions} onPick={pickStock} />
+              )}
+            </div>
+          )}
+          {defaultTicker && (
+            <p className="muted small">
+              Stock: <strong>{defaultStockLabel ?? defaultTicker}</strong> (NSE:{' '}
+              <strong>{defaultTicker}</strong>)
+            </p>
+          )}
 
           <fieldset className="calc-run-rate-pe-n">
             <legend className="pe-eval-label">Number of latest reported quarters</legend>

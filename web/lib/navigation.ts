@@ -41,6 +41,7 @@ export const STOCK_ANALYSIS_INTRO =
 /** Top sub-nav on Stock Analysis hub — module tabs live inside each stock report only */
 export const STOCK_CALCULATOR_HUB_NAV = [
   { href: '/stock-calculator', label: 'Analyze' },
+  { href: '/stock-calculator/pe', label: 'P/E' },
   { href: '/stock-calculator/history', label: 'History' },
 ] as const;
 
