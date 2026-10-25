@@ -599,6 +599,22 @@ Run Stock Analysis → Earnings Quality to verify Part A/B render. Write-back fa
 Engine: file registers override sector dynamic overlay · base EPS CAGR minus risk haircuts; external trims taper in outer years.`,
       },
       {
+        id: 'quarterly-run-rate-pe',
+        categoryId: 'stock-calculator',
+        title: 'Quarterly run-rate P/E (PAT annualisation vs TTM)',
+        description:
+          'Last N consolidated PAT quarters → annualised earnings → run-rate P/E; compare to TTM on Overview after Full analysis.',
+        cadence: 'quarterly',
+        actionType: 'prompt',
+        channel: 'both',
+        href: '/stock-calculator',
+        hrefLabel: 'Stock Analysis → Overview',
+        prompt: `{TICKER} (NSE) — run-rate P/E per StockBook/QUARTERLY-RUN-RATE-PE.md (N={N}, default 4).
+
+FACT consolidated PAT per quarter · AnnualisedPat = SumPat×(4÷N) · Run-rate P/E vs Moneycontrol/VRO TTM.
+Write one line to PARAMETERS Part 1 P/E if gap >10%. Overview panel: replace UNVERIFIED Yahoo PAT with filing numbers.`,
+      },
+      {
         id: 'pe-gordon-fair-pe',
         categoryId: 'stock-calculator',
         title: 'PE Evaluation — Gordon fair P/E + implied growth',

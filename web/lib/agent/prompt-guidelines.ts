@@ -625,6 +625,21 @@ Label sector proxies OUR ASSUMPTION until verified. Web tab must never show blan
         placeholders: ['{TICKER}'],
       },
       {
+        id: 'quarterly-run-rate-pe',
+        title: 'Quarterly PAT → earnings run-rate P/E (vs TTM)',
+        description:
+          'Annualise last N consolidated PAT quarters · run-rate P/E vs conventional TTM — Stock Calculator Overview panel.',
+        prompt: `{TICKER} (NSE) — earnings run-rate P/E per StockBook/QUARTERLY-RUN-RATE-PE.md.
+
+Quarters N = {N} (default 4). Consolidated PAT (₹ cr) for latest N reported quarters — label each FACT from BSE/NSE/AR.
+AnnualisedPat = SumPat(N) × (4÷N). Run-rate EPS = AnnualisedPat ÷ diluted shares (cr). Run-rate P/E = CMP ÷ run-rate EPS.
+Compare to conventional TTM P/E (PARAMETERS / Moneycontrol) — explain gap (consolidated vs standalone, one-offs, share count, stale quote).
+If N=2 or 3, flag seasonality OUR ASSUMPTION. Do not rank surplus on run-rate P/E alone — PCCL + Module E.`,
+        channel: 'both',
+        framework: ['QUARTERLY-RUN-RATE-PE', 'PARAMETERS-FRAMEWORK', 'PE-EVALUATION-FRAMEWORK'],
+        placeholders: ['{TICKER}', '{N}'],
+      },
+      {
         id: 'pe-gordon-fair',
         title: 'Gordon fair P/E + implied growth',
         description: 'PE Evaluation Part D — Fair P/E = 1/(R−G); inverse implied G at CMP P/E.',

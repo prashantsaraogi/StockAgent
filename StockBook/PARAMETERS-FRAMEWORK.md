@@ -6,7 +6,7 @@
 1. **Rear-view (10Y)** — how the market **priced** this business in the past  
 2. **Forward vision (5Y)** — what parameters look like if **average/normalized earnings** grow — **history does not have to repeat**
 
-Cross-ref: `StockBook/AGENT-RULES.md` · `StockBook/PE-EVALUATION-FRAMEWORK.md` (purchase vs today scorecard) · `pccl-analysis` · `valuation-analysis`
+Cross-ref: `StockBook/AGENT-RULES.md` · `StockBook/PE-EVALUATION-FRAMEWORK.md` (purchase vs today scorecard) · `StockBook/QUARTERLY-RUN-RATE-PE.md` (PAT annualisation vs TTM P/E) · `pccl-analysis` · `valuation-analysis`
 
 **Public cross-check (mandatory when refreshing PARAMETERS):**
 

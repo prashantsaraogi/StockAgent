@@ -18,6 +18,7 @@ import {
 } from '@/lib/investor-report-format';
 import { ParametersPastForwardOverview } from '@/components/ParametersPastForwardOverview';
 import { PeTtmForwardStrip } from '@/components/PeTtmForwardStrip';
+import { QuarterlyRunRatePePanel } from '@/components/QuarterlyRunRatePePanel';
 
 export type FullResultTabId =
   | 'report'
@@ -186,6 +187,7 @@ export function StockCalculatorFullResults({
       {activeTab === 'overview' && (
         <section className="card wide calc-full-overview">
           <PeTtmForwardStrip analysis={analysis} />
+          <QuarterlyRunRatePePanel analysis={analysis} />
           <h3>Module verdicts</h3>
           <div className="calc-full-overview-grid">
             {overviewModules.map((mod) => (

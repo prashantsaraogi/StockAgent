@@ -1,20 +1,20 @@
 {
   "version": 1,
-  "refreshedAt": "2026-10-16",
+  "refreshedAt": "2026-10-25",
   "quotes": {
     "ITC": {
-      "cmp": 261.7,
-      "asOf": "2026-10-16T04:41:06.000Z",
+      "cmp": 257.9,
+      "asOf": "2026-10-23T09:58:19.000Z",
       "source": "nse-yahoo"
     },
     "MARUTI": {
-      "cmp": 11438,
-      "asOf": "2026-10-16T04:41:04.000Z",
+      "cmp": 11230,
+      "asOf": "2026-10-23T09:58:20.000Z",
       "source": "nse-yahoo"
     },
     "MAXHEALTH": {
-      "cmp": 850.85,
-      "asOf": "2026-10-16T04:41:07.000Z",
+      "cmp": 815,
+      "asOf": "2026-10-23T09:58:19.000Z",
       "source": "nse-yahoo"
     }
   }
