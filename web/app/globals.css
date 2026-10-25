@@ -3475,6 +3475,43 @@ td.gain-neg {
   margin: 0.35rem 0;
 }
 
+.earnings-based-pe-panel {
+  margin-bottom: 1.5rem;
+}
+
+.pe-scorecard-intro {
+  margin-top: 1.25rem;
+}
+
+.earnings-based-pe-report h3 {
+  margin-top: 1.25rem;
+  font-size: 1rem;
+}
+
+.earnings-based-pe-highlight {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0.35rem 0;
+}
+
+.earnings-based-pe-final {
+  font-size: 1.5rem;
+}
+
+.earnings-based-pe-conclusion {
+  margin-top: 0.75rem;
+  line-height: 1.5;
+}
+
+.earnings-based-pe-warnings {
+  color: var(--warn, #b45309);
+  font-size: 0.88rem;
+}
+
+.earnings-based-pe-limits {
+  margin-top: 0.5rem;
+}
+
 .calc-pe-ttm-fwd-strip {
   margin-bottom: 1.25rem;
 }

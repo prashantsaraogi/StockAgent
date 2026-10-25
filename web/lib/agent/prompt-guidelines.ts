@@ -628,7 +628,7 @@ Label sector proxies OUR ASSUMPTION until verified. Web tab must never show blan
         id: 'quarterly-run-rate-pe',
         title: 'Quarterly PAT → earnings run-rate P/E (vs TTM)',
         description:
-          'Annualise last N consolidated PAT quarters · run-rate P/E vs conventional TTM — Stock Calculator Overview panel.',
+          'Annualise last N consolidated PAT quarters · earnings-based P/E (MCap ÷ annualised PAT) vs TTM — Stock Analysis P/E tab.',
         prompt: `{TICKER} (NSE) — earnings run-rate P/E per StockBook/QUARTERLY-RUN-RATE-PE.md.
 
 Quarters N = {N} (default 4). Consolidated PAT (₹ cr) for latest N reported quarters — label each FACT from BSE/NSE/AR.

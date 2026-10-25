@@ -18,7 +18,6 @@ import {
 } from '@/lib/investor-report-format';
 import { ParametersPastForwardOverview } from '@/components/ParametersPastForwardOverview';
 import { PeTtmForwardStrip } from '@/components/PeTtmForwardStrip';
-import { QuarterlyRunRatePePanel } from '@/components/QuarterlyRunRatePePanel';
 
 export type FullResultTabId =
   | 'report'
@@ -187,7 +186,11 @@ export function StockCalculatorFullResults({
       {activeTab === 'overview' && (
         <section className="card wide calc-full-overview">
           <PeTtmForwardStrip analysis={analysis} />
-          <QuarterlyRunRatePePanel analysis={analysis} />
+          <p className="muted small">
+            <strong>Earnings-based P/E vs TTM:</strong>{' '}
+            <a href="/stock-calculator/pe">Stock Analysis → P/E tab</a> — select N quarters and
+            calculate from consolidated PAT.
+          </p>
           <h3>Module verdicts</h3>
           <div className="calc-full-overview-grid">
             {overviewModules.map((mod) => (

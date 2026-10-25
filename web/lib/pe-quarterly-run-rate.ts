@@ -14,7 +14,9 @@ export interface RunRateQuarterInput {
 }
 
 export interface QuarterlyRunRatePeInput {
-  cmp: number;
+  cmp?: number | null;
+  /** Market cap (₹ cr) — preferred for earnings-based P/E per framework. */
+  marketCapCr?: number | null;
   quarterCount: RunRateQuarterCount;
   /** Oldest → newest; only the last `quarterCount` rows are used. */
   quarters: RunRateQuarterInput[];
@@ -32,8 +34,16 @@ export interface QuarterlyRunRatePeResult {
   sumPatCr: number | null;
   annualisedPatCr: number | null;
   runRateEps: number | null;
+  /** Earnings-based P/E = market cap ÷ annualised PAT (primary). */
+  earningsBasedPe: number | null;
+  /** @deprecated alias */
   runRatePe: number | null;
   ttmPeReference: number | null;
+  /** Current TTM P/E − earnings-based P/E (× points). */
+  peDifference: number | null;
+  /** [(TTM ÷ earnings-based) − 1] × 100 — negative = discount. */
+  currentPeDiscountPremiumPct: number | null;
+  /** Legacy spread vs TTM — same as currentPeDiscountPremiumPct. */
   spreadVsTtmPct: number | null;
   epsSource: 'pat_and_shares' | 'quarterly_eps' | null;
   sharesCrUsed: number | null;
@@ -59,8 +69,14 @@ export function inferSharesCrFromTtm(
   return round2(annualisedPatCr / trailingEps);
 }
 
+export function annualisedPatFromSum(sumPatCr: number, quarterCount: RunRateQuarterCount): number {
+  if (quarterCount === 4) return round2(sumPatCr);
+  return round2((sumPatCr / quarterCount) * 4);
+}
+
 export function computeQuarterlyRunRatePe(input: QuarterlyRunRatePeInput): QuarterlyRunRatePeResult {
-  const { cmp, quarterCount, ttmPeReference = null, trailingEpsReference = null } = input;
+  const { cmp = null, marketCapCr = null, quarterCount, ttmPeReference = null, trailingEpsReference = null } =
+    input;
   const warnings: string[] = [];
   const notes: string[] = [];
   const annualisationFactor = 4 / quarterCount;
@@ -81,7 +97,7 @@ export function computeQuarterlyRunRatePe(input: QuarterlyRunRatePeInput): Quart
     : null;
 
   const annualisedPatCr =
-    sumPatCr != null ? round1(sumPatCr * annualisationFactor) : null;
+    sumPatCr != null ? annualisedPatFromSum(sumPatCr, quarterCount) : null;
 
   let runRateEps: number | null = null;
   let epsSource: QuarterlyRunRatePeResult['epsSource'] = null;
@@ -116,10 +132,21 @@ export function computeQuarterlyRunRatePe(input: QuarterlyRunRatePeInput): Quart
     }
   }
 
-  const runRatePe =
-    runRateEps != null && runRateEps > 0 && Number.isFinite(cmp) && cmp > 0
-      ? round1(cmp / runRateEps)
-      : null;
+  let earningsBasedPe: number | null = null;
+  if (
+    annualisedPatCr != null &&
+    annualisedPatCr > 0 &&
+    marketCapCr != null &&
+    Number.isFinite(marketCapCr) &&
+    marketCapCr > 0
+  ) {
+    earningsBasedPe = round2(marketCapCr / annualisedPatCr);
+  } else if (runRateEps != null && runRateEps > 0 && cmp != null && Number.isFinite(cmp) && cmp > 0) {
+    earningsBasedPe = round1(cmp / runRateEps);
+    notes.push('Earnings-based P/E from CMP ÷ run-rate EPS — provide market cap for framework-primary method.');
+  }
+
+  const runRatePe = earningsBasedPe;
 
   if (quarterCount === 2) {
     notes.push('N=2: H1 annualised run-rate — seasonality may distort full-year PAT.');
@@ -130,14 +157,21 @@ export function computeQuarterlyRunRatePe(input: QuarterlyRunRatePeInput): Quart
   if (quarterCount === 6) {
     notes.push('N=6: longer smoothing window — not comparable to exchange TTM P/E.');
   }
-  if (quarterCount === 4 && runRatePe != null && ttmPeReference != null) {
-    notes.push('N=4: run-rate P/E should match TTM when PAT/EPS and share count align with the quote provider.');
+  if (quarterCount === 4 && earningsBasedPe != null && ttmPeReference != null) {
+    notes.push('N=4: earnings-based P/E should align with TTM when PAT and market cap match the quote provider.');
   }
 
-  const spreadVsTtmPct =
-    runRatePe != null && ttmPeReference != null && ttmPeReference > 0
-      ? round1(((runRatePe - ttmPeReference) / ttmPeReference) * 100)
+  const peDifference =
+    ttmPeReference != null && earningsBasedPe != null
+      ? round2(ttmPeReference - earningsBasedPe)
       : null;
+
+  const currentPeDiscountPremiumPct =
+    ttmPeReference != null && earningsBasedPe != null && earningsBasedPe > 0
+      ? round2(((ttmPeReference / earningsBasedPe) - 1) * 100)
+      : null;
+
+  const spreadVsTtmPct = currentPeDiscountPremiumPct;
 
   return {
     quarterCount,
@@ -145,8 +179,11 @@ export function computeQuarterlyRunRatePe(input: QuarterlyRunRatePeInput): Quart
     sumPatCr,
     annualisedPatCr,
     runRateEps,
+    earningsBasedPe,
     runRatePe,
     ttmPeReference,
+    peDifference,
+    currentPeDiscountPremiumPct,
     spreadVsTtmPct,
     epsSource,
     sharesCrUsed,

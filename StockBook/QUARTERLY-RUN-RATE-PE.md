@@ -2,7 +2,7 @@
 
 **Created:** 22 Oct 2026  
 **Purpose:** Compute **earnings run-rate P/E** from **verified consolidated PAT** (last *N* reported quarters), annualised, vs **conventional trailing P/E (TTM)** on quote sites.  
-**Web:** Stock Calculator → Full analysis → **Overview** → **Quarterly run-rate P/E** panel  
+**Web:** Stock Analysis → **P/E** tab → **Earnings-based P/E vs market TTM** (Calculate now)  
 **Cross-ref:** `PARAMETERS-FRAMEWORK.md` · `PE-EVALUATION-FRAMEWORK.md` · `EARNINGS-QUALITY-FRAMEWORK.md` · `web/lib/pe-quarterly-run-rate.ts`
 
 ---
@@ -32,10 +32,12 @@ Let **Q₁…Qₙ** = consolidated PAT (₹ cr) for the **latest N reported quar
 
 ```
 SumPat(N)     = Q₁ + … + Qₙ
-AnnualisedPat = SumPat(N) × (4 ÷ N)
-Run-rate EPS  = AnnualisedPat ÷ DilutedShares(cr)     [₹ per share]
-Run-rate P/E  = CMP ÷ Run-rate EPS
+AnnualisedPat = (SumPat(N) ÷ N) × 4    [when N=4, AnnualisedPat = SumPat — no extra factor]
+Market cap    = CMP × shares outstanding (₹ cr)
+Earnings-based P/E = Market cap ÷ AnnualisedPat
 ```
+
+Equivalent per-share form: `Run-rate EPS = AnnualisedPat ÷ shares(cr)` · `CMP ÷ run-rate EPS` when share count is consistent.
 
 **Alternate (when quarterly EPS is verified per share):**
 
@@ -52,6 +54,19 @@ Implied P/E from PAT = MarketCap ÷ (AnnualisedPat × 10⁷)   [PAT in ₹ absol
 ```
 
 Use **diluted** share count as of the same result date when possible.
+
+---
+
+## Compare earnings-based P/E vs market TTM (required output)
+
+| Measure | Definition |
+|---------|------------|
+| **A. Current market P/E (TTM)** | Latest verified trailing P/E (PARAMETERS / NSE / VRO / MC) — not forward |
+| **B. Earnings-based P/E** | Market cap ÷ annualised PAT from selected N quarters |
+| **C. Difference** | TTM P/E − earnings-based P/E (× points) |
+| **D. Discount or premium** | `[(TTM ÷ earnings-based) − 1] × 100` — negative = TTM **discount** vs run-rate |
+
+Do **not** treat a TTM discount as proof of undervaluation — earnings windows differ.
 
 ---
 

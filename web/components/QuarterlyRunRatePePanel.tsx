@@ -145,7 +145,9 @@ export function QuarterlyRunRatePePanel({ analysis }: QuarterlyRunRatePePanelPro
         <div className="calc-pe-ttm-fwd-grid calc-run-rate-pe-results">
           <article className="calc-pe-ttm-fwd-card">
             <span className="pe-eval-label">Earnings run-rate P/E</span>
-            <strong className="calc-pe-ttm-fwd-value">{fmtRunRatePe(result.runRatePe)}</strong>
+            <strong className="calc-pe-ttm-fwd-value">
+              {fmtRunRatePe(result.earningsBasedPe ?? result.runRatePe)}
+            </strong>
             <span className="muted small">
               N={result.quarterCount} · annualised PAT ÷ run-rate EPS
             </span>
@@ -165,10 +167,10 @@ export function QuarterlyRunRatePePanel({ analysis }: QuarterlyRunRatePePanelPro
             <span className="pe-eval-label">Conventional TTM P/E</span>
             <strong className="calc-pe-ttm-fwd-value">{fmtPeTimes(result.ttmPeReference)}</strong>
             <span className="muted small">Trailing · PARAMETERS / quote lens</span>
-            {result.spreadVsTtmPct != null && (
+            {result.currentPeDiscountPremiumPct != null && (
               <span className="muted small">
-                Run-rate {result.spreadVsTtmPct >= 0 ? '+' : ''}
-                {result.spreadVsTtmPct.toFixed(1)}% vs TTM
+                TTM {result.currentPeDiscountPremiumPct >= 0 ? 'premium' : 'discount'}{' '}
+                {Math.abs(result.currentPeDiscountPremiumPct).toFixed(1)}% vs earnings-based
               </span>
             )}
           </article>

@@ -607,8 +607,8 @@ Engine: file registers override sector dynamic overlay · base EPS CAGR minus ri
         cadence: 'quarterly',
         actionType: 'prompt',
         channel: 'both',
-        href: '/stock-calculator',
-        hrefLabel: 'Stock Analysis → Overview',
+        href: '/stock-calculator/pe',
+        hrefLabel: 'Stock Analysis → P/E tab',
         prompt: `{TICKER} (NSE) — run-rate P/E per StockBook/QUARTERLY-RUN-RATE-PE.md (N={N}, default 4).
 
 FACT consolidated PAT per quarter · AnnualisedPat = SumPat×(4÷N) · Run-rate P/E vs Moneycontrol/VRO TTM.

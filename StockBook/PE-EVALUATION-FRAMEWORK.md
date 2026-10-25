@@ -2,7 +2,7 @@
 
 **Created:** 7 Sep 2026  
 **Purpose:** Stock-agnostic lens separating **“Was my purchase good?”** from **“Is the stock attractive today?”**  
-**Web:** Stock Calculator → **PE Evaluation Framework** tab  
+**Web:** Stock Analysis → **P/E** tab (earnings-based P/E vs TTM + purchase scorecard)  
 **Persistence:** Each run saved per user — disk `data/users/{tenant}/stock-calculator/pe-evaluation/` + Supabase `pe_evaluation_history` (migration `004_pe_evaluation_history.sql`)  
 **Cross-ref:** `PARAMETERS-FRAMEWORK.md` (Part 1 rear-view · Part 2 forward) · `pccl-analysis` · `long-term-investor-mandate.md`
 

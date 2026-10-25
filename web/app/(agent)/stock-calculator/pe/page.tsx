@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { requireSession } from '@/lib/auth';
+import { EarningsBasedPePanel } from '@/components/EarningsBasedPePanel';
 import { PeEvaluationPanel } from '@/components/PeEvaluationPanel';
 import { StockCalculatorSubNav } from '@/components/StockCalculatorSubNav';
 import { STOCK_ANALYSIS_TITLE } from '@/lib/navigation';
@@ -49,9 +50,19 @@ export default async function PeEvaluationPage() {
       <div className="journal-section-intro card wide">
         <h2 className="journal-section-title">P/E evaluation</h2>
         <p className="muted small">
-          <strong>Part A</strong> — was purchase P/E cheap or expensive ·{' '}
-          <strong>Part B</strong> — EPS growth + P/E compression ·{' '}
-          <strong>Part C</strong> — 8-point scorecard at today&apos;s CMP.
+          <strong>Earnings-based P/E</strong> — latest N quarters consolidated PAT vs market TTM ·{' '}
+          <strong>Purchase scorecard</strong> — Part A/B purchase quality · Part C today&apos;s
+          8-point score · Part D Gordon fair P/E.
+        </p>
+      </div>
+
+      <EarningsBasedPePanel />
+
+      <div className="journal-section-intro card wide pe-scorecard-intro">
+        <h2 className="journal-section-title">Purchase P/E scorecard</h2>
+        <p className="muted small">
+          Requires your <strong>purchase price</strong> and <strong>purchase date</strong> — separate
+          from the earnings run-rate comparison above.
         </p>
       </div>
 
