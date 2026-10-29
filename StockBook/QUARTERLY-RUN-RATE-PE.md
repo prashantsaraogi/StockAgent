@@ -70,6 +70,25 @@ Do **not** treat a TTM discount as proof of undervaluation — earnings windows 
 
 ---
 
+## PEG on the same report (Stock Analysis → P/E tab)
+
+Use **one** EPS/PAT growth rate (%, &gt; 0) for both P/E lenses:
+
+```
+TTM PEG              = TTM P/E ÷ growth %
+Earnings-based PEG   = Earnings-based P/E ÷ growth %
+PEG difference       = TTM PEG − earnings-based PEG
+PEG discount/premium = [(TTM PEG ÷ earnings-based PEG) − 1] × 100
+```
+
+**Growth source priority:** (1) user override in report · (2) PAT YoY on same N-quarter window if 2N quarters in table · (3) Earnings Quality 5Y EPS CAGR · (4) PARAMETERS Part 2 base EPS CAGR (**OUR ASSUMPTION**).
+
+**Maruti-style rule:** If latest quarter PAT is not yet verified (e.g. Q2 FY27 on results day), **leave blank** — do not annualise with stale or prior-year Q2 PAT. P/E and PEG update after FACT PAT is entered.
+
+PEG zones: see `PEG-FRAMEWORK.md` — never BUY on PEG alone.
+
+---
+
 ## Run-rate P/E vs conventional TTM P/E
 
 | Lens | Numerator | Denominator | Typical source |

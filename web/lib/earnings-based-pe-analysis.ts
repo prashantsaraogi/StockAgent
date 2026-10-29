@@ -9,9 +9,16 @@ import { fetchMarketCapCr } from './market-cap';
 import { fetchLiveNseCmp, resolveNseSymbol } from './nse-cmp';
 import { resolveStock } from './stock-search';
 import { fetchYahooQuoteSummary } from './yahoo-finance-session';
+import { parseParametersEpsCagrBasePct } from './parameters-assumptions';
+import { getBundledParametersMd } from './load-bundled-stockbook';
+import { readStockTabContent } from './content';
+import { getStockbookByTicker } from './stockbook-index';
 import {
+  computeEarningsBasedPegCompare,
   computeQuarterlyRunRatePe,
+  patGrowthPctFromQuarterWindow,
   quarterlyRowsToRunRateInput,
+  type EarningsBasedPegCompare,
   type RunRateQuarterCount,
 } from './pe-quarterly-run-rate';
 
@@ -47,7 +54,14 @@ export interface EarningsBasedPeAnalysisResult {
   ttmPeSource: string;
   peDifference: number | null;
   currentPeDiscountPremiumPct: number | null;
+  /** PEG = P/E ÷ EPS growth % — same growth for both P/E lenses. */
+  peg: EarningsBasedPegCompare;
+  epsGrowthPct: number | null;
+  epsGrowthSource: string;
+  epsGrowthEvidence: EvidenceLabel;
+  patWindowGrowthPct: number | null;
   conclusion: string;
+  pegConclusion: string;
   warnings: string[];
   limitations: string[];
   notes: string[];
@@ -132,15 +146,24 @@ export async function runEarningsBasedPeAnalysis(
   const limitations: string[] = [
     'Do not treat earnings-based P/E as fair value or a justified multiple.',
     'Market TTM P/E providers may use different earnings definitions than consolidated PAT.',
+    'PEG uses one growth input for both P/E lenses — not a standalone BUY signal (PEG-FRAMEWORK).',
   ];
 
-  const [peEval, eq, yahooCap, liveCmp, mcapFallback] = await Promise.all([
+  const loc = await getStockbookByTicker(resolved.ticker);
+  const sector = loc?.sector ?? resolved.sector;
+  const stockName = loc?.stock ?? resolved.company;
+
+  const [peEval, eq, yahooCap, liveCmp, mcapFallback, paramFile] = await Promise.all([
     loadPeEvaluation(resolved.ticker, tenantId),
     runEarningsQualityAnalysis({ ticker: resolved.ticker, tenantId }),
     fetchYahooCapAndShares(resolved.ticker),
     fetchLiveNseCmp(resolved.ticker).catch(() => null),
     fetchMarketCapCr(resolved.ticker),
+    readStockTabContent(sector, stockName, 'parameters', tenantId),
   ]);
+
+  const parametersMd =
+    paramFile?.content ?? getBundledParametersMd(resolved.ticker) ?? null;
 
   let cmp: number | null = liveCmp?.price ?? peEval?.cmp ?? yahooCap.price ?? null;
   let cmpSource = liveCmp?.source ?? peEval?.cmpSource ?? yahooCap.source;
@@ -201,6 +224,44 @@ export async function runEarningsBasedPeAnalysis(
     warnings.push('Market TTM P/E could not be verified — comparison row omitted or provisional.');
   }
 
+  const patWindowGrowthPct = patGrowthPctFromQuarterWindow(quarterInputs, quarterCount);
+  let epsGrowthPct: number | null = patWindowGrowthPct;
+  let epsGrowthSource = 'PAT YoY on same N-quarter window (quarterly table)';
+  let epsGrowthEvidence: EvidenceLabel = 'UNVERIFIED';
+
+  if (epsGrowthPct == null && eq?.partA?.epsCagr5y != null && eq.partA.epsCagr5y > 0) {
+    epsGrowthPct = eq.partA.epsCagr5y;
+    epsGrowthSource = 'Earnings Quality Part A — 5Y EPS CAGR';
+    epsGrowthEvidence = 'UNVERIFIED';
+  }
+  if (epsGrowthPct == null) {
+    const fromParams = parseParametersEpsCagrBasePct(parametersMd);
+    if (fromParams != null && fromParams > 0) {
+      epsGrowthPct = fromParams;
+      epsGrowthSource = 'PARAMETERS Part 2 — base EPS CAGR (5Y)';
+      epsGrowthEvidence = 'OUR ASSUMPTION';
+    }
+  }
+  if (epsGrowthPct == null) {
+    warnings.push(
+      'EPS/PAT growth % unavailable — enter growth manually in the report to compute PEG.'
+    );
+  }
+
+  const peg = computeEarningsBasedPegCompare(
+    computed.earningsBasedPe,
+    ttmPe,
+    epsGrowthPct
+  );
+
+  let pegConclusion = '';
+  if (peg.ttmPeg != null && peg.earningsBasedPeg != null && epsGrowthPct != null) {
+    pegConclusion = `At ${epsGrowthPct}% growth ( ${epsGrowthSource} ), TTM PEG ${peg.ttmPeg.toFixed(2)} vs earnings-based PEG ${peg.earningsBasedPeg.toFixed(2)}. PEG compares growth justification across the two P/E measures — not fair value.`;
+  } else {
+    pegConclusion =
+      'PEG not calculated — need verified EPS/PAT growth % > 0 and both P/E multiples.';
+  }
+
   return {
     ticker: resolved.ticker,
     stockName: resolved.company,
@@ -222,6 +283,12 @@ export async function runEarningsBasedPeAnalysis(
     ttmPeSource,
     peDifference: computed.peDifference,
     currentPeDiscountPremiumPct: computed.currentPeDiscountPremiumPct,
+    peg,
+    epsGrowthPct,
+    epsGrowthSource,
+    epsGrowthEvidence,
+    patWindowGrowthPct,
+    pegConclusion,
     conclusion: buildConclusion(
       resolved.company,
       computed.earningsBasedPe,

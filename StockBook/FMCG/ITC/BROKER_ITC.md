@@ -1,6 +1,6 @@
 # ITC - Broker Target Prices
 
-**Ticker:** ITC (NSE) | **CMP:** Rs 257.9 (2026-10-25) | **CMP date:** 2026-10-25  
+**Ticker:** ITC (NSE) | **CMP:** Rs 259.5 (2026-10-29) | **CMP date:** 2026-10-29  
 **Trendlyne consensus:** Rs 371 (upside 39.36%) | 7 analysts  
 **As of:** 2026-08-29 | **Horizon:** ~12-month broker targets (typical)
 

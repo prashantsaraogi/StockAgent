@@ -205,3 +205,79 @@ export function fmtRunRatePe(n: number | null): string {
   if (n == null || !Number.isFinite(n)) return '—';
   return `${n.toFixed(1)}×`;
 }
+
+/** PEG = P/E ÷ EPS growth (%) — same growth denominator for TTM vs earnings-based P/E. */
+export function computePegRatio(pe: number | null, epsGrowthPct: number | null): number | null {
+  if (pe == null || epsGrowthPct == null || !Number.isFinite(pe) || !Number.isFinite(epsGrowthPct)) {
+    return null;
+  }
+  if (epsGrowthPct <= 0) return null;
+  return Math.round((pe / epsGrowthPct) * 100) / 100;
+}
+
+export type PegZoneLabel = '🟢' | '🟡' | '🟠' | '🔴' | '—';
+
+export function pegZone(peg: number | null): PegZoneLabel {
+  if (peg == null) return '—';
+  if (peg < 1) return '🟢';
+  if (peg < 1.5) return '🟡';
+  if (peg < 2.5) return '🟠';
+  return '🔴';
+}
+
+export interface EarningsBasedPegCompare {
+  epsGrowthPct: number | null;
+  ttmPeg: number | null;
+  earningsBasedPeg: number | null;
+  pegDifference: number | null;
+  pegDiscountPremiumPct: number | null;
+  ttmPegZone: PegZoneLabel;
+  earningsBasedPegZone: PegZoneLabel;
+}
+
+export function computeEarningsBasedPegCompare(
+  earningsBasedPe: number | null,
+  ttmPe: number | null,
+  epsGrowthPct: number | null
+): EarningsBasedPegCompare {
+  const ttmPeg = computePegRatio(ttmPe, epsGrowthPct);
+  const earningsBasedPeg = computePegRatio(earningsBasedPe, epsGrowthPct);
+  const pegDifference =
+    ttmPeg != null && earningsBasedPeg != null
+      ? Math.round((ttmPeg - earningsBasedPeg) * 100) / 100
+      : null;
+  const pegDiscountPremiumPct =
+    ttmPeg != null && earningsBasedPeg != null && earningsBasedPeg > 0
+      ? Math.round(((ttmPeg / earningsBasedPeg) - 1) * 1000) / 10
+      : null;
+
+  return {
+    epsGrowthPct,
+    ttmPeg,
+    earningsBasedPeg,
+    pegDifference,
+    pegDiscountPremiumPct,
+    ttmPegZone: pegZone(ttmPeg),
+    earningsBasedPegZone: pegZone(earningsBasedPeg),
+  };
+}
+
+/** PAT growth: sum(latest N) vs sum(prior N) on same calendar quarters — proxy only. */
+export function patGrowthPctFromQuarterWindow(
+  quarters: RunRateQuarterInput[],
+  quarterCount: RunRateQuarterCount
+): number | null {
+  if (quarters.length < quarterCount * 2) return null;
+  const recent = quarters.slice(-quarterCount);
+  const prior = quarters.slice(-quarterCount * 2, -quarterCount);
+  const sumRecent = recent.reduce((s, q) => s + (q.patCr ?? 0), 0);
+  const sumPrior = prior.reduce((s, q) => s + (q.patCr ?? 0), 0);
+  if (!recent.every((q) => q.patCr != null) || !prior.every((q) => q.patCr != null)) return null;
+  if (sumPrior <= 0) return null;
+  return Math.round(((sumRecent - sumPrior) / sumPrior) * 1000) / 10;
+}
+
+export function fmtPeg(n: number | null): string {
+  if (n == null || !Number.isFinite(n)) return '—';
+  return n.toFixed(2);
+}

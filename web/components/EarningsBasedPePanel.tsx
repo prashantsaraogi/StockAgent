@@ -101,13 +101,14 @@ export function EarningsBasedPePanel({
   return (
     <div className="earnings-based-pe-panel">
       <section className={embedded ? 'calc-full-module-section' : 'card wide'}>
-        {!embedded && <h2>Earnings-based P/E vs market TTM</h2>}
-        {embedded && <h3>Earnings-based P/E vs market TTM</h3>}
+        {!embedded && <h2>Earnings-based P/E & PEG vs market TTM</h2>}
+        {embedded && <h3>Earnings-based P/E & PEG vs market TTM</h3>}
         <p className="muted small">
-          Consolidated PAT for the latest <strong>N</strong> quarters → annualised earnings →{' '}
-          <strong>market cap ÷ annualised PAT</strong>. Compare to verified{' '}
-          <strong>trailing P/E (TTM)</strong> and show discount or premium. Not fair value — see{' '}
-          <code>StockBook/QUARTERLY-RUN-RATE-PE.md</code>.
+          Consolidated PAT for the latest <strong>N</strong> quarters → annualised PAT →{' '}
+          <strong>earnings-based P/E</strong> (mcap ÷ annualised PAT) vs <strong>TTM P/E</strong>, plus{' '}
+          <strong>PEG</strong> (P/E ÷ growth %) on both multiples. Enter verified PAT when a quarter
+          is newly released (do not substitute last year&apos;s quarter). Not fair value —{' '}
+          <code>StockBook/QUARTERLY-RUN-RATE-PE.md</code> · <code>PEG-FRAMEWORK.md</code>.
         </p>
 
         <form onSubmit={submit} className="holding-form calculator-form">

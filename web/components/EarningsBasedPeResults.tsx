@@ -3,7 +3,9 @@
 import { useMemo, useState } from 'react';
 import type { EarningsBasedPeAnalysisResult } from '@/lib/earnings-based-pe-analysis';
 import {
+  computeEarningsBasedPegCompare,
   computeQuarterlyRunRatePe,
+  fmtPeg,
   type RunRateQuarterCount,
 } from '@/lib/pe-quarterly-run-rate';
 
@@ -28,8 +30,16 @@ interface EarningsBasedPeResultsProps {
   initial: EarningsBasedPeAnalysisResult;
 }
 
+function fmtPegPct(n: number | null): string {
+  if (n == null || !Number.isFinite(n)) return '—';
+  if (n < 0) return `${Math.abs(n).toFixed(1)}% discount`;
+  if (n > 0) return `${n.toFixed(1)}% premium`;
+  return '0% (aligned)';
+}
+
 export function EarningsBasedPeResults({ initial }: EarningsBasedPeResultsProps) {
   const [patOverrides, setPatOverrides] = useState<Record<string, string>>({});
+  const [growthOverride, setGrowthOverride] = useState<string>('');
 
   const analysis = useMemo(() => {
     const quarters = initial.quarters.map((q) => {
@@ -55,6 +65,22 @@ export function EarningsBasedPeResults({ initial }: EarningsBasedPeResultsProps)
       trailingEpsReference: null,
     });
 
+    const growthRaw = growthOverride.trim();
+    const epsGrowthPct =
+      growthRaw !== ''
+        ? parseFloat(growthRaw)
+        : initial.epsGrowthPct;
+    const growthValid =
+      epsGrowthPct != null && Number.isFinite(epsGrowthPct) && epsGrowthPct > 0
+        ? epsGrowthPct
+        : null;
+
+    const peg = computeEarningsBasedPegCompare(
+      computed.earningsBasedPe,
+      initial.ttmPe,
+      growthValid
+    );
+
     const currentPeDiscountPremiumPct = computed.currentPeDiscountPremiumPct;
     let conclusion = initial.conclusion;
     if (computed.earningsBasedPe != null && initial.ttmPe != null && currentPeDiscountPremiumPct != null) {
@@ -68,8 +94,13 @@ export function EarningsBasedPeResults({ initial }: EarningsBasedPeResultsProps)
       }
     }
 
-    return { ...initial, computed, quarters, conclusion };
-  }, [initial, patOverrides]);
+    let pegConclusion = initial.pegConclusion;
+    if (peg.ttmPeg != null && peg.earningsBasedPeg != null && growthValid != null) {
+      pegConclusion = `At ${growthValid}% EPS/PAT growth, market TTM PEG ${peg.ttmPeg.toFixed(2)} (${peg.ttmPegZone}) vs earnings-based PEG ${peg.earningsBasedPeg.toFixed(2)} (${peg.earningsBasedPegZone}). Same growth denominator — compare with P/E discount/premium above; PEG alone is not a buy rule.`;
+    }
+
+    return { ...initial, computed, quarters, conclusion, peg, pegConclusion, growthValid };
+  }, [initial, patOverrides, growthOverride]);
 
   const used = analysis.computed.usedQuarters;
 
@@ -77,7 +108,7 @@ export function EarningsBasedPeResults({ initial }: EarningsBasedPeResultsProps)
     <article className="card wide earnings-based-pe-report">
       <header className="earnings-based-pe-head">
         <h2>
-          {analysis.stockName} (NSE: {analysis.ticker}) — Earnings-based P/E
+          {analysis.stockName} (NSE: {analysis.ticker}) — Earnings-based P/E & PEG
         </h2>
         <p className="muted small">
           <strong>Calculation date:</strong> {analysis.calculationDate} ·{' '}
@@ -241,7 +272,78 @@ export function EarningsBasedPeResults({ initial }: EarningsBasedPeResultsProps)
       </section>
 
       <section>
-        <h3>6. Summary</h3>
+        <h3>6. PEG (same growth — both P/E lenses)</h3>
+        <p className="muted small">
+          PEG = P/E ÷ EPS growth (%). Uses one growth rate for TTM P/E and earnings-based P/E so you
+          can compare growth justification. Zones: 🟢 &lt;1 · 🟡 1–1.5 · 🟠 1.5–2.5 · 🔴 &gt;2.5 (
+          <code>PEG-FRAMEWORK.md</code>). Do not substitute missing quarter PAT with prior-year
+          earnings — enter verified PAT first (e.g. Q2 FY27 when released).
+        </p>
+        <label className="calc-run-rate-shares">
+          <span className="pe-eval-label">EPS / PAT growth % (for PEG)</span>
+          <input
+            type="number"
+            step="0.1"
+            min="0.1"
+            className="calc-run-rate-input"
+            value={growthOverride}
+            placeholder={
+              initial.epsGrowthPct != null
+                ? `Default ${initial.epsGrowthPct}% — ${initial.epsGrowthSource}`
+                : 'Enter growth %'
+            }
+            onChange={(e) => setGrowthOverride(e.target.value)}
+          />
+          <span className="muted small">
+            Source: {initial.epsGrowthSource} · {initial.epsGrowthEvidence}
+            {initial.patWindowGrowthPct != null && (
+              <> · PAT window YoY proxy {initial.patWindowGrowthPct}%</>
+            )}
+          </span>
+        </label>
+        <table className="calc-table">
+          <thead>
+            <tr>
+              <th>Measure</th>
+              <th>PEG</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A. Market TTM PEG</td>
+              <td>
+                {fmtPeg(analysis.peg.ttmPeg)} {analysis.peg.ttmPegZone}
+              </td>
+            </tr>
+            <tr>
+              <td>B. Earnings-based PEG</td>
+              <td>
+                <strong>
+                  {fmtPeg(analysis.peg.earningsBasedPeg)} {analysis.peg.earningsBasedPegZone}
+                </strong>
+              </td>
+            </tr>
+            <tr>
+              <td>C. Difference (TTM PEG − earnings-based PEG)</td>
+              <td>
+                {analysis.peg.pegDifference != null
+                  ? `${analysis.peg.pegDifference >= 0 ? '+' : ''}${analysis.peg.pegDifference.toFixed(2)}`
+                  : '—'}
+              </td>
+            </tr>
+            <tr>
+              <td>D. TTM PEG discount or premium vs earnings-based PEG</td>
+              <td>
+                <strong>{fmtPegPct(analysis.peg.pegDiscountPremiumPct)}</strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p className="muted small">{analysis.pegConclusion}</p>
+      </section>
+
+      <section>
+        <h3>7. Summary</h3>
         <table className="calc-table compact">
           <tbody>
             <tr>
@@ -261,8 +363,20 @@ export function EarningsBasedPeResults({ initial }: EarningsBasedPeResultsProps)
               <td>{fmtPe(analysis.ttmPe)}</td>
             </tr>
             <tr>
-              <th>TTM vs earnings-based</th>
+              <th>TTM vs earnings-based (P/E)</th>
               <td>{fmtPct(analysis.computed.currentPeDiscountPremiumPct)}</td>
+            </tr>
+            <tr>
+              <th>Market TTM PEG</th>
+              <td>
+                {fmtPeg(analysis.peg.ttmPeg)} {analysis.peg.ttmPegZone}
+              </td>
+            </tr>
+            <tr>
+              <th>Earnings-based PEG</th>
+              <td>
+                {fmtPeg(analysis.peg.earningsBasedPeg)} {analysis.peg.earningsBasedPegZone}
+              </td>
             </tr>
           </tbody>
         </table>
