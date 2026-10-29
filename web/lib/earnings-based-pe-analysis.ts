@@ -17,10 +17,15 @@ import {
   computeEarningsBasedPegCompare,
   computeQuarterlyRunRatePe,
   patGrowthPctFromQuarterWindow,
-  quarterlyRowsToRunRateInput,
   type EarningsBasedPegCompare,
   type RunRateQuarterCount,
 } from './pe-quarterly-run-rate';
+import { mergeQuarterlyPatSources } from './quarterly-pat-sources';
+import {
+  fetchTapetideQuarterlyPat,
+  fetchTapetideQuote,
+  isTapetideConfigured,
+} from './tapetide-client';
 
 export type EvidenceLabel = 'FACT' | 'UNVERIFIED' | 'OUR ASSUMPTION';
 
@@ -65,6 +70,10 @@ export interface EarningsBasedPeAnalysisResult {
   warnings: string[];
   limitations: string[];
   notes: string[];
+  sourceRank: import('./quarterly-pat-sources').PatSourceSnapshot[];
+  latestResultSource: string;
+  mergeNote: string;
+  tapetideConfigured: boolean;
 }
 
 function todayIsoDate(): string {
@@ -153,20 +162,27 @@ export async function runEarningsBasedPeAnalysis(
   const sector = loc?.sector ?? resolved.sector;
   const stockName = loc?.stock ?? resolved.company;
 
-  const [peEval, eq, yahooCap, liveCmp, mcapFallback, paramFile] = await Promise.all([
-    loadPeEvaluation(resolved.ticker, tenantId),
-    runEarningsQualityAnalysis({ ticker: resolved.ticker, tenantId }),
-    fetchYahooCapAndShares(resolved.ticker),
-    fetchLiveNseCmp(resolved.ticker).catch(() => null),
-    fetchMarketCapCr(resolved.ticker),
-    readStockTabContent(sector, stockName, 'parameters', tenantId),
-  ]);
+  const [peEval, eq, yahooCap, liveCmp, mcapFallback, paramFile, tapetideQ, tapetideFin] =
+    await Promise.all([
+      loadPeEvaluation(resolved.ticker, tenantId),
+      runEarningsQualityAnalysis({ ticker: resolved.ticker, tenantId }),
+      fetchYahooCapAndShares(resolved.ticker),
+      fetchLiveNseCmp(resolved.ticker).catch(() => null),
+      fetchMarketCapCr(resolved.ticker),
+      readStockTabContent(sector, stockName, 'parameters', tenantId),
+      fetchTapetideQuote(resolved.ticker),
+      fetchTapetideQuarterlyPat(resolved.ticker, 12),
+    ]);
 
   const parametersMd =
     paramFile?.content ?? getBundledParametersMd(resolved.ticker) ?? null;
 
-  let cmp: number | null = liveCmp?.price ?? peEval?.cmp ?? yahooCap.price ?? null;
-  let cmpSource = liveCmp?.source ?? peEval?.cmpSource ?? yahooCap.source;
+  let cmp: number | null =
+    liveCmp?.price ?? tapetideQ?.price ?? peEval?.cmp ?? yahooCap.price ?? null;
+  let cmpSource = liveCmp?.source ?? (tapetideQ?.price != null ? 'Tapetide quote' : peEval?.cmpSource ?? yahooCap.source);
+  if (tapetideQ?.price != null && liveCmp?.price == null) {
+    cmpSource = `Tapetide quote${tapetideQ.updatedAt ? ` · ${tapetideQ.updatedAt.slice(0, 10)}` : ''}`;
+  }
   let cmpDate: string | null = calculationDate;
 
   let marketCapCr = yahooCap.marketCapCr ?? mcapFallback;
@@ -185,23 +201,49 @@ export async function runEarningsBasedPeAnalysis(
   }
 
   const eqRows = eq?.quarterly ?? [];
-  const quarterInputs = quarterlyRowsToRunRateInput(eqRows);
-  const quarterRows: EarningsBasedPeQuarterRow[] = eqRows.map((r) => ({
+  const merged = mergeQuarterlyPatSources({
+    tapetide: tapetideFin?.quarters ?? null,
+    eqRows,
+    eqDataSource: eq?.dataSource ?? 'Earnings Quality module',
+    stockbookFact: Boolean(eq?.earningsQualityFile),
+  });
+
+  const quarterInputs = merged.inputs;
+  const quarterRows: EarningsBasedPeQuarterRow[] = merged.rows.map((r) => ({
     quarter: r.quarter,
-    patCr: r.pat,
-    source: eq?.dataSource ?? 'Earnings Quality module',
-    evidence: 'UNVERIFIED' as EvidenceLabel,
-    periodEnded: null,
-    announcedOn: null,
+    patCr: r.patCr,
+    source: r.source,
+    evidence: r.evidence,
+    periodEnded: r.periodEnded,
+    announcedOn: r.announcedOn,
   }));
 
-  const ttmPe = peEval?.ttmPe ?? liveCmp?.trailingPe ?? null;
+  const ttmCandidates: { pe: number; source: string; at: number }[] = [];
+  if (tapetideQ?.peTtm != null) {
+    ttmCandidates.push({
+      pe: tapetideQ.peTtm,
+      source: `Tapetide quote (pe_ttm)${tapetideQ.updatedAt ? ` · ${tapetideQ.updatedAt.slice(0, 10)}` : ''}`,
+      at: parseIso(tapetideQ.updatedAt ?? tapetideQ.asOf),
+    });
+  }
+  if (liveCmp?.trailingPe != null) {
+    ttmCandidates.push({
+      pe: liveCmp.trailingPe,
+      source: liveCmp.source,
+      at: parseIso(calculationDate),
+    });
+  }
+  if (peEval?.ttmPe != null) {
+    ttmCandidates.push({
+      pe: peEval.ttmPe,
+      source: `${peEval.cmpSource} / PARAMETERS`,
+      at: 0,
+    });
+  }
+  ttmCandidates.sort((a, b) => b.at - a.at);
+  const ttmPe = ttmCandidates[0]?.pe ?? null;
   const ttmPeSource =
-    peEval?.ttmPe != null
-      ? `${peEval.cmpSource} / PARAMETERS`
-      : liveCmp?.trailingPe != null
-        ? liveCmp.source
-        : 'Unavailable — verify on Moneycontrol / VRO';
+    ttmCandidates[0]?.source ?? 'Unavailable — verify on Moneycontrol / VRO / Tapetide';
 
   const computed = computeQuarterlyRunRatePe({
     cmp,
@@ -214,8 +256,10 @@ export async function runEarningsBasedPeAnalysis(
   });
 
   const warnings = [...computed.warnings];
-  if (eqRows.length === 0) {
-    warnings.push('No quarterly PAT in StockBook — add EARNINGS_QUALITY section D or refresh Earnings Quality tab.');
+  if (quarterRows.length === 0) {
+    warnings.push(
+      'No quarterly PAT — set TAPETIDE_TOKEN, add EARNINGS_QUALITY section D, or enter PAT manually.'
+    );
   }
   if (marketCapCr == null) {
     warnings.push('Market capitalisation could not be verified — earnings-based P/E may be incomplete.');
@@ -262,6 +306,16 @@ export async function runEarningsBasedPeAnalysis(
       'PEG not calculated — need verified EPS/PAT growth % > 0 and both P/E multiples.';
   }
 
+  const notes: string[] = [...computed.notes, merged.mergeNote];
+  if (!isTapetideConfigured()) {
+    notes.push(
+      'Tapetide not configured — set TAPETIDE_TOKEN in web/.env.local for priority latest quarterly P&L (developers.tapetide.com).'
+    );
+  }
+  if (tapetideFin?.patRowLabel) {
+    notes.push(`Tapetide PAT row: “${tapetideFin.patRowLabel}” (₹ cr) — verify consolidated vs standalone in filing.`);
+  }
+
   return {
     ticker: resolved.ticker,
     stockName: resolved.company,
@@ -298,6 +352,16 @@ export async function runEarningsBasedPeAnalysis(
     ),
     warnings,
     limitations,
-    notes: computed.notes,
+    notes,
+    sourceRank: merged.sourceRank,
+    latestResultSource: merged.latestResultSource,
+    mergeNote: merged.mergeNote,
+    tapetideConfigured: isTapetideConfigured(),
   };
+}
+
+function parseIso(iso: string | null | undefined): number {
+  if (!iso) return 0;
+  const t = Date.parse(iso);
+  return Number.isFinite(t) ? t : 0;
 }

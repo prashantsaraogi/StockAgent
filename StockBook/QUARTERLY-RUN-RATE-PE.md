@@ -3,6 +3,7 @@
 **Created:** 22 Oct 2026  
 **Purpose:** Compute **earnings run-rate P/E** from **verified consolidated PAT** (last *N* reported quarters), annualised, vs **conventional trailing P/E (TTM)** on quote sites.  
 **Web:** Stock Analysis → **P/E** tab → **Earnings-based P/E vs market TTM** (Calculate now)  
+**Live quarterly PAT (optional):** **Tapetide API** (`TAPETIDE_TOKEN` in `web/.env.local`) — priority over Yahoo/StockBook when `available_from` is newer · cross-check Moneycontrol/BSE for FACT consolidated PAT  
 **Cross-ref:** `PARAMETERS-FRAMEWORK.md` · `PE-EVALUATION-FRAMEWORK.md` · `EARNINGS-QUALITY-FRAMEWORK.md` · `web/lib/pe-quarterly-run-rate.ts`
 
 ---

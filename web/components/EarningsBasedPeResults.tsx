@@ -120,9 +120,36 @@ export function EarningsBasedPeResults({ initial }: EarningsBasedPeResultsProps)
       <section>
         <h3>1. Quarterly consolidated PAT</h3>
         <p className="muted small">
-          Replace UNVERIFIED PAT with filing figures (BSE/NSE consolidated PAT attributable to
-          owners). Do not substitute standalone headline profit when consolidated differs.
+          Source priority: <strong>Tapetide</strong> (if token set, uses{' '}
+          <code>available_from</code> per quarter) → StockBook Earnings Quality → Yahoo. Per quarter,
+          the newest publication date wins. Replace UNVERIFIED cells with BSE/NSE consolidated PAT;
+          do not substitute standalone headline when consolidated differs.
         </p>
+        {initial.sourceRank.length > 0 && (
+          <table className="calc-table compact">
+            <thead>
+              <tr>
+                <th>Feed</th>
+                <th>Latest publication</th>
+                <th>Quarters loaded</th>
+              </tr>
+            </thead>
+            <tbody>
+              {initial.sourceRank.map((s) => (
+                <tr key={s.id}>
+                  <td>
+                    {s.label}
+                    {s.id === 'tapetide' && initial.latestResultSource.startsWith('Tapetide') && (
+                      <span className="tag"> priority</span>
+                    )}
+                  </td>
+                  <td>{s.latestAt ? s.latestAt.slice(0, 10) : '—'}</td>
+                  <td>{s.quarterCount}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
         <div className="calc-run-rate-pe-table-wrap">
           <table className="calc-table">
             <thead>
