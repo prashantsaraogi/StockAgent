@@ -190,7 +190,7 @@ Prioritize names with new results or large book weight.`,
         categoryId: 'automated',
         title: 'Sector cap-tier market cap',
         description:
-          'Refresh Mcap ₹ cr for all Large / Mid / Small tables across 17 sector outlook files (Yahoo NSE).',
+          'Refresh Mcap ₹ cr for all Large / Mid / Small tables across 18 sector outlook files (Yahoo NSE).',
         cadence: 'weekly',
         actionType: 'api',
         apiAction: 'refresh-sector-mcap',
@@ -301,12 +301,12 @@ Merge same-day summary.md · update TICKER-INDEX.`,
     id: 'industry',
     label: 'Industry & sector outlook',
     description:
-      'Industry Growth clusters: **Healthcare & Medical** (hospitals · pharma · CDMO), **Banking & Finance** (overview + banks/NBFC/insurance/AMC), **Technology**, **Industrials**, **Consumer/Auto**, **Energy** — each with sub-sector scorecards.',
+      'Industry Growth clusters: **Healthcare & Medical** (hospitals · pharma · CDMO), **Banking & Finance** (overview + banks/NBFC/insurance/AMC), **Technology**, **Industrials**, **Consumer/Auto**, **Energy**, **Chemicals** — each with sub-sector scorecards.',
     services: [
       {
         id: 'refresh-all-sector-scores',
         categoryId: 'industry',
-        title: 'Re-score all 17 sectors (6 parameters)',
+        title: 'Re-score all 18 sectors (6 parameters)',
         description:
           'Agent researches Growth, Profitability, India Structural, Capacity, Capital Quality, Risk/Valuation — updates all sector-outlook.md files (classic + thematic).',
         cadence: 'weekly',
@@ -314,7 +314,7 @@ Merge same-day summary.md · update TICKER-INDEX.`,
         channel: 'cursor',
         estimatedDuration: '20–40 min',
         statusField: 'sectorScores',
-        prompt: `Refresh all 17 sector outlook scores — run StockBook/SECTOR-OUTLOOK-FRAMEWORK.md end-to-end.
+        prompt: `Refresh all 18 sector outlook scores — run StockBook/SECTOR-OUTLOOK-FRAMEWORK.md end-to-end.
 
 For each sector in SECTOR-OUTLOOK-INDEX.md:
 1. Live-search latest sector KPIs, policy, peer results (analysis date = today)

@@ -1,7 +1,7 @@
 # Earnings Quality — HEROMOTOCO (Hero MotoCorp)
 
-**Last updated:** 2026-10-08  
-**Sources:** Q1 FY27 results (6 Aug 2026) · FY26 annual · SIAM · FACT where filed
+**Last updated:** 2026-10-29  
+**Sources:** Q2 FY27 results (28 Oct 2026) · Q1 FY27 (6 Aug 2026) · FY26 annual · SIAM · FACT where filed
 
 ---
 
@@ -71,9 +71,11 @@
 | Q3 FY26 | 11450 | 1630 | 14.2 | 1040 | 52.0 | — |
 | Q4 FY26 | 12100 | 1710 | 14.1 | 1120 | 56.0 | — |
 | Q1 FY27 | 12450 | 1656 | 13.3 | 1454 | 72.7 | — |
+| Q2 FY27 | 14971 | 1968 | 13.4 | 1861 | 93.1 | — |
 
 **Notes:**
 
+- Q2 FY27 consolidated PAT **₹1,861 cr** (press release **₹1,861.3 cr**), revenue **₹14,971 cr**: **FACT** — BSE/NSE outcome 28 Oct 2026; includes **₹397 cr** associate equity-consolidation gain (read normalized PAT for run-rate)
 - Q1 FY27 revenue, PAT, margin **13.3%**: **FACT** — results 6 Aug 2026; standalone PAT +29% YoY; consolidated PAT −17% on labour-code exceptional
 - Q2 FY25–Q4 FY26: **HYPOTHESIS** — interpolated from FY25/FY26 trajectory; refresh on exchange filings
 - Revenue/EBITDA/PAT for interim quarters rounded for margin tab — replace with filed numbers when available

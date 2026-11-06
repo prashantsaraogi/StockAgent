@@ -199,7 +199,7 @@ Never use dividend yield on CMP as primary metric for existing holders.`,
         id: 'industry-growth-clusters',
         title: 'Industry Growth — cluster map (web)',
         description:
-          'Web `/industry-analysis` groups outlooks: Healthcare & Medical · Banking & Finance · Technology · Industrials · Consumer/Auto · Energy.',
+          'Web `/industry-analysis` groups outlooks: Healthcare & Medical · Banking & Finance · Technology · Industrials · Consumer/Auto · Energy · Chemicals.',
         prompt: `Industry Growth cluster refresh — web \`/industry-analysis\`.
 
 Groups live in \`web/lib/industry-sector-groups.ts\`. Each card = one \`*-sector-outlook.md\` (6-parameter score + cap tiers).

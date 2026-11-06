@@ -10,7 +10,7 @@ import { fetchLiveNseCmp, resolveNseSymbol } from './nse-cmp';
 import { resolveStock } from './stock-search';
 import { fetchYahooQuoteSummary } from './yahoo-finance-session';
 import { parseParametersEpsCagrBasePct } from './parameters-assumptions';
-import { getBundledParametersMd } from './load-bundled-stockbook';
+import { getBundledEarningsQualityMd, getBundledParametersMd } from './load-bundled-stockbook';
 import { readStockTabContent } from './content';
 import { getStockbookByTicker } from './stockbook-index';
 import {
@@ -73,7 +73,15 @@ export interface EarningsBasedPeAnalysisResult {
   sourceRank: import('./quarterly-pat-sources').PatSourceSnapshot[];
   latestResultSource: string;
   mergeNote: string;
+  staleStockbookWarning: string | null;
+  latestQuarterInTable: string | null;
   tapetideConfigured: boolean;
+}
+
+function parseStockbookLastUpdated(eqMd: string | null | undefined): string | null {
+  if (!eqMd) return null;
+  const m = eqMd.match(/\*\*Last updated:\*\*\s*(\d{4}-\d{2}-\d{2})/i);
+  return m?.[1] ?? null;
 }
 
 function todayIsoDate(): string {
@@ -171,7 +179,7 @@ export async function runEarningsBasedPeAnalysis(
       fetchMarketCapCr(resolved.ticker),
       readStockTabContent(sector, stockName, 'parameters', tenantId),
       fetchTapetideQuote(resolved.ticker),
-      fetchTapetideQuarterlyPat(resolved.ticker, 12),
+      fetchTapetideQuarterlyPat(resolved.ticker, 16),
     ]);
 
   const parametersMd =
@@ -201,11 +209,16 @@ export async function runEarningsBasedPeAnalysis(
   }
 
   const eqRows = eq?.quarterly ?? [];
+  const eqMdBundled = getBundledEarningsQualityMd(resolved.ticker);
+  const eqFileLastUpdated = parseStockbookLastUpdated(eqMdBundled);
+
   const merged = mergeQuarterlyPatSources({
     tapetide: tapetideFin?.quarters ?? null,
     eqRows,
     eqDataSource: eq?.dataSource ?? 'Earnings Quality module',
     stockbookFact: Boolean(eq?.earningsQualityFile),
+    stockbookLastUpdated: eqFileLastUpdated,
+    calculationDate,
   });
 
   const quarterInputs = merged.inputs;
@@ -256,6 +269,14 @@ export async function runEarningsBasedPeAnalysis(
   });
 
   const warnings = [...computed.warnings];
+  if (merged.staleStockbookWarning) {
+    warnings.push(merged.staleStockbookWarning);
+  }
+  if (merged.latestQuarterInTable && merged.staleStockbookWarning) {
+    warnings.push(
+      `Table ends at ${merged.latestQuarterInTable}. After results day: paste new consolidated PAT below or push StockBook EARNINGS_QUALITY update + Vercel redeploy.`
+    );
+  }
   if (quarterRows.length === 0) {
     warnings.push(
       'No quarterly PAT — set TAPETIDE_TOKEN, add EARNINGS_QUALITY section D, or enter PAT manually.'
@@ -309,7 +330,7 @@ export async function runEarningsBasedPeAnalysis(
   const notes: string[] = [...computed.notes, merged.mergeNote];
   if (!isTapetideConfigured()) {
     notes.push(
-      'Tapetide not configured — set TAPETIDE_TOKEN in web/.env.local for priority latest quarterly P&L (developers.tapetide.com).'
+      'Tapetide not configured — set TAPETIDE_TOKEN (Vercel env or web/.env.local) for latest quarterly P&L (developers.tapetide.com).'
     );
   }
   if (tapetideFin?.patRowLabel) {
@@ -322,7 +343,7 @@ export async function runEarningsBasedPeAnalysis(
     exchange: 'NSE',
     calculationDate,
     quarterCount,
-    quarters: quarterRows.slice(-Math.max(quarterRows.length, quarterCount)),
+    quarters: quarterRows,
     sumPatCr: computed.sumPatCr,
     annualisedPatCr: computed.annualisedPatCr,
     cmp,
@@ -356,6 +377,8 @@ export async function runEarningsBasedPeAnalysis(
     sourceRank: merged.sourceRank,
     latestResultSource: merged.latestResultSource,
     mergeNote: merged.mergeNote,
+    staleStockbookWarning: merged.staleStockbookWarning,
+    latestQuarterInTable: merged.latestQuarterInTable,
     tapetideConfigured: isTapetideConfigured(),
   };
 }

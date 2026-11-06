@@ -81,6 +81,13 @@ export const INDUSTRY_SECTOR_GROUPS: IndustrySectorGroupDef[] = [
     intro: 'Oil, gas, OMC cycle, and energy-linked policy (RBI / geopolitical transmission).',
     members: [{ slug: 'oil-gas', cardLabel: 'Oil & gas' }],
   },
+  {
+    id: 'chemicals',
+    title: 'Chemicals',
+    intro:
+      'Specialty chemicals, agrochemicals, and industrial intermediates — cyclical spreads, China supply, and export-linked niches.',
+    members: [{ slug: 'chemicals', cardLabel: 'Chemicals & specialty' }],
+  },
 ];
 
 const SLUG_TO_GROUP = new Map<string, IndustrySectorGroupDef>();

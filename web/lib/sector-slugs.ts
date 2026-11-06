@@ -27,6 +27,7 @@ export const SECTOR_OUTLOOK_PATHS: Record<string, string> = {
     'StockBook/Aerospace and Space/aerospace-space-sector-outlook.md',
   'hv-grid-equipment':
     'StockBook/HV Grid Equipment/hv-grid-equipment-sector-outlook.md',
+  chemicals: 'StockBook/Chemical/chemicals-sector-outlook.md',
 };
 
 /** Display labels where slug → title is not obvious */
@@ -45,6 +46,7 @@ export const SECTOR_SLUG_LABELS: Record<string, string> = {
   'banking-finance-amc': 'AMC',
   'oil-gas': 'Oil & Gas',
   'hotels-leisure': 'Hotels & Leisure',
+  chemicals: 'Chemicals',
 };
 
 export function sectorSlugFromOutlookPath(path: string): string | null {

@@ -115,6 +115,21 @@ export function EarningsBasedPeResults({ initial }: EarningsBasedPeResultsProps)
           <strong>Quarters:</strong> latest {analysis.quarterCount} reported ·{' '}
           <strong>Currency:</strong> INR (₹)
         </p>
+        {!initial.tapetideConfigured && (
+          <p className="calc-run-rate-warn">
+            <strong>Stale-data risk:</strong> Tapetide is not configured — PAT often comes from Yahoo /
+            StockBook and can lag ChatGPT (which uses live web search). Add{' '}
+            <code>TAPETIDE_TOKEN</code> in Vercel → Settings → Environment Variables (then redeploy), or
+            in <code>web/.env.local</code> locally — or paste
+            consolidated PAT from BSE/Moneycontrol into the table below after each results day.
+          </p>
+        )}
+        {initial.tapetideConfigured && (
+          <p className="muted small">
+            Live fetch: Tapetide + NSE on each <strong>Calculate now</strong> (no 5‑min cache). Still
+            cross-check consolidated PAT vs exchange filing — label FACT before acting.
+          </p>
+        )}
       </header>
 
       <section>
@@ -410,6 +425,12 @@ export function EarningsBasedPeResults({ initial }: EarningsBasedPeResultsProps)
         <p className="earnings-based-pe-conclusion">{analysis.conclusion} </p>
       </section>
 
+      {initial.latestQuarterInTable && (
+        <p className="muted small">
+          Latest quarter in merged table: <strong>{initial.latestQuarterInTable}</strong>
+          {initial.staleStockbookWarning ? ` — ${initial.staleStockbookWarning}` : ''}
+        </p>
+      )}
       {analysis.warnings.length > 0 && (
         <ul className="earnings-based-pe-warnings">
           {analysis.warnings.map((w) => (

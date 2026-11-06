@@ -45,6 +45,7 @@
 | **Specialty Pharma CDMO** | [specialty-pharma-cdmo-sector-outlook.md](Specialty%20Pharma%20CDMO/specialty-pharma-cdmo-sector-outlook.md) | **Scored** | 2026-09-15 | 2026-09-22 |
 | **Aerospace and Space** | [aerospace-space-sector-outlook.md](Aerospace%20and%20Space/aerospace-space-sector-outlook.md) | **Scored** | 2026-09-15 | 2026-09-22 |
 | **HV Grid Equipment** | [hv-grid-equipment-sector-outlook.md](HV%20Grid%20Equipment/hv-grid-equipment-sector-outlook.md) | **Scored** | 2026-09-15 | 2026-09-22 |
+| **Chemicals** | [chemicals-sector-outlook.md](Chemical/chemicals-sector-outlook.md) | **Scored** | 2026-11-06 | 2026-11-13 |
 
 **Comparative-rank siblings (surplus rank — separate cadence):**  
 `fmcg-comparative-rank.md` · `healthcare-comparative-rank.md` · `pharma-comparative-rank.md` · `banking-finance-comparative-rank.md` · `oil-gas-comparative-rank.md` · `data-centre-beneficiaries-comparative-rank.md` (legacy — cross-ref AI DC) · **`precision-engineering-comparative-rank.md`** · **`ai-data-centre-infrastructure-comparative-rank.md`** · **`semiconductor-electronics-comparative-rank.md`** · **`specialty-pharma-cdmo-comparative-rank.md`** · **`aerospace-space-comparative-rank.md`** · **`hv-grid-equipment-comparative-rank.md`**

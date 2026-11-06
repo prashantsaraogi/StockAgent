@@ -45,7 +45,7 @@ async function tapetideGet<T>(path: string, query?: Record<string, string>): Pro
     const res = await fetch(url.toString(), {
       headers: { Authorization: `Bearer ${bearer}`, Accept: 'application/json' },
       signal: AbortSignal.timeout(25_000),
-      next: { revalidate: 300 },
+      cache: 'no-store',
     });
     if (!res.ok) return null;
     const json = (await res.json()) as { data?: unknown; meta?: { as_of?: string } };

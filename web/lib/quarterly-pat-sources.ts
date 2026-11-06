@@ -5,6 +5,12 @@
 import type { QuarterlyRow } from './earnings-quality';
 import type { TapetideQuarterPat } from './tapetide-client';
 import type { RunRateQuarterInput } from './pe-quarterly-run-rate';
+import {
+  compareFiscalQuarterLabels,
+  formatFiscalQuarter,
+  parseFiscalQuarter,
+} from './fiscal-quarter-sort';
+
 type EvidenceLabel = 'FACT' | 'UNVERIFIED' | 'OUR ASSUMPTION';
 
 export interface PatSourceSnapshot {
@@ -49,11 +55,13 @@ type CellCandidate = {
   availableFrom: string | null;
   evidence: EvidenceLabel;
   periodEnded: string | null;
+  displayQuarter: string;
 };
 
-/** Normalise period label for loose matching (Tapetide vs EQ FY labels). */
-function periodKey(label: string): string {
-  return label.trim().toLowerCase().replace(/\s+/g, ' ');
+function fiscalSlotKey(label: string): string | null {
+  const p = parseFiscalQuarter(label);
+  if (!p) return null;
+  return formatFiscalQuarter(p.fy, p.q);
 }
 
 export function mergeQuarterlyPatSources(input: {
@@ -61,14 +69,19 @@ export function mergeQuarterlyPatSources(input: {
   eqRows: QuarterlyRow[];
   eqDataSource: string;
   stockbookFact?: boolean;
+  stockbookLastUpdated?: string | null;
+  calculationDate?: string;
 }): {
   rows: MergedQuarterPatRow[];
   inputs: RunRateQuarterInput[];
   sourceRank: PatSourceSnapshot[];
   latestResultSource: string;
   mergeNote: string;
+  latestQuarterInTable: string | null;
+  staleStockbookWarning: string | null;
 } {
   const snapshots: PatSourceSnapshot[] = [];
+  const stockbookUpdatedMs = parseIsoTime(input.stockbookLastUpdated);
 
   if (input.tapetide?.length) {
     snapshots.push({
@@ -84,36 +97,57 @@ export function mergeQuarterlyPatSources(input: {
     snapshots.push({
       id: isYahoo ? 'yahoo' : 'stockbook',
       label: isYahoo ? 'Yahoo Finance (.NS)' : `StockBook / ${input.eqDataSource}`,
-      latestAt: null,
+      latestAt: input.stockbookLastUpdated ?? null,
       quarterCount: input.eqRows.length,
     });
   }
 
   snapshots.sort((a, b) => parseIsoTime(b.latestAt) - parseIsoTime(a.latestAt));
 
-  const byPeriod = new Map<string, CellCandidate>();
+  const bySlot = new Map<string, CellCandidate>();
 
   const upsert = (period: string, cand: CellCandidate) => {
-    const key = periodKey(period);
-    const prev = byPeriod.get(key);
+    const slot = fiscalSlotKey(period) ?? period.trim().toLowerCase();
+    const prev = bySlot.get(slot);
     if (!prev) {
-      byPeriod.set(key, cand);
+      bySlot.set(slot, cand);
       return;
     }
     const tNew = parseIsoTime(cand.availableFrom);
     const tOld = parseIsoTime(prev.availableFrom);
+
     if (tNew > tOld) {
-      byPeriod.set(key, cand);
+      bySlot.set(slot, cand);
       return;
     }
-    if (tNew === tOld && tNew === 0) {
+    if (tNew > 0 && tOld === 0 && prev.sourceId === 'stockbook') {
+      bySlot.set(slot, cand);
+      return;
+    }
+    if (tNew === tOld) {
       const rank = (id: PatSourceSnapshot['id']) =>
         id === 'tapetide' ? 3 : id === 'stockbook' ? 2 : 1;
-      if (rank(cand.sourceId) > rank(prev.sourceId)) byPeriod.set(key, cand);
+      if (rank(cand.sourceId) > rank(prev.sourceId)) bySlot.set(slot, cand);
     }
   };
 
+  const isYahoo = /yahoo/i.test(input.eqDataSource);
+
+  for (const q of input.eqRows) {
+    upsert(q.quarter, {
+      sourceId: isYahoo ? 'yahoo' : 'stockbook',
+      sourceLabel: isYahoo ? 'Yahoo Finance' : input.eqDataSource,
+      patCr: q.pat,
+      availableFrom: input.stockbookLastUpdated ?? null,
+      evidence: input.stockbookFact && !isYahoo ? 'FACT' : 'UNVERIFIED',
+      periodEnded: q.quarter,
+      displayQuarter: q.quarter,
+    });
+  }
+
   for (const q of input.tapetide ?? []) {
+    const slot = fiscalSlotKey(q.period);
+    const display = slot ?? q.period;
     upsert(q.period, {
       sourceId: 'tapetide',
       sourceLabel: 'Tapetide API',
@@ -121,44 +155,22 @@ export function mergeQuarterlyPatSources(input: {
       availableFrom: q.availableFrom,
       evidence: 'UNVERIFIED',
       periodEnded: q.period,
+      displayQuarter: display.includes('FY') ? display : q.period,
     });
   }
 
-  for (const q of input.eqRows) {
-    const isYahoo = /yahoo/i.test(input.eqDataSource);
-    upsert(q.quarter, {
-      sourceId: isYahoo ? 'yahoo' : 'stockbook',
-      sourceLabel: isYahoo ? 'Yahoo Finance' : input.eqDataSource,
-      patCr: q.pat,
-      availableFrom: null,
-      evidence: input.stockbookFact && !isYahoo ? 'FACT' : 'UNVERIFIED',
-      periodEnded: q.quarter,
-    });
-  }
+  const mergedCells = [...bySlot.values()].sort((a, b) =>
+    compareFiscalQuarterLabels(a.displayQuarter, b.displayQuarter)
+  );
 
-  const orderedPeriods: string[] = [];
-  for (const q of input.tapetide ?? []) {
-    if (!orderedPeriods.some((p) => periodKey(p) === periodKey(q.period))) {
-      orderedPeriods.push(q.period);
-    }
-  }
-  for (const q of input.eqRows) {
-    if (!orderedPeriods.some((p) => periodKey(p) === periodKey(q.quarter))) {
-      orderedPeriods.push(q.quarter);
-    }
-  }
-
-  const rows: MergedQuarterPatRow[] = orderedPeriods.map((period) => {
-    const cell = byPeriod.get(periodKey(period));
-    return {
-      quarter: period,
-      patCr: cell?.patCr ?? null,
-      source: cell?.sourceLabel ?? '—',
-      evidence: cell?.evidence ?? 'UNVERIFIED',
-      periodEnded: cell?.periodEnded ?? period,
-      announcedOn: cell?.availableFrom ?? null,
-    };
-  });
+  const rows: MergedQuarterPatRow[] = mergedCells.map((cell) => ({
+    quarter: cell.displayQuarter,
+    patCr: cell.patCr,
+    source: cell.sourceLabel,
+    evidence: cell.evidence,
+    periodEnded: cell.periodEnded,
+    announcedOn: cell.availableFrom,
+  }));
 
   const inputs: RunRateQuarterInput[] = rows.map((r) => ({
     quarter: r.quarter,
@@ -166,12 +178,44 @@ export function mergeQuarterlyPatSources(input: {
     eps: null,
   }));
 
+  const latestQuarterInTable = rows.length ? rows[rows.length - 1].quarter : null;
+  const tapetideLatest = maxAvailableFrom(input.tapetide ?? []);
+  let staleStockbookWarning: string | null = null;
+
+  if (
+    input.stockbookFact &&
+    tapetideLatest &&
+    stockbookUpdatedMs > 0 &&
+    parseIsoTime(tapetideLatest) > stockbookUpdatedMs
+  ) {
+    staleStockbookWarning =
+      `StockBook file is older than Tapetide (file ${input.stockbookLastUpdated?.slice(0, 10) ?? '—'} vs Tapetide publication ${tapetideLatest.slice(0, 10)}). Tapetide wins overlapping quarters — refresh EARNINGS_QUALITY after results.`;
+  }
+
+  const calcMs = parseIsoTime(input.calculationDate);
+  if (latestQuarterInTable && calcMs > 0) {
+    const latestAnn = rows[rows.length - 1].announcedOn;
+    if (latestAnn && calcMs - parseIsoTime(latestAnn) > 45 * 86400000) {
+      staleStockbookWarning =
+        (staleStockbookWarning ? staleStockbookWarning + ' ' : '') +
+        `Latest quarter in table (${latestQuarterInTable}) may be stale vs today — paste new PAT after results or redeploy after StockBook update.`;
+    }
+  }
+
   const top = snapshots[0];
   const latestResultSource = top?.label ?? 'Manual / none';
   const mergeNote =
     snapshots.length === 0
       ? 'No automated quarterly PAT — enter values manually or set TAPETIDE_TOKEN.'
-      : `Per quarter: newest publication date wins; tie-break Tapetide → StockBook → Yahoo. Overall freshest feed: ${latestResultSource}${top?.latestAt ? ` (latest publication ${top.latestAt.slice(0, 10)})` : ''}. Cross-check consolidated PAT vs BSE/NSE before FACT.`;
+      : `Quarters sorted FY order. Per slot: newest publication wins; Tapetide over StockBook when Tapetide has a newer available_from. Freshest feed: ${latestResultSource}${top?.latestAt ? ` (${String(top.latestAt).slice(0, 10)})` : ''}. After results day, update StockBook or paste PAT — providers lag 0–2 days.`;
 
-  return { rows, inputs, sourceRank: snapshots, latestResultSource, mergeNote };
+  return {
+    rows,
+    inputs,
+    sourceRank: snapshots,
+    latestResultSource,
+    mergeNote,
+    latestQuarterInTable,
+    staleStockbookWarning,
+  };
 }
